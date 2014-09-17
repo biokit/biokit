@@ -17,7 +17,9 @@
 __version__ = '0.0.1'
 
 from . import viz
+from . import services
 #from . import sequence
 #from . import data
 #from . import io
 
+from .services import EUtils, KEGG, UniProt

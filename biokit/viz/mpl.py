@@ -17,9 +17,9 @@ def imshow(data, interpolation='None', cmap='hot', tight_layout=True,
     if fontsize_y == None:
         fontsize_y = 16 #FIXME use default values
     pylab.yticks(range(0, len(data.index)), data.index, 
-            fontsize=fontsize_x)
+            fontsize=fontsize_y)
     pylab.xticks(range(0, len(data.columns[:])), data.columns, 
-            fontsize=fontsize_y, rotation=90)
+            fontsize=fontsize_x, rotation=90)
 
     if colorbar is True:
         pylab.colorbar()

@@ -3,4 +3,4 @@ from .mpl import *
 
 
 
-
+from . import heatmap
