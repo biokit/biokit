@@ -3,6 +3,7 @@ import pandas as pd
 
 __all__ = ['imshow']
 
+
 def imshow(data, interpolation='None', cmap='hot', tight_layout=True,
         colorbar=True, fontsize_x=None, fontsize_y=None, rotation_x=90, **kargs):
     """wrapper around imshow to plot a dataframe
@@ -38,7 +39,5 @@ def imshow(data, interpolation='None', cmap='hot', tight_layout=True,
 
 
 
-def heatmap(df):
-    raise NotImplementedError
 
 

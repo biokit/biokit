@@ -20,6 +20,17 @@ import colormap
 __all__ = ['heatmap', 'Heatmap']
 
 
+def get_heatmap_df():
+    """a simple example to play with and perform test"""
+    import pandas as pd
+    df = pd.DataFrame(
+            {'A':[1,0,1,1],
+             'B':[.9,0.1,.6,1],
+             'C':[.5,.2,0,1],
+             'D':[.5,.2,0,1]})
+    return df
+
+
 def heatmap(data, *args, **kargs):
     """alias to Heatmap class"""
     h = Heatmap(data, *args, **kargs)

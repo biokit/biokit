@@ -50,8 +50,6 @@ def scatter_hist(x, y=None,
 
         except Exception as err:
             raise(err)
-            x = x[0]
-            y = x[1]
 
     if kargs.get("hold", False) is False:
         pylab.clf()
