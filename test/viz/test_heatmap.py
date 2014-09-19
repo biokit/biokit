@@ -1,5 +1,5 @@
-from biokit.viz import heatmap
-from biokit.data.viz.heatmap_sample import load_heatmap_sample
+#from biokit.viz import heatmap
+#from biokit.data.viz.heatmap_sample import load_heatmap_sample
 
 
 
