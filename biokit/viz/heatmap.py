@@ -9,13 +9,10 @@ import pylab
 import scipy.cluster.hierarchy as hierarchy
 import scipy.spatial.distance as distance
 import numpy as np # get rid of this dependence
+
 import easydev
 import colormap
 
-
-
-
-###############################################################################
 
 __all__ = ['heatmap', 'Heatmap']
 
@@ -60,7 +57,7 @@ class Heatmap(object):
 
         :param data: a dataframe or possibly a numpy matrix.
 
-        .. todo:: if ow_method id none, no ordering in the dendogram
+        .. todo:: if row_method id none, no ordering in the dendogram
 
         """
         # should be a copy since it is reshuffled ?
@@ -80,6 +77,7 @@ class Heatmap(object):
         self._row_metric = row_metric
 
         # some default parameters
+        self.cluster_criterion = 'distance'
         self.params = easydev.AttrDict()
         self.params.col_side_colors = ['r', 'g', 'b', 'y', 'w', 'k', 'm']
         self.params.row_side_colors = ['r', 'g', 'b', 'y', 'w', 'k', 'm']
@@ -143,9 +141,11 @@ class Heatmap(object):
     row_metric = property(_get_row_metric, _set_row_metric)
 
     def plot(self, num=1, cmap="heat", colorbar=True, vmin=None,
-             vmax=None, colorbar_position='right'):
+             vmax=None, colorbar_position='right', gradient_span='None'):
         """
 
+
+        :param gradient_span: None is default in R
         using
 
             df = pd.DataFrame({'A':[1,0,1,1],
@@ -162,9 +162,23 @@ class Heatmap(object):
             df = data.frame(A=c(1,0,1,1), B=c(.9,.1,.6,1), C=c(.5,.2,0,1), D=c(.5,.2,0,1))
             heatmap((as.matrix(df)), scale='none')
 
+
+        .. todo:: right now, the order of cols and rows is random somehow.
+            could be ordered like in heatmap (r) byt mean of the row and col
+            or with a set of vector for col and rows.
+
+            heatmap((as.matrix(df)), Rowv=c(3,2), Colv=c(1), scale='none')
+
+            gives same as::
+
+                df = get_heatmap_df()
+                h = heatmap.Heatmap(df)
+                h.plot(vmin=-0, vmax=1.1)
+
         """
         # save all parameters in a dict
         layout = {}
+
         cmap = colormap.get_cmap(cmap)
 
         # keep track of row and column names for later.
@@ -181,18 +195,17 @@ class Heatmap(object):
 
 
         # scaling min/max range
-        self.gradient_span  = 'None' #'only_max'
+        self.gradient_span  = gradient_span #'only_max'
         # min_to_max, min_to_max_centered, only_max, only_min
-        if vmin == None:
-            vmin = self.frame.min().min()
-        if vmax == None:
-            vmax = self.frame.max().max()
+
         if self.gradient_span == 'min_to_max_centered':
             vmax = max([vmax, abs(vmin)])
             vmin = vmax * -1
         if self.gradient_span == 'only_max':
             vmin = 0
+            vmax = self.frame.max().max()
         if self.gradient_span == 'only_min':
+            vmin = self.frame.min().min()
             vmax = 0
         norm = matplotlib.colors.Normalize(vmin, vmax)
 
@@ -200,24 +213,25 @@ class Heatmap(object):
         fig = pylab.figure(num=num, figsize=(12, 8))
         fig.clf()
 
-        # ax1, placement of dendrogram 1, on the left of the heatmap
-        ### The second value controls the position of the matrix relative to the bottom of the view
+
+        # LAYOUT --------------------------------------------------
+        # ax1 (dendrogram 1) on the left of the heatmap
         [ax1_x, ax1_y, ax1_w, ax1_h] = [0.05, 0.22, 0.2, 0.6]
         width_between_ax1_axr = 0.004
-        ### distance between the top color bar axis and the matrix
+        # distance between the top color bar axis and the matrix
         height_between_ax1_axc = 0.004
-        ### Sufficient size to show
+        # Sufficient size to show
         color_bar_w = 0.015
 
-        # axr, placement of row side colorbar #
-        ### second to last controls the width of the side color bar - 0.015 when showing
+        # axr, placement of row side colorbar
+        # second to last controls the width of the side color bar - 0.015 when showing
         [axr_x, axr_y, axr_w, axr_h] = [0.31, 0.1, color_bar_w, 0.6]
         axr_x = ax1_x + ax1_w + width_between_ax1_axr
         axr_y = ax1_y; axr_h = ax1_h
         width_between_axr_axm = 0.004
 
         # axc, placement of column side colorbar #
-        ### last one controls the hight of the top color bar - 0.015 when showing
+        # last one controls the hight of the top color bar - 0.015 when showing
         [axc_x, axc_y, axc_w, axc_h] = [0.4, 0.63, 0.5, color_bar_w]
         axc_x = axr_x + axr_w + width_between_axr_axm
         axc_y = ax1_y + ax1_h + height_between_ax1_axc
@@ -229,8 +243,7 @@ class Heatmap(object):
         axm_y = ax1_y; axm_h = ax1_h
         axm_w = axc_w
 
-        # ax2, placement of dendrogram 2, on the top of the heatmap #
-        ### last one controls hight of the dendrogram
+        # ax2 (dendrogram 2), on the top of the heatmap #
         [ax2_x, ax2_y, ax2_w, ax2_h] = [0.3, 0.72, 0.6, 0.15]
         ax2_x = axr_x + axr_w + width_between_axr_axm
         ax2_y = ax1_y + ax1_h + height_between_ax1_axc + axc_h + height_between_axc_ax2
@@ -242,59 +255,56 @@ class Heatmap(object):
         elif colorbar_position == 'right':
             [axcb_x, axcb_y, axcb_w, axcb_h] = [0.85, 0.2, 0.08, 0.6]
 
-        # Compute and plot top dendrogram #
+        # COMPUTATION DENDOGRAM 1 -------------------------------------
         if self.column_method:
-            #d2 = distance.pdist(self.frame.transpose())
-            #D2 = distance.squareform(d2)
-            #Y2 = hierarchy.linkage(D2, method=self.column_method, metric=self.column_metric)
-            Y2 = self.get_linkage(self.frame.transpose(),self.column_method,
+            Y = self.get_linkage(self.frame.transpose(),self.column_method,
                                   self.column_metric )
             ax2 = fig.add_axes([ax2_x, ax2_y, ax2_w, ax2_h], frame_on=True)
-            Z2 = hierarchy.dendrogram(Y2)
-            ind2 = hierarchy.fcluster(Y2, 0.7*max(Y2[:,2]), 'distance')
+            Z = hierarchy.dendrogram(Y)
+            ind2 = hierarchy.fcluster(Y, 0.7*max(Y[:,2]), self.cluster_criterion)
 
             ax2.set_xticks([])
             ax2.set_yticks([])
-            ### apply the clustering for the array-dendrograms to the actual matrix data
-            idx2 = Z2['leaves']
+            # apply the clustering for the array-dendrograms to the actual matrix data
+            idx2 = Z['leaves']
             self.frame = self.frame.iloc[:,idx2]
-            ### reorder the flat cluster to match the order of the leaves the dendrogram
+            # reorder the flat cluster to match the order of the leaves the dendrogram
             ind2 = ind2[idx2]
+            layout['dendogram2'] = ax2
         else:
             idx2 = range(self.frame.shape[1])
 
-        # Compute and plot left dendrogram #
+        # COMPUTATION DENDOGRAM 2 ---------------------------------
         if self.row_method:
-            d1 = distance.pdist(self.frame)
-            D1 = distance.squareform(d1)
-            Y1 = hierarchy.linkage(D1, method=self.row_method, metric=self.row_metric)
+            Y = self.get_linkage(self.frame,self.row_method,
+                                  self.row_metric )
+
             ax1 = fig.add_axes([ax1_x, ax1_y, ax1_w, ax1_h], frame_on=True)
-            Z1 = hierarchy.dendrogram(Y1, orientation='right')
-            ind1 = hierarchy.fcluster(Y1, 0.7*max(Y1[:,2]), 'distance')
+            Z = hierarchy.dendrogram(Y, orientation='right')
+            ind1 = hierarchy.fcluster(Y, 0.7*max(Y[:,2]), self.cluster_criterion)
 
             ax1.set_xticks([])
             ax1.set_yticks([])
-            ### apply the clustering for the array-dendrograms to the actual matrix data
-            idx1 = Z1['leaves']
+            # apply the clustering for the array-dendrograms to the actual matrix data
+            idx1 = Z['leaves']
             self.frame = self.frame.iloc[idx1,:]
-            ### reorder the flat cluster to match the order of the leaves the dendrogram
+            # reorder the flat cluster to match the order of the leaves the dendrogram
             ind1 = ind1[idx1]
+            layout['dendogram1'] = ax1
         else:
             idx1 = range(self.frame.shape[0])
 
-        # Plot distance matrix #
+        # HEATMAP itself
         axm = fig.add_axes([axm_x, axm_y, axm_w, axm_h])
-
-        # OK is input dataframe is transposed
         axm.imshow(self.frame, aspect='auto', origin='lower', interpolation='None',
                    cmap=cmap, norm=norm)
         axm.set_xticks([])
         axm.set_yticks([])
+        layout['heatmap'] = axm
 
-        # Add text #
+        # TEXT
         new_row_header = []
         new_column_header = []
-
         for i in range(self.frame.shape[0]):
             axm.text(self.frame.shape[1]-0.5, i, '  ' + str(row_header[idx1[i]]),
                      verticalalignment="center")
@@ -306,7 +316,8 @@ class Heatmap(object):
                      horizontalalignment="center")
             new_column_header.append(column_header[idx2[i]] if self.column_method else column_header[i])
 
-        # Plot column side colorbar #
+
+        # CATEGORY column ------------------------------
         if self.column_method:
             axc = fig.add_axes([axc_x, axc_y, axc_w, axc_h])
             cmap_c = matplotlib.colors.ListedColormap(self.params.col_side_colors)
@@ -315,8 +326,9 @@ class Heatmap(object):
             axc.matshow(dc, aspect='auto', origin='lower', cmap=cmap_c)
             axc.set_xticks([])
             axc.set_yticks([])
+            layout['category_column'] = axc
 
-        # Plot column side colorbar #
+        # CATEGORY row -------------------------------
         if self.row_method:
             axr = fig.add_axes([axr_x, axr_y, axr_w, axr_h])
             dr = np.array(ind1, dtype=int)
@@ -325,7 +337,9 @@ class Heatmap(object):
             axr.matshow(dr, aspect='auto', origin='lower', cmap=cmap_r)
             axr.set_xticks([])
             axr.set_yticks([])
+            layout['category_row'] = axr
 
+        # COLORBAR ----------------------
         if colorbar == True:
             axcb = fig.add_axes([axcb_x, axcb_y, axcb_w, axcb_h], frame_on=False)
             if colorbar_position == 'right':
@@ -334,10 +348,10 @@ class Heatmap(object):
                 orientation = 'horizontal'
             cb = matplotlib.colorbar.ColorbarBase(axcb, cmap=cmap,
                                               norm=norm, orientation=orientation)
-            #axcb.set_title("colorkey")
-            max_cb_ticks = 5
+            #axcb.set_title("whatever")
+            #max_cb_ticks = 5
             #axcb.xaxis.set_major_locator(matplotlib.ticker.MaxNLocator(max_cb_ticks))
-
+            layout['colorbar'] = cb
         # Return figure #
 
         return layout
