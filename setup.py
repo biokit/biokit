@@ -24,10 +24,10 @@ metainfo = {
     'platforms' : ['Linux', 'Unix', 'MacOsX', 'Windows'],
     'keywords' : [],
     'classifiers' : [
-          'Development Status :: 5 - Development',
+          'Development Status :: 1 - Planning',
           'Intended Audience :: Developers',
           'Intended Audience :: Science/Research',
-          'License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)',
+          'License :: OSI Approved :: BSD License',
           'Operating System :: OS Independent',
           'Programming Language :: Python :: 2.7',
           'Topic :: Software Development :: Libraries :: Python Modules',
@@ -63,7 +63,8 @@ setup(
     #package_dir = {'':''},
     packages = ['biokit'],
     #package_dir  = package_dir,
-    install_requires = [],
+    install_requires = ['pandas', 'bioservices'],
+
     )
 
 

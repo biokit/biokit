@@ -16,8 +16,5 @@
 """
 __version__ = '0.0.1'
 
-from . import viz
-#from . import sequence
-#from . import data
-#from . import io
-
+from biokit.viz import *
+from biokit.services import EUtils, KEGG, UniProt
