@@ -4,7 +4,7 @@ import pandas as pd
 __all__ = ['imshow']
 
 
-def imshow(data, interpolation='None', cmap='hot', tight_layout=True,
+def imshow(data, interpolation='None', aspect='auto', cmap='hot', tight_layout=True,
         colorbar=True, fontsize_x=None, fontsize_y=None, rotation_x=90, **kargs):
     """wrapper around imshow to plot a dataframe
 
@@ -20,7 +20,7 @@ def imshow(data, interpolation='None', cmap='hot', tight_layout=True,
         data = pd.DataFrame(data)
 
     pylab.clf()
-    pylab.imshow(data, interpolation=interpolation, cmap=cmap, **kargs)
+    pylab.imshow(data, interpolation=interpolation, aspect='auto', cmap=cmap, **kargs)
 
     if fontsize_x == None:
         fontsize_x = 16 #FIXME use default values
