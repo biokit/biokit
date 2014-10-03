@@ -20,7 +20,7 @@ def imshow(data, interpolation='None', aspect='auto', cmap='hot', tight_layout=T
         data = pd.DataFrame(data)
 
     pylab.clf()
-    pylab.imshow(data, interpolation=interpolation, aspect='auto', cmap=cmap, **kargs)
+    pylab.imshow(data, interpolation=interpolation, aspect=aspect, cmap=cmap, **kargs)
 
     if fontsize_x == None:
         fontsize_x = 16 #FIXME use default values
