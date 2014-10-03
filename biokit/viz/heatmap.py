@@ -352,7 +352,9 @@ class Heatmap(object):
             #max_cb_ticks = 5
             #axcb.xaxis.set_major_locator(matplotlib.ticker.MaxNLocator(max_cb_ticks))
             layout['colorbar'] = cb
-        # Return figure #
+
+        #   could be useful
+        d = {'ordered': self.frame.copy(),  'rorder': idx1, 'corder': idx2} 
 
         return layout
 
