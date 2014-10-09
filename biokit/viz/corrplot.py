@@ -67,11 +67,12 @@ class Corrplot(object):
         # replace NA with zero
         self.df.fillna(na, inplace=True)
 
-        self.params = {'colorbar.N': 100}
+        self.params = {'colorbar.N': 100, 'colorbar.orientation':'vertical'}
+        
         
 
     def _set_default_cmap(self):
-        self.cm = cmap_builder('#A80000','white','darkblue')
+        self.cm = cmap_builder('#AA0000','white','darkblue')
 
     def order(self, method='complete', metric='euclidean',inplace=False):
         import scipy.cluster.hierarchy as hierarchy
@@ -87,6 +88,19 @@ class Corrplot(object):
             self.df = cor2
         else:
             return cor2
+        self.Y = Y
+        self.Z = Z
+        self.idx1 = idx1
+        self.ind1 = ind1
+
+        #treee$order == Z.leaves and c.idx1
+        # hc = c.ind1
+        
+        #clustab <- table(hc)[unique(hc[tree$order])]
+        #cu <- c(0, cumsum(clustab))
+        #mat <- cbind(cu[-(k + 1)] + 0.5, n - cu[-(k + 1)] + 0.5,
+        #cu[-1] + 0.5, n - cu[-1] + 0.5)
+        #rect(mat[,1], mat[,2], mat[,3], mat[,4], border = col, lwd = lwd)
 
     def plot(self, num=1, grid=True,
             rotation=30, colorbar_width=10, lower=None, upper=None, 
@@ -225,10 +239,11 @@ class Corrplot(object):
 
         if colorbar:
             N = self.params['colorbar.N']
-            cb = plt.gcf().colorbar(self.collection, orientation='vertical', shrink=.9, 
-                boundaries= np.linspace(0,1,N), ticks=[-1,-.5,0,.5,1])
+            cb = plt.gcf().colorbar(self.collection, 
+                    orientation=self.params['colorbar.orientation'], shrink=.9, 
+                boundaries= np.linspace(0,1,N), ticks=[0,.25, 0.5, 0.75,1])
             cb.ax.set_yticklabels([-1,-.5,0,.5,1])
-
+            cb.set_clim(0,1) # make sure it goes from -1 to 1 even though actual values may not reach that range
     def _add_patches(self, df, method, fill, ax, diagonal=True):
         width, height = df.shape
         labels = (df.columns)
