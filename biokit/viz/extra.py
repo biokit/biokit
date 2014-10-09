@@ -33,7 +33,7 @@ def scatter_hist(x, y=None,
     """
     # if 2D --> scatter ->
     # if pandas matrix -> imshow + mean or sum 
-    if y == None:
+    if y is None:
         try: # is it a pandas df ?
             y = x.ix[:,1].values # first let us fill y and
             try:

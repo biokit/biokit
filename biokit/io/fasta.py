@@ -1,3 +1,10 @@
+"""
+
+http://blast.ncbi.nlm.nih.gov/blastcgihelp.shtml
+http://www.ncbi.nlm.nih.gov/toolkit/doc/book/ch_demo/?rendertype=table&id=ch_demo.T5#ch_demo.id1_fetch.html_ref_fasta
+
+"""
+
 from collections import OrderedDict
 import pandas as pd
 import pylab
@@ -136,17 +143,22 @@ class FASTA(object):
         VETSSDEILMRRLGDATRNRDIELTSDIDEHQFMNRCAAMAYGVLTGATVKIIKNRDGLL
         DKAVEELISVLK
 
+    Comments can be added with the ; character. Note also that length of the sequence
+    is wrapped to 80 characters in general.
+
     The format is made of a header and a sequence. Any FASTA can be read
     and the pair of header/sequence retrieved from the :attr:`sequence` and
     :attr:`header` attributes. However, headers differ from one database to
-    another one and interpretation is not implemented except for SWISS-PROT.
-    Identifiers can be retrieved whatsoever.
+    another one (see table below)
 
-    You can read a FASTA sequence from a local file or download one from UniProt
+    Wikipedia. A multiple sequence FASTA format would be obtained by concatenating several single sequence FASTA files. This does not imply a contradiction with the format as only the first line in a FASTA file may start with a ";" or ">", hence forcing all subsequent sequences to start with a ">" in order to be taken as different ones (and further forcing the exclusive reservation of ">" for the sequence definition line). Thus, the examples above may as well be taken as a multisequence file if taken together.
+
+    You can read a FASTA sequence from a local file, a string or download one 
+    from UniProt using BioServices::
 
     .. doctest::
 
-        >>> from bioservices.apps.fasta import FASTA
+        >>> from biokit.io.fasta import FASTA
         >>> f = FASTA()
         >>> f.load("P43403")
         >>> acc = f.accession    # the accession (P43403)
@@ -176,20 +188,40 @@ class FASTA(object):
     ================================= ====================================
     ================================= ====================================
     GenBank                           gi|gi-number|gb|accession|locus
+    GenBank                           gb|accession|locus
+    GenInfo integrated database       gi|integer
     EMBL Data Library                 gi|gi-number|emb|accession|locus
+    EMBL Data Library                 emb|accession|locus
     DDBJ, DNA Database of Japan       gi|gi-number|dbj|accession|locus
+    DDBJ, DNA Database of Japan       dbj|accession|locus
     NBRF PIR                          pir||entry
+    PIR                               pir|accession|name
     Protein Research Foundation       prf||name
+    PRF                               prf|accession|name
     SWISS-PROT                        sp|accession|name
     Brookhaven Protein Data Bank (1)  pdb|entry|chain
     Brookhaven Protein Data Bank (2)  entry:chain|PDBID|CHAIN|SEQUENCE
     Patents                           pat|country|number
+    patent                            pat|country|patent|sequence
+    pre-grant patent                  pgp|country|application-number|seq-number
     GenInfo Backbone Id               bbs|number
+    GenInfo Backbone moltype          bbm|number
+    GenInfo import ID                 gim|integer
     General database identifier       gnl|database|identifier
     NCBI Reference Sequence           ref|accession|locus
+    RefSeq 2                          ref|accession|name
     Local Sequence identifier         lcl|identifier
+    PDB                               pdb|entry|chain
+    DDBJ                              dbj|accession|locus  
+    Default                           |accession|name
     ================================= ====================================
 
+identifier is mix of integers and characters
+
+
+
+
+    gnl allows databases not included in this list to use the same identifying syntax.
 
     The :meth::`load_fasta` relies on UniProt service.
     """
@@ -387,7 +419,21 @@ class FASTA(object):
 
 
 
+    def check(self):
+        """Before submitting a request, any numerical digits in the query 
+        sequence should either be removed or replaced by appropriate letter 
+        codes (e.g., N for unknown nucleic acid residue or X for unknown 
+        amino acid residue). The nucleic acid codes supported are:
+            
+         For those programs that use amino acid query sequences (BLASTP 
+         and TBLASTN), the accepted amino acid codes are:
+         A, B, C, D, E, F, G, H, I, K, L, M, N, P, Q, R, S, T, U, V, W, Y, Z, X, *, -
 
+
+         * is for translation stop and - for gap of indeterminate length
+                                                                                                                        
+        """
+        pass
 
 
 
