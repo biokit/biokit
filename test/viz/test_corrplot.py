@@ -27,8 +27,8 @@ class TestCorrplot(object):
 
 
     def test_lower(self):
-        self.s.plot(colorbar=False, method='circle', shrink=.9, fill='lower'  )
+        self.s.plot(colorbar=False, method='circle', shrink=.9, lower='circle'  )
 
     def test_upper(self):
-        self.s.plot(colorbar=False, method='circle', shrink=.9, fill='upper'  )
+        self.s.plot(colorbar=False, method='circle', shrink=.9, upper='circle'  )
 
