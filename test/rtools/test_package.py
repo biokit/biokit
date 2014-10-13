@@ -2,21 +2,20 @@ from biokit.rtools import package
 
 
 def test_install_packages():
-    # create a dummy package as a tar.gz
-    # install it 
-    # remove it
-    pass
-
+    import create_dummy_package as dun
+    d = dun.CreateDummy()
+    d()
+    
+    package.install_package('dummy/dummy.tar.gz') 
+    d._clean()
+    
 
 def test_get_r_version():
     package.get_R_version()
 
 
 def test_biocLite():
-
-    # how to test without intefering with user directory ?
-    #
-    pass
+    package.biocLite('truncnorm')
 
 
 def test_rpackage():
