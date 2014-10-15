@@ -13,7 +13,7 @@
 #  website: https://github.com/biokit
 #
 ##############################################################################
-import pyper
+from biokit.rtools import pyper
 
 __all__ = ['RSession']
 
@@ -22,14 +22,12 @@ class RSession(pyper.R):
     """Interface to pyper
 
         session = RSession()
-        session.run("a = c(1,2,3)")
-        a = session.ge("a")
-        a.sum() # a is numpy array
-
-
+        session.run("mylist = c(1,2,3)")
+        a = session("mylist")
+        a.sum() # a is numpy array !
 
     For now, this is just to inherit from pyper.R class but there is no
-    additional feature. This is to create a common API.
+    additional features. This is to create a common API.
 
     .. todo:: connection/pipe breaks sometimes.
     """
@@ -44,6 +42,10 @@ class RSession(pyper.R):
                 dump_stdout=dump_stdout)
 
     def get_version(self):
+        return self.version
+
+
+    def reconnect(self):
         raise NotImplementedError
 
 

@@ -66,7 +66,9 @@ setup(
     #package_dir = package_dir,
     #packages = ['biokit'],
     #package_dir  = package_dir,
-    install_requires = ['pandas', 'bioservices', 'colormap>=0.9.3'],
+
+    # distutils in rtools.package
+    install_requires = [ 'pandas', 'bioservices', 'colormap>=0.9.3'],
 
     )
 

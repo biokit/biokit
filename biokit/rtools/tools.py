@@ -13,7 +13,6 @@
 #  website: https://github.com/biokit
 #
 ##############################################################################
-import pyper
 from .session import RSession
 
 __all__ = ["bool2R", "rcode"]
@@ -33,7 +32,7 @@ def rcode(code, verbose=True):
     r = RSession(dump_stdout=verbose)
     r.run(code)
     return r
-    
+
 
 
 

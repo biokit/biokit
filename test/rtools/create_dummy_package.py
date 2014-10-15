@@ -25,11 +25,12 @@ class CreateDummy(object):
         self.create_R_file()
     
         # Create the tar ball file
-        code = "R CMD build %s " % self.directory
+        code = "cd %s; R CMD build %s ; cd .." % (self.directory, '.')
         os.system(code)
 
     def _clean(self):
         import shutil
+        # we could just used the last command but this adds some safety
         shutil.rmtree(os.sep.join([self.directory, 'man']))
         shutil.rmtree(os.sep.join([self.directory, 'R']))
         shutil.rmtree(os.sep.join([self.directory]))
