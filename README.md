@@ -6,28 +6,27 @@ Bioinformatics in Python
 
 
 
-.. image:: https://badge.fury.io/py/bioservices.svg
-    :target: https://pypi.python.org/pypi/bioservices
+.. image:: https://badge.fury.io/py/biokit.svg
+    :target: https://pypi.python.org/pypi/biokit
 
-.. image:: https://pypip.in/d/bioservices/badge.png
-    :target: https://crate.io/packages/bioservices/
+.. image:: https://pypip.in/d/biokit/badge.png
+    :target: https://crate.io/packages/biokit/
 
-.. image:: https://secure.travis-ci.org/cokelaer/bioservices.png
-    :target: http://travis-ci.org/cokelaer/bioservices
-
-.. image::
-https://coveralls.io/repos/cokelaer/bioservices/badge.png?branch=master 
-   :target: https://coveralls.io/r/cokelaer/bioservices?branch=master 
-
-.. image:: https://landscape.io/github/cokelaer/bioservices/master/landscape.png
-   :target: https://landscape.io/github/cokelaer/bioservices/master
+.. image:: https://secure.travis-ci.org/cokelaer/biokit.png
+    :target: http://travis-ci.org/cokelaer/biokit
 
 .. image::
-https://badge.waffle.io/cokelaer/bioservices.png?label=ready&title=Ready 
-   :target: https://waffle.io/cokelaer/bioservices
+https://coveralls.io/repos/cokelaer/biokit/badge.png?branch=master 
+   :target: https://coveralls.io/r/cokelaer/biokit?branch=master 
 
-:note: BioServices is tested for Python 2.7, 3.3. Version 3.4 is currently not
-       available due to a gevent dependencies, which should be fixed soon.
+.. image:: https://landscape.io/github/cokelaer/biokit/master/landscape.png
+   :target: https://landscape.io/github/cokelaer/biokit/master
+
+.. image::
+https://badge.waffle.io/cokelaer/biokit.png?label=ready&title=Ready 
+   :target: https://waffle.io/cokelaer/biokit
+
+:note: BioKit is tested under Python 2.7, 3.3.
 
 :contributions: Please join https://github.com/biokit and share
 your notebooks https://github.com/biokit/biobooks/
