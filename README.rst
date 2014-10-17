@@ -27,7 +27,7 @@ Bioinformatics in Python
 :note: BioKit is tested under Python 2.7
        Note yet fully compatible with python 3.3 but should be easy to fix (import issue)
 
-:contributions: Please join https://github.com/biokit and share your notebooks https://github.com/biokit/biobooks/
+:contributions: Please join https://github.com/biokit/biokit and share your notebooks https://github.com/biokit/biobooks/
 :issues: Please use https://github.com/biokit/issues
 
 
