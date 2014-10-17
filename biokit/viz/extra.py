@@ -27,9 +27,20 @@ def scatter_hist(x, y=None,
     histx_position can be 'top'/'bottom'
     histy_position can be 'left'/'right'
 
-    .. todo:: log scale + test 
+    .. plot::
+        :include-source:
+        :width: 50%
 
-    see notebooks 
+        from biokit.viz import scatter_hist
+        import pylab
+        import pandas as pd
+        X = pylab.randn(1000)
+        Y = pylab.randn(1000)
+        df = pd.DataFrame({'X':X, 'Y':Y})
+        scatter_hist(df)
+
+
+    .. seealso:: `notebook <http://nbviewer.ipython.org/github/biokit/biokit/blob/master/notebooks/viz/biokit.viz examples.ipynb>`_
     """
     # if 2D --> scatter ->
     # if pandas matrix -> imshow + mean or sum 

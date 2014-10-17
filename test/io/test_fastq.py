@@ -1,5 +1,5 @@
 from biokit.io.fastq import FASTQ
-
+from nose.plugins.attrib import attr
 
 
 
@@ -49,6 +49,7 @@ class test_FASTQ(object):
         self.f.to_qual()
         assert self.f.to_qual().split("\n")[1] == '0 31 26 32'
 
+    @attr('fixme')
     def test_read_and_plot(self):
         self.f.read(self.f._multiple_fastq_example)
         self.f.plot()

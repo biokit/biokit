@@ -6,6 +6,7 @@ BioKit
 #################################################################################
 
 
+.. image:: biokit.gif
 
 
 .. toctree::
@@ -13,6 +14,18 @@ BioKit
 
 Overview and Installation
 ##############################
+Installation
+=============
+
+::
+
+    pip install biokit
+
+
+Contributions
+================
+
+Please join https://github.com/biokit/biokit
 
 Overview
 ==========
@@ -21,17 +34,22 @@ Overview
     :nosignatures:
 
     biokit.viz
-    biokit.io
 
 
 
 .. _installation:
 
 
-Installation
+Other resources
 ===============
+
+Set of `Notebooks <http://nbviewer.ipython.org/github/biokit/biokit/tree/master/notebooks/>`_
 
 
 .. toctree::
 
     definitions.rst
+
+
+
+
