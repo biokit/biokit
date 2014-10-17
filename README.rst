@@ -30,5 +30,5 @@ Bioinformatics in Python
 :issues: Please use https://github.com/biokit/issues
 
 
-.. image:: http://pythonhosted.org/biokit/_images/biokit.png
-    :target: http://pythonhosted.org/biokit/_images/biokit.png
+.. image:: http://pythonhosted.org/biokit/_images/biokit.gif
+    :target: http://pythonhosted.org/biokit/_images/biokit.gif
