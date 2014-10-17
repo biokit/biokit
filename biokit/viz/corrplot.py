@@ -13,7 +13,7 @@ import pandas as pd
 references: http://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html
 
 
-todo:: 
+todo::
 
  - addrect if clustering
 
@@ -22,14 +22,14 @@ todo::
 class Corrplot(object):
     """A implementation of correlation plotting (corrplot)
 
-    Input must be a dataframe (Pandas) with data (any values) or a correlatoin 
+    Input must be a dataframe (Pandas) with data (any values) or a correlatoin
     matrix (square) with values between -1 and 1.
-       
-    If NAs are found in the correlation matrix, there are replaced with zeros. 
+
+    If NAs are found in the correlation matrix, there are replaced with zeros.
 
     Data can also be a correlation matrix as a 2-D numpy array containing
     the pairwise correlations between variables. Labels will then be numerical
-    indices though. 
+    indices though.
 
 
     By default from red por positive correlation to blue for negative ones but other colormap
@@ -68,8 +68,8 @@ class Corrplot(object):
         self.df.fillna(na, inplace=True)
 
         self.params = {'colorbar.N': 100, 'colorbar.orientation':'vertical'}
-        
-        
+
+
 
     def _set_default_cmap(self):
         self.cm = cmap_builder('#AA0000','white','darkblue')
@@ -95,7 +95,7 @@ class Corrplot(object):
 
         #treee$order == Z.leaves and c.idx1
         # hc = c.ind1
-        
+
         #clustab <- table(hc)[unique(hc[tree$order])]
         #cu <- c(0, cumsum(clustab))
         #mat <- cbind(cu[-(k + 1)] + 0.5, n - cu[-(k + 1)] + 0.5,
@@ -103,7 +103,7 @@ class Corrplot(object):
         #rect(mat[,1], mat[,2], mat[,3], mat[,4], border = col, lwd = lwd)
 
     def plot(self, num=1, grid=True,
-            rotation=30, colorbar_width=10, lower=None, upper=None, 
+            rotation=30, colorbar_width=10, lower=None, upper=None,
             shrink=0.9, axisbg='white', colorbar=True, label_color='black',
             fontsize='small', edgecolor='black', method='ellipse', order=None,
             cmap=None
@@ -143,7 +143,7 @@ class Corrplot(object):
 
         # add all patches to the figure
         # TODO check value of lower and upper
-        
+
         if upper is None and lower is None:
             mode = 'method'
             diagonal = True
@@ -158,7 +158,7 @@ class Corrplot(object):
             diagonal = True
         else:
             raise ValueError
-       
+
         if mode == 'upper':
             self._add_patches(df, upper, 'upper',  ax, diagonal=True)
         elif mode == 'lower':
@@ -172,14 +172,14 @@ class Corrplot(object):
         # shift the limits to englobe the patches correctly
         ax.set_xlim(-0.5, width-.5)
         ax.set_ylim(-0.5, height-.5)
-            
+
         # set xticks/xlabels on top
         ax.xaxis.tick_top()
         xtickslocs = np.arange(len(labels))
         ax.set_xticks(xtickslocs)
         ax.set_xticklabels(labels, rotation=rotation, color=label_color,
                 fontsize=fontsize, ha='left')
-    
+
         ax.invert_yaxis()
         ytickslocs = np.arange(len(labels))
         ax.set_yticks(ytickslocs)
@@ -188,8 +188,8 @@ class Corrplot(object):
 
         if grid is True:
             for i in range(0, width):
-                ratio1 = float(i)/width 
-                ratio2 = float(i+2)/width 
+                ratio1 = float(i)/width
+                ratio2 = float(i+2)/width
                 # TODO 1- set axis off
                 # 2 - set xlabels along the diagonal
                 # set colorbar either on left or bottom
@@ -239,11 +239,12 @@ class Corrplot(object):
 
         if colorbar:
             N = self.params['colorbar.N']
-            cb = plt.gcf().colorbar(self.collection, 
-                    orientation=self.params['colorbar.orientation'], shrink=.9, 
+            cb = plt.gcf().colorbar(self.collection,
+                    orientation=self.params['colorbar.orientation'], shrink=.9,
                 boundaries= np.linspace(0,1,N), ticks=[0,.25, 0.5, 0.75,1])
             cb.ax.set_yticklabels([-1,-.5,0,.5,1])
             cb.set_clim(0,1) # make sure it goes from -1 to 1 even though actual values may not reach that range
+
     def _add_patches(self, df, method, fill, ax, diagonal=True):
         width, height = df.shape
         labels = (df.columns)
@@ -273,7 +274,7 @@ class Corrplot(object):
                         func = Rectangle
                         w = h = d_abs * self.shrink
                         #FIXME shring must be <=1
-                        offset = (1-w)/2. 
+                        offset = (1-w)/2.
                         if method == 'color':
                             w = 1
                             h = 1
@@ -301,19 +302,19 @@ class Corrplot(object):
                     patches.append(patch)
                 elif method in ['number', 'text']:
                     from easydev import precision
-                    #FIXME 
+                    #FIXME
                     if d<0:
                         edgecolor = 'red'
                     elif d>0:
                         edgecolor = 'blue'
-                    plt.text(x,y, precision(d, 2), color=edgecolor, 
+                    ax.text(x,y, precision(d, 2), color=edgecolor,
                             fontsize=self.fontsize, horizontalalignment='center',
                             weight='bold', alpha=d_abs,
                             withdash=False)
                 elif method == 'pie':
                     S = 360 * d_abs
                     patch = [
-                        Wedge((x,y), 1*self.shrink/2., -90, S-90),       
+                        Wedge((x,y), 1*self.shrink/2., -90, S-90),
                         Wedge((x,y), 1*self.shrink/2., S-90, 360-90),
                         ]
                     #patch[0].set_facecolor(cmap(d_abs))
@@ -326,12 +327,13 @@ class Corrplot(object):
 
                     #ax.add_artist(patch[0])
                     #ax.add_artist(patch[1])
-                    patches.append(patch[0])
+                    patches.append(patch[0])                    
                     patches.append(patch[1])
-        col1 = PatchCollection(patches, array=np.array(colors), cmap=self.cm)
-        ax.add_collection(col1)
+        if len(patches):                    
+            col1 = PatchCollection(patches, array=np.array(colors), cmap=self.cm)
+            ax.add_collection(col1)
 
-        self.collection = col1
+            self.collection = col1
 
 
 if __name__ == "__main__":
