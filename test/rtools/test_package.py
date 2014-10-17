@@ -2,6 +2,10 @@ from biokit.rtools import package
 from nose.plugins.attrib import attr
 import create_dummy_package as dun
 
+# This will not work on travis since you will need R
+
+
+@attr('Ronly')
 def test_install_packages():
     d = dun.CreateDummy()
     d()
@@ -9,19 +13,22 @@ def test_install_packages():
     d._clean()
 
 
-@attr('fulltest')
+@attr('Ronly')
 def test_install_packages():
     package.install_package("truncnorm")
 
 
+@attr('Ronly')
 def test_get_r_version():
     package.get_R_version()
 
 
-def test_biocLite():
+@attr('Ronly')
+def test_bioclite():
     package.biocLite('truncnorm')
 
 
+@attr('Ronly')
 def test_rpackage():
     # need to play with a pacakge. Again a dummy one would be handy
     p = package.RPackage('CellNOptR')
@@ -33,6 +40,7 @@ def test_rpackage():
     print(p)
 
 
+@attr('Ronly')
 def test_pm():
 
     pm = package.RPackageManager()
