@@ -6,6 +6,7 @@ BioKit
 #################################################################################
 
 
+.. image:: biokit.gif
 
 
 .. toctree::
@@ -21,7 +22,6 @@ Overview
     :nosignatures:
 
     biokit.viz
-    biokit.io
 
 
 

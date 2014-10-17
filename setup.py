@@ -8,7 +8,7 @@ import glob
 
 _MAJOR               = 0
 _MINOR               = 0
-_MICRO               = 1
+_MICRO               = 2
 version              = '%d.%d.%d' % (_MAJOR, _MINOR, _MICRO)
 release              = '%d.%d' % (_MAJOR, _MINOR)
 
@@ -22,7 +22,7 @@ metainfo = {
     'url' : ['http://pypi.python.org/pypi/biokit'],
     'description':'Access to Biological Web Services from Python' ,
     'platforms' : ['Linux', 'Unix', 'MacOsX', 'Windows'],
-    'keywords' : [],
+    'keywords' : ['corrplot', 'heatmap'],
     'classifiers' : [
           'Development Status :: 1 - Planning',
           'Intended Audience :: Developers',

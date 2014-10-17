@@ -45,6 +45,16 @@ class Heatmap(object):
     dendrogram is carried out.
 
 
+    .. plot::
+        :include-source:
+        :width: 50%
+       
+        from biokit.viz import heatmap
+        df = heatmap.get_heatmap_df()
+        h = heatmap.Heatmap(df)
+        h.plot()
+
+    .. warning:: in progress
     """
 
     def __init__(self, data=None, row_method='complete', column_method='complete',
@@ -146,7 +156,7 @@ class Heatmap(object):
 
 
         :param gradient_span: None is default in R
-        using
+        iusing::
 
             df = pd.DataFrame({'A':[1,0,1,1],
                                'B':[.9,0.1,.6,1],

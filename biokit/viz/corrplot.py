@@ -20,27 +20,35 @@ todo::
 """
 
 class Corrplot(object):
-    """A implementation of correlation plotting (corrplot)
+    """An implementation of correlation plotting tools (corrplot)
 
-    Input must be a dataframe (Pandas) with data (any values) or a correlatoin
+    Input must be a dataframe (Pandas) with data (any values) or a correlation
     matrix (square) with values between -1 and 1.
 
     If NAs are found in the correlation matrix, there are replaced with zeros.
 
     Data can also be a correlation matrix as a 2-D numpy array containing
-    the pairwise correlations between variables. Labels will then be numerical
+    the pairwise correlations between variables. Labels will be numerical
     indices though.
 
+    By default from red for positive correlation to blue for negative ones but
+    other colormaps can easily be provided.
 
-    By default from red por positive correlation to blue for negative ones but other colormap
-    can easily be provided.
+    .. plot::
+        :width: 50%
+        :include-source:
 
-        # standard matplotlib cmap
-        c.plot(method='square', cmap='jet')
-        # or 2 colors
-        c.plot(method='square', cmap=('red','green'))
-        # or 3 colors
-        c.plot(method='square', cmap=('red','white','green'))
+        from biokit.viz import corrplot
+        import string
+        letters = string.uppercase[0:10]
+        import pandas as pd
+        df = pd.DataFrame(dict(( (k, np.random.random(10)+ord(k)-65) for k in letters)))
+
+        c = corrplot.Corrplot(df)
+        c.plot()
+
+    .. seealso::    All functionalities are covered in this 
+        `notebook <http://nbviewer.ipython.org/github/biokit/biokit/blob/master/notebooks/viz/corrplot.ipynb>`_
 
     """
     def __init__(self, data, pvalues=None, na=0):
@@ -75,6 +83,13 @@ class Corrplot(object):
         self.cm = cmap_builder('#AA0000','white','darkblue')
 
     def order(self, method='complete', metric='euclidean',inplace=False):
+        """Rearrange the order of rows and columns after clustering
+
+        :param method: any scipy method
+        :param metric: any scipy distance
+        :param bool inplace: if set to True, the dataframe is replaced
+
+        """
         import scipy.cluster.hierarchy as hierarchy
         import scipy.spatial.distance as distance
         d = distance.pdist(self.df)
@@ -108,6 +123,29 @@ class Corrplot(object):
             fontsize='small', edgecolor='black', method='ellipse', order=None,
             cmap=None
             ):
+        """plot the correlation matrix from the content of :attr:`df`
+        (dataframe)
+
+        :param grid: add grid (Defaults to True)
+        :param rotation: rotate labels on y-axis
+        :param lower: if set to a valid method, plots the data on the lower
+            left triangle
+        :param upper: if set to a valid method, plots the data on the upper
+            left triangle
+        :param method: shape to be used in 'ellipse', 'square', 'rectangle', 
+            'color', 'text', 'circle',  'number', 'pie'.
+        :param cmap: a valid cmap from matplotlib of colormap package (e.g.,
+        jet, or 
+
+        Here are some examples provided that the data is created and pass to c::
+
+            c = corrplot.Corrplor(dataframe)
+            c.plot(cmap=('Orange', 'white', 'green'))
+            c.plot(method='circle')
+            c.plot(colorbar=False, shrink=.8, upper='circle'  )
+
+
+        """
 
         # default
         if cmap != None:
