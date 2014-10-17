@@ -43,6 +43,7 @@ with open('README.md') as f:
     readme = f.read()
 
 
+
 setup(
     name             = 'biokit',
     version          = version,
@@ -59,11 +60,15 @@ setup(
     download_url     = metainfo['download_url'],
     classifiers      = metainfo['classifiers'],
 
+    zip_safe=False,
+    packages = find_packages(),
     # package installation
-    #package_dir = {'':''},
-    packages = ['biokit'],
+    #package_dir = package_dir,
+    #packages = ['biokit'],
     #package_dir  = package_dir,
-    install_requires = ['pandas', 'bioservices'],
+
+    # distutils in rtools.package
+    install_requires = [ 'pandas', 'bioservices', 'colormap>=0.9.3'],
 
     )
 

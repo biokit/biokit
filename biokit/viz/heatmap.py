@@ -179,7 +179,7 @@ class Heatmap(object):
         # save all parameters in a dict
         layout = {}
 
-        cmap = colormap.get_cmap(cmap)
+        cmap = colormap.cmap_builder(cmap)
 
         # keep track of row and column names for later.
         row_header = self.frame.index
