@@ -36,9 +36,9 @@ except Exception, e:
 import pkg_resources
 version = pkg_resources.require(pkg_name)[0].version
 release = version
-author = "Thomas Cokelaer, Lea M. Harder, Jordi Serra-Musach, \nDennis Pultz"
-title = "BioServices"
-copyright = author + ", 2012"
+author = "BioKit developers"
+title = "BioKit"
+copyright = author + ", 2014"
 project = pkg_name
 
 

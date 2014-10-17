@@ -7,6 +7,7 @@ Utilities
 
 Some visualisation tools
 ===================================================================
+.. automodule:: biokit.viz
 
 .. automodule:: biokit.viz.corrplot
     :members:

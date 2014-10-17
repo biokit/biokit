@@ -14,6 +14,18 @@ BioKit
 
 Overview and Installation
 ##############################
+Installation
+=============
+
+::
+
+    pip install biokit
+
+
+Contributions
+================
+
+Please join https://github.com/biokit/biokit
 
 Overview
 ==========
@@ -28,10 +40,16 @@ Overview
 .. _installation:
 
 
-Installation
+Other resources
 ===============
+
+Set of `Notebooks <http://nbviewer.ipython.org/github/biokit/biokit/tree/master/notebooks/>`_
 
 
 .. toctree::
 
     definitions.rst
+
+
+
+
