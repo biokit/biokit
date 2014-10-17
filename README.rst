@@ -24,7 +24,8 @@ Bioinformatics in Python
 .. image:: https://badge.waffle.io/cokelaer/biokit.png?label=ready&title=Ready 
    :target: https://waffle.io/cokelaer/biokit
 
-:note: BioKit is tested under Python 2.7, 3.3.
+:note: BioKit is tested under Python 2.7
+       Note yet fully compatible with python 3.3 but should be easy to fix (import issue)
 
 :contributions: Please join https://github.com/biokit and share your notebooks https://github.com/biokit/biobooks/
 :issues: Please use https://github.com/biokit/issues
