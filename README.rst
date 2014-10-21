@@ -28,7 +28,7 @@ Bioinformatics in Python
        Note yet fully compatible with python 3.3 but should be easy to fix (import issue)
 
 :contributions: Please join https://github.com/biokit/biokit and share your notebooks https://github.com/biokit/biobooks/
-:issues: Please use https://github.com/biokit/issues
+:issues: Please use https://github.com/biokit/biokit/issues
 
 
 .. image:: http://pythonhosted.org/biokit/_images/biokit.gif
