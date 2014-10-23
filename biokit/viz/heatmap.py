@@ -197,9 +197,9 @@ class Heatmap(object):
 
         # FIXME sometinh clever for the fontsize
         if len(row_header)>100 or len(column_header)>100:
-            matplotlib.rcParams['font.size'] = 8
+            matplotlib.rcParams['font.size'] = 6
         if len(row_header)>50 or len(column_header)>50:
-            matplotlib.rcParams['font.size'] = 8
+            matplotlib.rcParams['font.size'] = 7
         else:
             matplotlib.rcParams['font.size'] = 12
 
