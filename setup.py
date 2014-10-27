@@ -42,7 +42,9 @@ metainfo = {
 with open('README.rst') as f:
     readme = f.read()
 
+from distutils.core import setup, Extension
 
+sequence = Extension('sequence', sources=['biokit/sequence/sequence.c'])
 
 setup(
     name             = 'biokit',
@@ -69,6 +71,15 @@ setup(
 
     # distutils in rtools.package
     install_requires = [ 'pandas', 'bioservices', 'colormap>=0.9.3'],
+    ext_modules=[
+        Extension('biokit.sequence.complement', 
+                sources=['biokit/sequence/complement.c', ],
+                #export_symbols=['complement'],
+                #include_dirs=['/usr/include', '/usr/include/glib-2.0/gio/'],
+                #library_dirs=['-liostream'],
+                 )
+        
+        ],
 
     )
 

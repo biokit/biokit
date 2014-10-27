@@ -4,12 +4,33 @@ http://blast.ncbi.nlm.nih.gov/blastcgihelp.shtml
 http://www.ncbi.nlm.nih.gov/toolkit/doc/book/ch_demo/?rendertype=table&id=ch_demo.T5#ch_demo.id1_fetch.html_ref_fasta
 
 """
-
 from collections import OrderedDict
 import pandas as pd
 import pylab
 
 __all__ = ["FASTA", "MultiFASTA"]
+
+"""
+json file like in ensembl:
+    molecule (e.g., dna)
+    id =
+
+    {u'id': u'contig::ABBA01004489.1:1:100:1',
+             u'molecule': u'dna',
+              u'seq': u'ctgtact'}
+"""
+
+
+class Sequence(str):
+    def __init__(self):
+        self.description = None
+        
+    def complement(self):
+        pass
+
+    def reverse(self):
+        pass
+
 
 
 class MultiFASTA(object):
