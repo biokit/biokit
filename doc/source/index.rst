@@ -31,9 +31,10 @@ Overview
 ==========
 
 .. autosummary::
-    :nosignatures:
 
     biokit.viz
+    biokit.rtools
+    biokit.services
 
 
 

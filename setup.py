@@ -8,7 +8,7 @@ import glob
 
 _MAJOR               = 0
 _MINOR               = 0
-_MICRO               = 2
+_MICRO               = 3
 version              = '%d.%d.%d' % (_MAJOR, _MINOR, _MICRO)
 release              = '%d.%d' % (_MAJOR, _MINOR)
 
@@ -42,7 +42,9 @@ metainfo = {
 with open('README.rst') as f:
     readme = f.read()
 
+from distutils.core import setup, Extension
 
+sequence = Extension('sequence', sources=['biokit/sequence/sequence.c'])
 
 setup(
     name             = 'biokit',
@@ -68,7 +70,13 @@ setup(
     #package_dir  = package_dir,
 
     # distutils in rtools.package
-    install_requires = [ 'pandas', 'bioservices', 'colormap>=0.9.3'],
+    install_requires = [ 'pandas', 'bioservices', 'colormap'],
+    ext_modules=[
+        Extension('biokit.sequence.complement', 
+                sources=['biokit/sequence/complement.c', ],
+                 )
+        
+        ],
 
     )
 

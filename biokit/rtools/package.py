@@ -4,9 +4,10 @@ import os.path
 
 from biokit.rtools import bool2R, RSession
 from distutils.version import StrictVersion
+from easydev import Logging
 
-
-__all__ = ["get_R_version", "biocLite", "RPackage", 'install_package']
+__all__ = ["get_R_version", "biocLite", "RPackage", 
+    'install_package', 'RPackageManager']
 
 
 def install_package(query, dependencies=False, verbose=True,
@@ -27,69 +28,57 @@ def install_package(query, dependencies=False, verbose=True,
         >>> rtools.install_package("hash") # a CRAN package
         >>> rtools.install_package("path to a valid R package directory")
 
-
-    .. todo:: packagemanager with bioclite included.
-
+    .. seealso:: :class:`biokit.rtools.RPackageManager`
     """
-
-    session = RSession(dump_stdout=verbose)
+    session = RSession(verbose=verbose)
 
     # Is it a local file?
     if os.path.exists(query):
-        filename = query[:]
+        repos = 'NULL'
     else:
-        try:
-            print("TRY")
-           # is it a valid URL ? If so, it should be a kind of source package
-            data = urllib2.urlopen(query)
-            if verbose == True:
-                print("Installing %s from %s" % (query, filename))
-            code = """install.packages("%s", dependencies=%s """ % \
-                (filename, bool2R(dependencies))
-            if repos != None:
-                code += """ , repos="%s") """ % repos
-            else:
-                code += """ , repos=NULL) """
-            session.run(code)
+        repos = '"{0}"'.format(repos) # we want the " to be part of the string later on
+    
+    try:
+        # PART for fetching a file on the web, download and install locally
+        print("Trying from the web ?")
+        data = urllib2.urlopen(query)
+        from easydev import TempFile
+        fh = TempFile(suffix=".tar.gz")
+        with open(fh.name, 'w') as fh:
+            for x in data.readlines():
+                fh.write(x)
+        code = """install.packages("%s", dependencies=%s """ % \
+            (fh.name, bool2R(dependencies))
+        code += """ , repos=NULL) """
+        session.run(code)
 
-        except:
-            print("EXCEPT")
-            print("RTOOLS warning: URL provided does not seem to exist %s. Trying from CRAN" % query)
-            code = """install.packages("%s", dependencies=%s """ % \
-                (query, bool2R(dependencies))
+    except Exception as err:
+        print(err.message)
+        print("trying local or from repos")
+        print("RTOOLS warning: URL provided does not seem to exist %s. Trying from CRAN" % query)
+        code = """install.packages("%s", dependencies=%s """ % \
+            (query, bool2R(dependencies))
 
-            if repos:
-                code += """ , repos="%s") """ % repos
-            else:
-                code += ")"
-            session.run(code)
-            return
-        # If valid URL, let us download the data in a temp file
-        # get new temp filename
-        handle = tempfile.NamedTemporaryFile()
-
-        # and save the downloaded data into it before installation
-        ff = open(handle.name, "w")
-        ff.write(data.read())
-        ff.close()
-        filename = ff.name[:]
-
-
+        code += """ , repos=%s) """ % repos
+        session.run(code)
+        return
 
 def get_R_version():
+    """Return R version"""
     r = RSession()
     r.run("version")
     return r.version
 
 
-def biocLite(package=None, suppressUpdates=True, dump_stdout=True):
+def biocLite(package=None, suppressUpdates=True, verbose=True):
     """Install a bioconductor package
 
     This function does not work like the R function. Only a few options are
     implemented so far. However, you can use rcode function directly if needed.
 
     :param str package: name of the bioconductor package to install. If None, no
-        package is installed but installed packages are updated.
+        package is installed but installed packages are updated. If not provided, 
+        biocLite itself may be updated if needed.
     :param bool suppressUpdates: updates the dependencies if needed (default is
         False)
 
@@ -105,7 +94,7 @@ def biocLite(package=None, suppressUpdates=True, dump_stdout=True):
     code = """source("http://bioconductor.org/biocLite.R")\n"""
 
     # without a package, biocLite performs an update of the installed packages
-    if package == None:
+    if package is None:
         code += """biocLite(suppressUpdates=%s) """ % (
             bool2R(suppressUpdates))
     else:
@@ -113,14 +102,9 @@ def biocLite(package=None, suppressUpdates=True, dump_stdout=True):
         code += """biocLite("%s", suppressUpdates=%s) """ % (
             package,
             bool2R(suppressUpdates))
-    r = RSession(dump_stdout=dump_stdout)
+    r = RSession(verbose=verbose)
     r.run(code)
-    return True
-
-
-
-
-
+    
 
 class RPackage(object):
     """
@@ -134,6 +118,7 @@ class RPackage(object):
         >>> p.version
         '1.11.3'
 
+    .. todo:: do we need the version_required attribute/parameter anywhere ?
     """
     def __init__(self, name, version_required=None, install=False, verbose=False):
         self.name = name
@@ -162,7 +147,6 @@ class RPackage(object):
                 print("Found %s (version %s) but version %s required." % (
                     self.name, self.version, self.version_required))
 
-
     def install(self):
         install_package(self.name)
 
@@ -185,10 +169,8 @@ class RPackage(object):
         return txt
 
 
-
 class RPackageManager(object):
     """Implements a R package manager from Python
-
 
     So far you can install a package (from source, or CRAN, or biocLite)
 
@@ -197,32 +179,37 @@ class RPackageManager(object):
         pm = PackageManager()
         [(x, pm.installed[x][2]) for x in pm.installed.keys()]
 
+
+    You can access to all information within a dataframe called **packages** where
+    indices are the name packages. Some aliases are provided as attributes (e.g., available, 
+    installed)
+
+
     """
     cran_repos = "http://cran.univ-lyon1.fr/"
 
-    def __init__(self):
-
+    def __init__(self, verbose=True):
         self.session = RSession()
+        self.logging = Logging(verbose)
+        self.logging.info('Fetching package information')
+        self.update()
 
-
-    def _installed_packages(self):
-        # we do not buffer because one may install packages in between
+    def _update(self):
+        # local import ?
+        import numpy
+        import pandas
+        # figure out the installed packages first
         code = """rvar_packages = as.data.frame(installed.packages())"""
         self.session.run(code)
         s = self.session.rvar_packages
         # FIXME. these 4 lines are needed as a hack related to pyper.
         s = s.replace("\n", "")
-        import numpy
-        import pandas
         df = eval(s)
 
         df.set_index('Package', inplace=True)
         self._packages = df.copy()
-        return self._packages
-        #m.reshape(16,1088/16)
 
-    def _package_status(self):
-        # we do not buffer because one may install packages in between
+        # Now, fetch was is possible to install from the default cran repo
         code = """rvar_status=packageStatus(repos="%s/src/contrib")"""
         code = code % self.cran_repos
 
@@ -231,89 +218,58 @@ class RPackageManager(object):
 
         # FIXME.
         s = s.replace("\n", "")
-        import pandas
-        import numpy
         res = eval(s)
         res['inst'].set_index('Package', inplace=True)
         res['avail'].set_index('Package', inplace=True)
         self._status = res
 
+    def update(self):
+        """If you install/remove packages yourself elsewhere, you may need to 
+        call this function to update the package manager"""
+        self._update()
+
     def _get_installed(self):
         # we do not buffer because packages may be removed manually or from R of
         # using remove_packages method, ....
-        self._package_status()
+        #self._package_status()
         return self._status['inst']
     installed = property(_get_installed, "returns list of packages installed as a dataframe")
 
     def _get_available(self):
         # we do not buffer because packages may be removed manually or from R of
         # using remove_packages method, ....
-        self._package_status()
+        #self._package_status()
         return self._status['avail']
     available = property(_get_available, "returns list of packages available as a dataframe")
 
     def  _get_packages(self):
         # do not buffer since it may change in many places
-        self._installed_packages()
         return self._packages
     packages = property(_get_packages)
 
-    def install_packages(self, packageName, dependencies=True, repos=None):
-        raise NotImplementedError
+    def get_package_version(self, package):
+        """Get version of an install package"""
+        if package not in self.installed.index:
+            self.logging.error("package {0} not installed".format(package))
+        return self.installed['Version'].ix[package]
 
-    def get_package_version(self):
-        return self.packages['Version']['CellNOptR']
+    def biocLite(self, package=None, suppressUpdates=True, verbose=False):
+        """Installs one or more biocLite packages
 
-    def biocLite(self):
-        raise NotImplementedError
+        :param package: a package name (string) or list of package names (list of 
+            strings) that will be installed from BioConductor. If package is set 
+            to None, all packages already installed will be updated.
 
-    def remove(self):
-        raise NotImplementedError
-
-    def install(self):
-        raise NotImplementedError
-
-
-"""
-    def install_packages(self, packageName, dependencies=True, repos=None,
-        type=None):
-        "Installs one or more CRAN packages"
-
-        if repos == None:
-            repos = self.cran_repos
-        # if this is a source file we want to reset the repo
-        if type == "source":
-            repos = None
-        if isinstance(packageName, str):
-            if packageName not in self.installed['Package']:
-                install_packages(packageName, dependencies=dependencies,
-                    repos=repos)
-        elif isinstance(packageName, list):
-            for pkg in packageName:
-                if pkg not in self.installed['Package']:
-                    install_packages(pkg, dependencies=dependencies,
-                        repos=repos)
-
-    def biocLite(self, packageName=None,suppressUpdates=True):
-        Installs one or more biocLite packages
-
-
-        :param packageName: a package name (string) that will be installed from
-            BioConductor. Several package names can be provided as a list. If
-            packageName is set to None, all packages already installed will be
-            updated.
-
-        "
-        if isinstance(packageName, str):
-            if packageName not in self.installed['Package']:
-                biocLite(packageName, suppressUpdates)
-        elif isinstance(packageName, list):
-            for pkg in packageName:
-                if pkg not in self.installed['Package']:
-                    biocLite(pkg, suppressUpdates)
-        elif packageName == None:
-            if packageName not in self.installed['Package']:
-                 biocLite(None, suppressUpdates)
+        """
+        if isinstance(package, str):
+            if package not in self.installed.index:
+                biocLite(package, suppressUpdates, verbose=verbose)
+        elif isinstance(package, list):
+            for pkg in package:
+                if pkg not in self.installed.index:
+                    biocLite(pkg, suppressUpdates, verbose=verbose)
+        else: # trying other cases (e.g., None updates biocLite itself). 
+             biocLite(package, suppressUpdates)
 
     def _isLocal(self, pkg):
         if os.path.exists(pkg):
@@ -321,24 +277,22 @@ class RPackageManager(object):
         else:
             return False
 
-    def remove_packages(self, packageName):
-        code ="remove.packages("%s")"
-        if isinstance(packageName, str):
-            if packageName in self.installed['Package']:
-                rcode(code % packageName)
+    def remove(self, package):
+        """Remove a package (or list) from local repository"""
+        rcode ="""remove.packages("%s")"""
+        if isinstance(package, str):
+            package = [package]
+        for pkg in package:
+            if pkg in self.installed.index:
+                self.session(rcode % pkg)
             else:
                 self.logging.warning("Package not found. Nothing to remove")
-        elif isinstance(packageName, list):
-            for pkg in packageName:
-                if packageName in self.installed['Package']:
-                    rcode(code % pkg)
-                else:
-                    self.logging.warning("Package not found. Nothing to remove")
+        self.update()
 
     def require(self, pkg, version):
         "Check if a package with given version is available"
 
-        if pkg not in self.packages:
+        if pkg not in self.installed.index:
             self.logging.info("Package %s not installed" % pkg)
             return False
         currentVersion = self.packageVersion(pkg)
@@ -347,21 +301,38 @@ class RPackageManager(object):
         else:
             return False
 
+    def _install_packages(self, packageName, dependencies=True):
+        """Installs one or more CRAN packages
+        
+        
+        .. todo:: check if it is already available to prevent renstallation ?
+        """
+
+        repos = self.cran_repos
+        # if this is a source file we want to reset the repo
+        if isinstance(packageName, str):
+            packageName = [packageName]
+        for pkg in packageName:
+            if pkg not in self.installed.index:
+                install_package(pkg, dependencies=dependencies, 
+                        repos=repos)
+        self.update()
+
     def install(self, pkg, require=None):
-        "install a package automatically scanning CRAN and biocLite repos
+        """install a package automatically scanning CRAN and biocLite repos
 
 
-        "
+        """
         if self._isLocal(pkg):
             # if a local file, we do not want to jump to biocLite or CRAN. Let
             # us install it directly. We cannot check version yet so we will
             # overwrite what is already installed
             self.logging.warning("Installing from source")
-            self.install_packages(pkg, repos=None, type="source")
+            self._install_packages(pkg)
             return
 
-        if pkg in self.installed['Package']:
-            currentVersion = self.packageVersion(pkg)
+        if pkg in self.installed.index:
+            currentVersion = self.get_package_version(pkg)
             if require == None:
                 self.logging.info("%s already installed with version %s" % \
                     (pkg, currentVersion))
@@ -372,16 +343,16 @@ class RPackageManager(object):
                     % (pkg, currentVersion))
             else:
                 # Try updating
-                self.install_packages(pkg, repos=self.cran_repos)
+                self._install_packages(pkg)
                 if require == None:
                     return
-                currentVersion = self.packageVersion(pkg)
+                currentVersion = self.get_package_version(pkg)
                 if StrictVersion(currentVersion) >= StrictVersion(require):
                     self.logging.warning("%s installed but current version (%s) does not fulfill your requirement" % \
                         (pkg, currentVersion))
 
-        elif pkg in self.available['Package']:
-            self.install_packages(pkg, repos=self.cran_repos)
+        elif pkg in self.available.index:
+            self._install_packages(pkg)
         else:
             # maybe a biocLite package:
             # require is ignored. The latest will be installed
@@ -392,26 +363,6 @@ class RPackageManager(object):
             if StrictVersion(currentVersion) >= StrictVersion(require):
                 self.logging.warning("%s installed but version is %s too small (even after update)" % \
                     (pkg, currentVersion, require))
-
-
-
-
-
-
-
-"""
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
