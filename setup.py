@@ -8,7 +8,7 @@ import glob
 
 _MAJOR               = 0
 _MINOR               = 0
-_MICRO               = 2
+_MICRO               = 3
 version              = '%d.%d.%d' % (_MAJOR, _MINOR, _MICRO)
 release              = '%d.%d' % (_MAJOR, _MINOR)
 
@@ -70,13 +70,10 @@ setup(
     #package_dir  = package_dir,
 
     # distutils in rtools.package
-    install_requires = [ 'pandas', 'bioservices', 'colormap>=0.9.3'],
+    install_requires = [ 'pandas', 'bioservices', 'colormap'],
     ext_modules=[
         Extension('biokit.sequence.complement', 
                 sources=['biokit/sequence/complement.c', ],
-                #export_symbols=['complement'],
-                #include_dirs=['/usr/include', '/usr/include/glib-2.0/gio/'],
-                #library_dirs=['-liostream'],
                  )
         
         ],

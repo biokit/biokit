@@ -23,3 +23,31 @@ Some visualisation tools
     :members:
     :undoc-members:
     :synopsis: 
+
+Tools to handle R packages
+===============================
+.. automodule:: biokit.rtools
+
+.. automodule:: biokit.rtools.session
+    :members:
+    :synopsis: RSession (access) to R
+
+.. automodule:: biokit.rtools.tools
+    :members:
+    :undoc-members:
+    :synopsis: 
+
+.. automodule:: biokit.rtools.package
+
+
+BioServices
+================
+.. automodule:: biokit.services
+
+BioServices is used in BioKit to access to web services (e.g., KEGG, UniProt, Ensembl...) but documentation for bioservices itself is not provided. See BioServices instead.
+
+
+
+
+
+

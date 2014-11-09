@@ -1,6 +1,7 @@
 from biokit.rtools import session
+from nose.plugins.attrib import attr
 
-
+@attr('Ronly')
 def test_session():
 
     sess = session.RSession()
@@ -13,4 +14,4 @@ def test_session():
 
 
 
-    sess = session.RSession(RCMD='R --quiet')
+    #sess = session.RSession(RCMD='R --quiet')
