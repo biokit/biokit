@@ -29,7 +29,8 @@ def bool2R(value):
 
 
 def rcode(code, verbose=True):
-    r = RSession(dump_stdout=verbose)
+    """Run a R script and return the RSession object"""
+    r = RSession(verbose=verbose)
     r.run(code)
     return r
 

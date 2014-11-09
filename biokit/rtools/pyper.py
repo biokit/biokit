@@ -320,13 +320,29 @@ def OtherStr(obj):
             return(SeqStr(list(obj)))
     return(repr(obj))
 
-str_func = {type(None): NoneStr, bool: BoolStr, long: LongStr, int: repr, float: FloatStr, complex: ComplexStr,
-        unicode: UniStr, str: repr, list: SeqStr, tuple: SeqStr, set: SeqStr, frozenset: SeqStr, dict: DictStr} # str will override uncode in Python 3
+str_func = {
+        type(None): NoneStr, 
+        bool: BoolStr, 
+        long: LongStr, 
+        int: repr, 
+        float: FloatStr, 
+        complex: ComplexStr,
+        unicode: UniStr, 
+        str: repr, 
+        list: SeqStr, 
+        tuple: SeqStr, 
+        set: SeqStr, 
+        frozenset: SeqStr, 
+        dict: DictStr} # str will override uncode in Python 3
 
-base_tps = [type(None), bool, int, long, float, complex, str, unicode, list, tuple, set, frozenset, dict] # use type(None) instead of NoneType since the latter cannot be found in the types module in Python 3
+base_tps = [type(None), bool, int, long, float, complex, str, unicode, list, 
+        tuple, set, frozenset, dict] # use type(None) instead of NoneType since 
+        #the latter cannot be found in the types module in Python 3
+
 if has_numpy:
     str_func[numpy.ndarray] = NumpyNdarrayStr
     base_tps.append(numpy.ndarray)
+
 if has_pandas:
     str_func.update({pandas.Series: PandasSerieStr, pandas.DataFrame: PandasDataFrameStr})
     base_tps.extend([pandas.Series, pandas.DataFrame])
@@ -336,10 +352,11 @@ if _in_py3:
     base_tps.append(bytes)
     str_func[bytes] = ByteStr
 
+
 def Str4R(obj):
-    '''
+    """
     convert a Python basic object into an R object in the form of string.
-    '''
+    """
     #return str_func.get(type(obj), OtherStr)(obj)
     # for objects known by PypeR
     if type(obj) in str_func:
@@ -358,9 +375,9 @@ class RError(Exception):
         return(repr(self.value))
 
 class R(object): # "del r.XXX" fails on FePy-r7 (IronPython 1.1 on .NET 2.0.50727.42) if using old-style class
-    '''
+    """
     A Python class to enclose an R process.
-    '''
+    """
     __Rfun = r'''.getRvalue4Python__ <- function(x, use_dict=NULL, has_numpy=FALSE, has_pandas=FALSE) {
     if (has_pandas) has_numpy <- TRUE
     if (has_numpy) {
@@ -784,42 +801,5 @@ class R(object): # "del r.XXX" fails on FePy-r7 (IronPython 1.1 on .NET 2.0.5072
         return(rlt)
 
     run, assign, remove = __call__, __setitem__, __delitem__
-
-
-# for a single-round duty:
-def runR(CMDS, Robj='R', max_len=1000, use_numpy=True, use_pandas=True, use_dict=None, host='localhost', user=None, ssh='ssh'):
-    '''
-    Run a (list of) R command(s), and return the output from the STDOUT.
-
-    CMDS: a R command string or a list of R commands.
-    Robj: can be a shell command (like /usr/bin/R), or the R class.
-    max_len: define the upper limitation for the length of command string. A
-        command string will be passed to R by a temporary file if it is longer
-        than this value.
-    use_numpy: Used as a boolean value. A False value will disable numpy even
-        if it has been imported.
-    use_pandas: Used as a boolean value. A False value will disable pandas even
-        if it has been imported.
-    use_dict: named list will be returned a dict if use_dict is True, otherwise
-        it will be a list of tuples (name, value).
-    host: The computer name (or IP) on which the R interpreter is
-        installed. The value "localhost" means that the R locates on the
-        the localhost computer. On POSIX systems (including Cygwin
-        environment on Windows), it is possible to use R on a remote
-        computer if the command "ssh" works. To do that, the user need set
-        this value, and perhaps the parameter "user".
-    user: The user name on the remote computer. This value need to be set
-        only if the user name is different on the remote computer. In
-        interactive environment, the password can be input by the user if
-        prompted. If running in a program, the user need to be able to
-        login without typing password!
-    ssh: The program to login to remote computer.
-    '''
-    if isinstance(Robj, basestring):
-        Robj = R(RCMD=Robj, max_len=max_len, use_numpy=use_numpy, use_pandas=use_pandas, use_dict=use_dict, host=host, user=user, ssh=ssh, dump_stdout=dump_stdout)
-    rlt = Robj.run(CMDS=CMDS)
-    if len(rlt) == 1:
-        rlt = rlt[0]
-    return(rlt)
 
 
