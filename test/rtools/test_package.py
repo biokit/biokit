@@ -9,7 +9,7 @@ import create_dummy_package as dun
 def test_install_packages():
     d = dun.CreateDummy()
     d()
-    package.install_package('dummy/dummytest_1.0.0.tar.gz', verbose=True) 
+    package.install_package('dummytest_1.0.0.tar.gz', verbose=True) 
     d._clean()
 
 
@@ -25,6 +25,7 @@ def test_get_r_version():
 
 @attr('Ronly')
 def test_bioclite():
+    package.biocLite()
     package.biocLite('truncnorm')
 
 
@@ -34,6 +35,7 @@ def test_rpackage():
     p = package.RPackage('CellNOptR')
     p = package.RPackage('CellNOptR', version_required="2000.0")
     p = package.RPackage('CellNOptR', version_required="2000")
+    print(p)
 
     p = package.RPackage('dummy')
     assert p.isinstalled is False
@@ -47,3 +49,29 @@ def test_pm():
     pm.packages
     pm.installed
     pm.available
+
+
+    pm.get_package_version('truncnorm')
+    try:
+        pm.get_package_version('whatever_is_not_installed')
+        assert False
+    except:
+        assert True
+
+
+    pm.remove('truncnorm')
+    pm.biocLite('truncnorm')
+    pm.biocLite(['truncnorm'])
+    pm.biocLite(None)
+
+
+    d = dun.CreateDummy()
+    d()
+    pm.install('dummytest_1.0.0.tar.gz') 
+    pm.remove('dummytest')
+    d._clean()
+
+    pm.remove('truncnorm')
+    pm.install('truncnorm')
+    pm.install('truncnorm') # trying again with required version
+
