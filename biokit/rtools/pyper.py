@@ -192,13 +192,17 @@ else:
         return(rv)
 
 
-def NoneStr(obj): return('NULL')
+def NoneStr(obj): 
+    return('NULL')
+
 
 def BoolStr(obj):
     return(obj and 'TRUE' or 'FALSE')
 
+
 def ReprStr(obj):
     return(repr(obj))
+
 
 if has_numpy:
     def FloatStr(f):
@@ -376,7 +380,7 @@ class RError(Exception):
 
 class R(object): # "del r.XXX" fails on FePy-r7 (IronPython 1.1 on .NET 2.0.50727.42) if using old-style class
     """
-    A Python class to enclose an R process.
+*    A Python class to enclose an R process.
     """
     __Rfun = r'''.getRvalue4Python__ <- function(x, use_dict=NULL, has_numpy=FALSE, has_pandas=FALSE) {
     if (has_pandas) has_numpy <- TRUE
@@ -543,7 +547,8 @@ class R(object): # "del r.XXX" fails on FePy-r7 (IronPython 1.1 on .NET 2.0.5072
     _DEBUG_MODE = True
 
     def __init__(self, RCMD='R', max_len=10000, use_numpy=True, use_pandas=True, use_dict=None,
-                 host='localhost', user=None, ssh='ssh', return_err=True, dump_stdout=False):
+                 host='localhost', user=None, ssh='ssh', return_err=True, dump_stdout=False, 
+                 verbose=False):
         '''
         RCMD: The name of a R interpreter, path information should be included
             if it is not in the system search path.
@@ -582,12 +587,14 @@ class R(object): # "del r.XXX" fails on FePy-r7 (IronPython 1.1 on .NET 2.0.5072
         # "Warning: In 2.5, magic names (typically those with a double
         # underscore (DunderAlias) at both ends of the name) may look at the
         # class rather than the instance even for old-style classes."
-        self.__dict__.update({'prog': None,
+        self.__dict__.update({
+            'prog': None,
             'has_numpy': use_numpy and has_numpy,
             'has_pandas': use_pandas and has_pandas,
             'Rfun': self.__class__.__Rfun,
             'max_len': max_len,
             'use_dict': use_dict,
+            'verbose': verbose,
             'dump_stdout': dump_stdout,
             'localhost': host == 'localhost',
             'newline': sys.platform == 'win32' and '\r\n' or '\n',
@@ -630,13 +637,33 @@ class R(object): # "del r.XXX" fails on FePy-r7 (IronPython 1.1 on .NET 2.0.5072
             else:  # Give up and point child stderr at nul
                 childstderr = file('nul', 'a')
 
-        self.__dict__['prog'] = Popen(RCMD, stdin=PIPE, stdout=PIPE, stderr=return_err and _STDOUT or childstderr, startupinfo=info)
+        self.__dict__['subprocess_args'] = {'RCMD':RCMD, 'PIPE':PIPE, 
+            'stderr': return_err and _STDOUT or childstderr, 
+            'info':info}
+
+        self.__dict__['prog'] = Popen(RCMD, stdin=PIPE, stdout=PIPE, 
+                stderr=return_err and _STDOUT or childstderr, startupinfo=info)
+
+        self.__call__(self.Rfun)
+
+    def reconnect(self):
+        """TC: Nov 2014
+        
+        If CTRL+C is called, the pipe is broken, in which case, reconnecting could 
+        be handy.
+        
+        """
+        args = self.subprocess_args
+        RCMD = args['RCMD']
+        PIPE = args['PIPE']
+        stderr = args['stderr']
+        info = args['info']
+        self.__dict__['prog'] = Popen(RCMD, stdin=PIPE, stdout=PIPE, 
+                stderr=stderr, startupinfo=info)
         self.__call__(self.Rfun)
 
     def __runOnce(self, CMD, use_try=None):
-        '''
-        CMD: a R command string
-        '''
+        """CMD: a R command string"""
         use_try = use_try or self._DEBUG_MODE
         newline = self.newline
         tail_token = 'R command at time: %s' % repr(time.time())
@@ -644,17 +671,31 @@ class R(object): # "del r.XXX" fails on FePy-r7 (IronPython 1.1 on .NET 2.0.5072
         tail_cmd = 'print("%s")%s' % (tail_token, newline)
         tail_token = tail_token.replace(' ', '\\s').replace('.', '\\.').replace('+', '\\+')
         re_tail = re.compile(r'>\sprint\("%s"\)\r?\n\[1\]\s"%s"\r?\n$' % (tail_token, tail_token))
+
         if len(CMD) <= self.max_len or not self.localhost:
             fn = None
-            CMD = (use_try and 'try({%s})%s%s' or '%s%s%s') % (CMD.replace('\\', '\\\\'), newline, tail_cmd)
+            CMD = (use_try and 'try({%s})%s%s' or '%s%s%s') % (CMD.replace('\\', '\\\\'), 
+                    newline, tail_cmd)
         else:
             fh, fn = tempfile.mkstemp()
             os.fdopen(fh, 'wb').write(_mybytes(CMD))
             if sys.platform == 'cli':
                 os.close(fh)  # this is necessary on IronPython
             fn = fn.replace('\\', '/')
-            CMD = (use_try and 'try({source("%s")})%sfile.remove(%r)%s%s' or '%s%s%s') % (fn, newline, fn, newline, tail_cmd)
-        self.sendAll(self.prog, CMD)
+            CMD = (use_try and 'try({source("%s")})%sfile.remove(%r)%s%s' or '%s%s%s') % (fn, 
+                    newline, fn, newline, tail_cmd)
+
+        try:
+            self.sendAll(self.prog, CMD)
+        except IOError:
+            if self.verbose:
+                print("Reconnecting the PIPE")
+            self.reconnect()
+            self.sendAll(self.prog, CMD)
+        except Exception as err:
+            print("Failed")
+            raise err
+
         rlt = ''
         while not re_tail.search(rlt):
             try:

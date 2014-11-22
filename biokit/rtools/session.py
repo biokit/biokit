@@ -86,8 +86,6 @@ class RSession(pyper.R):
     def get_version(self):
         """Return the R version"""
         return self.version
-
-    def reconnect(self):
-        raise NotImplementedError
+    
 
 
