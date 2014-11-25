@@ -22,3 +22,12 @@ class Seq(str):
         else:
             return cseqkit.dna_complement(self.data, len(self.data))
 
+
+
+    def get_complement_dict(self, by=2):
+        pass
+        
+
+
+
+
