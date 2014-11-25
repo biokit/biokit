@@ -3,11 +3,12 @@ import string
 import pandas as pd
 import numpy as np
 
+
 class TestCorrplot(object):
 
     @classmethod
     def setup_class(klass):
-        letters = string.uppercase[0:10]
+        letters = string.ascii_uppercase[0:10]
         df = pd.DataFrame(dict(( (k, np.random.random(10)+ord(k)-65) for k in letters)))
         klass.s = corrplot.Corrplot(df.corr())
         klass.s = corrplot.Corrplot(df)
