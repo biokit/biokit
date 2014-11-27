@@ -33,3 +33,15 @@ Bioinformatics in Python
 
 .. image:: http://pythonhosted.org/biokit/_images/biokit.gif
     :target: http://pythonhosted.org/biokit/_images/biokit.gif
+
+
+testing
+==========
+
+From travis, coverage is about 50% at the moment, which is low because some tests are ignored. Tests ignored are
+those that are slow or required R dependencies. To be ignored, we filled the setup.cfg with an option called **attr**. 
+IF you comment that attribute in the **setup.cfg** and run ::
+
+    python setup.py nosetests
+    
+You should reach a higher coverage (about 70%)    
