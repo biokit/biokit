@@ -84,7 +84,7 @@ DEBUG model:
     the codes passed to it, PypeR is set to "DEBUG" model by default. This
     means that any code blocks send to R will be wrapped in the function
     "try()", which will prevent R from crashing. To disable the "DEBUG" model,
-    the user can simple set the variable "_DEBUG_MODE" in the R class or in its
+    the user can simple set the variable "DEBUG_MODE" in the R class or in its
     instance to False.
 
     To model the behavior of the "get" method of a Python dictionary, the
@@ -601,7 +601,7 @@ class R(object): # "del r.XXX" fails on FePy-r7 (IronPython 1.1 on .NET 2.0.5072
             'sendAll' : sendAll # keep a reference to the global function "sendAll" which will be used by __del__
             })
 
-        RCMD = [RCMD]  #shlex.split(RCMD) - shlex do not work properly on Windows! #re.split(r'\s', RCMD)
+        RCMD = [RCMD]  
         if not self.localhost:
             RCMD.insert(0, host)
             if user:
@@ -612,6 +612,7 @@ class R(object): # "del r.XXX" fails on FePy-r7 (IronPython 1.1 on .NET 2.0.5072
         for arg in args:
             if arg not in RCMD:
                 RCMD.append(arg)
+
         if _has_subp and hasattr(subprocess, 'STARTUPINFO'):
             info = subprocess.STARTUPINFO()
             try:
@@ -625,6 +626,7 @@ class R(object): # "del r.XXX" fails on FePy-r7 (IronPython 1.1 on .NET 2.0.5072
                 info = None
         else:
             info = None
+
         # create stderr to replace None for py2exe:
         # http://www.py2exe.org/index.cgi/Py2ExeSubprocessInteractions
         if sys.platform != 'win32':
@@ -637,14 +639,13 @@ class R(object): # "del r.XXX" fails on FePy-r7 (IronPython 1.1 on .NET 2.0.5072
             else:  # Give up and point child stderr at nul
                 childstderr = file('nul', 'a')
 
-        self.__dict__['subprocess_args'] = {'RCMD':RCMD, 'PIPE':PIPE, 
-            'stderr': return_err and _STDOUT or childstderr, 
-            'info':info}
+        self.__dict__['subprocess_args'] = {
+                'RCMD': RCMD, 
+                'PIPE': PIPE, 
+                'stderr': return_err and _STDOUT or childstderr, 
+                'info': info}
 
-        self.__dict__['prog'] = Popen(RCMD, stdin=PIPE, stdout=PIPE, 
-                stderr=return_err and _STDOUT or childstderr, startupinfo=info)
-
-        self.__call__(self.Rfun)
+        self.reconnect()
 
     def reconnect(self):
         """TC: Nov 2014
@@ -682,14 +683,21 @@ class R(object): # "del r.XXX" fails on FePy-r7 (IronPython 1.1 on .NET 2.0.5072
             if sys.platform == 'cli':
                 os.close(fh)  # this is necessary on IronPython
             fn = fn.replace('\\', '/')
-            CMD = (use_try and 'try({source("%s")})%sfile.remove(%r)%s%s' or '%s%s%s') % (fn, 
-                    newline, fn, newline, tail_cmd)
+
+            params = {'fn':fn , 'newline':newline, 'tail_cmd':tail_cmd}
+            if use_try is True:
+                CMD = 'try({source("%(fn)s")})%(newline)s ' % params
+                CMD += 'dummy=file.remove(%(fn)r)%(newline)s%(tail_cmd)s' % params
+            else:
+                CMD = '({source("%(fn)s")})%(newline)s ' % params
+                CMD += 'dummy=file.remove(%(fn)r)%(newline)s%(tail_cmd)s' % params
+
 
         try:
             self.sendAll(self.prog, CMD)
         except IOError:
             if self.verbose:
-                print("Reconnecting the PIPE")
+                print("PIPE was broken. Reconnecting...")
             self.reconnect()
             self.sendAll(self.prog, CMD)
         except Exception as err:
@@ -729,7 +737,7 @@ class R(object): # "del r.XXX" fails on FePy-r7 (IronPython 1.1 on .NET 2.0.5072
         return(rlt)
 
     def __getitem__(self, obj, use_try=None, use_dict=None): # to model a dict: "r['XXX']"
-        '''
+        """
         Get the value of an R variable or expression. The return value is
         converted to the corresponding Python object.
 
@@ -738,7 +746,7 @@ class R(object): # "del r.XXX" fails on FePy-r7 (IronPython 1.1 on .NET 2.0.5072
             crashing if the obj does not exist in R.
         use_dict: named list will be returned a dict if use_dict is True,
             otherwise it will be a list of tuples (name, value)
-        '''
+        """
         if obj.startswith('_'):
             raise RError('Leading underscore ("_") is not permitted in R variable names!')
         use_try = use_try or self._DEBUG_MODE
