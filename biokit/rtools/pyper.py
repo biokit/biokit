@@ -11,10 +11,12 @@ Examples that fail:
     packageVersion("CellNOptR")  --> special unicode not interpreted
 
 
+The get() function fails with S4 objects such as CNOlist
+We return None to avoid the failure::
 
+    else if (is.object(x)) 'None'
 
 ----------------------------------------------------------------------------
-
 
          PypeR (PYthon-piPE-R)
 
@@ -92,7 +94,6 @@ DEBUG model:
     Then the R expression will always be wrapped in "try()" to avoid R crashing
     if the method "get" is called.
 """
-
 # the module "subprocess" requires Python 2.4
 
 import os
@@ -525,7 +526,9 @@ class R(object): # "del r.XXX" fails on FePy-r7 (IronPython 1.1 on .NET 2.0.5072
             else if (is.matrix(x) || is.array(x)) ArrayStr(x)
             else if (is.data.frame(x)) DataFrameStr(x)
             else if (is.list(x)) ListStr(x)
-            else Str4Py(as.character(x)) } # other objects will be convert to character (instead of NullStr), or use "gettext"
+            else if (is.object(x)) 'None'
+            else Str4Py(as.character(x)) }
+            # other objects will be convert to character (instead of NullStr), or use "gettext"
         return(rlt) }
     Str4Py(x) }
     # initalize library path for TCL/TK based environment on Windows, e.g. Python IDLE
