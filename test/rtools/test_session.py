@@ -13,7 +13,6 @@ def test_session():
         assert True
 
 
-
 def test_attribute():
     s = session.RSession()
     s.run("b=1")
@@ -24,4 +23,4 @@ def test_attribute():
     except:
         assert True
     assert 1 == s.b
-    
+
