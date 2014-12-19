@@ -41,7 +41,8 @@ def install_package(query, dependencies=False, verbose=True,
     
     try:
         # PART for fetching a file on the web, download and install locally
-        print("Trying from the web ?")
+        if verbose:
+            print("Trying from the web ?")
         data = urllib2.urlopen(query)
         fh = TempFile(suffix=".tar.gz")
         with open(fh.name, 'w') as fh:
@@ -53,9 +54,10 @@ def install_package(query, dependencies=False, verbose=True,
         session.run(code)
 
     except Exception as err:
-        print(err.message)
-        print("trying local or from repos")
-        print("RTOOLS warning: URL provided does not seem to exist %s. Trying from CRAN" % query)
+        if verbose:
+            print(err.message)
+            print("trying local or from repos")
+            print("RTOOLS warning: URL provided does not seem to exist %s. Trying from CRAN" % query)
         code = """install.packages("%s", dependencies=%s """ % \
             (query, bool2R(dependencies))
 
@@ -119,6 +121,9 @@ class RPackage(object):
         '1.11.3'
 
     .. todo:: do we need the version_required attribute/parameter anywhere ?
+
+    .. note:: R version includes dashes, which are not recognised
+       by distutils so they should be replaced. 
     """
     def __init__(self, name, version_required=None, install=False, verbose=False):
         self.name = name
@@ -141,11 +146,14 @@ class RPackage(object):
         if self.version is None and install is True:
             self.install(name)
         if self.version and self.version_required:
-            if StrictVersion(self.version) >= StrictVersion(self.version_required):
+            if self._get_val_version(self.version) >= self._get_val_version(self.version_required):
                 pass
             else:
                 print("Found %s (version %s) but version %s required." % (
                     self.name, self.version, self.version_required))
+
+    def _get_val_version(self, version):
+        return StrictVersion(version.replace("-", "a"))
 
     def install(self):
         install_package(self.name)
@@ -232,6 +240,8 @@ class RPackageManager(object):
         except:
             self.logging.warning("Could not update the packages. Call update() again")
 
+    def _compat_version(self, version):
+        return version.replace("-", "a")
 
     def _get_installed(self):
         # we do not buffer because packages may be removed manually or from R of
@@ -307,7 +317,7 @@ class RPackageManager(object):
             self.logging.info("Package %s not installed" % pkg)
             return False
         currentVersion = self.packageVersion(pkg)
-        if StrictVersion(currentVersion) >= StrictVersion(version):
+        if self._get_version(currentVersion) >= self._get_version(version):
             return True
         else:
             return False
@@ -340,10 +350,12 @@ class RPackageManager(object):
         is available, it is installed
 
         """
-        for pkg in pkg:
-            self._install(pkg)
+        from easydev import to_list
+        pkgs = to_list(pkg)
+        for pkg in pkgs:
+            self._install(pkg, require=require, update=update, reinstall=reinstall)
 
-    def _install(self, pkg, require=require, update=update, reinstall=False):
+    def _install(self, pkg, require=None, update=update, reinstall=False):
         # LOCAL file
         if self._isLocal(pkg):
             # if a local file, we do not want to jump to biocLite or CRAN. Let
@@ -370,7 +382,7 @@ class RPackageManager(object):
                 return
             
             # if require is not none, is it the required version ?
-            if StrictVersion(currentVersion) >= StrictVersion(require) and reinstall is False:
+            if self._get_version(currentVersion) >= self._get_version(require) and reinstall is False:
                 self.logging.info("%s already installed with required version %s" \
                     % (pkg, currentVersion))
                 # if so, nothing to do
@@ -381,7 +393,7 @@ class RPackageManager(object):
                 if require is None:
                     return
                 currentVersion = self.get_package_version(pkg)
-                if StrictVersion(currentVersion) < StrictVersion(require):
+                if self._get_version(currentVersion) < self._get_version(require):
                     self.logging.warning("%s installed but current version (%s) does not fulfill your requirement" % \
                         (pkg, currentVersion))
 
@@ -392,12 +404,15 @@ class RPackageManager(object):
             # require is ignored. The latest will be installed
             self.logging.info("Trying to find the package on bioconductor")
             self.biocLite(pkg)
-            if require == None:
+            if require is None:
                 return
-            currentVersion = self.packageVersion(pkg)
-            if StrictVersion(currentVersion) >= StrictVersion(require):
+            currentVersion = self.get_package_version(pkg)
+            if self._get_version(currentVersion) >= self._get_version(require):
                 self.logging.warning("%s installed but version is %s too small (even after update)" % \
                     (pkg, currentVersion, require))
+
+    def _get_version(self, version):
+        return StrictVersion(version.replace("-", "a"))
 
     def is_installed(self, pkg_name):
         if pkg_name in self.installed.index:
