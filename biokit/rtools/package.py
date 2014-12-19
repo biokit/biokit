@@ -4,7 +4,8 @@ import os.path
 
 from biokit.rtools import bool2R, RSession
 from distutils.version import StrictVersion
-from easydev import Logging
+from easydev import Logging, TempFile
+
 
 __all__ = ["get_R_version", "biocLite", "RPackage", 
     'install_package', 'RPackageManager']
@@ -42,7 +43,6 @@ def install_package(query, dependencies=False, verbose=True,
         # PART for fetching a file on the web, download and install locally
         print("Trying from the web ?")
         data = urllib2.urlopen(query)
-        from easydev import TempFile
         fh = TempFile(suffix=".tar.gz")
         with open(fh.name, 'w') as fh:
             for x in data.readlines():
@@ -226,7 +226,12 @@ class RPackageManager(object):
     def update(self):
         """If you install/remove packages yourself elsewhere, you may need to 
         call this function to update the package manager"""
-        self._update()
+        try:
+            #self.session.reconnect()          
+            self._update()
+        except:
+            self.logging.warning("Could not update the packages. Call update() again")
+
 
     def _get_installed(self):
         # we do not buffer because packages may be removed manually or from R of
@@ -246,6 +251,10 @@ class RPackageManager(object):
         # do not buffer since it may change in many places
         return self._packages
     packages = property(_get_packages)
+
+    def get_package_latest_version(self, package):
+        """Get latest version available of a package"""
+        return self.available['Version'].ix[package]
 
     def get_package_version(self, package):
         """Get version of an install package"""
@@ -313,16 +322,26 @@ class RPackageManager(object):
         if isinstance(packageName, str):
             packageName = [packageName]
         for pkg in packageName:
-            if pkg not in self.installed.index:
+            if self.is_installed(pkg) is False:
+                self.logging.info("Package not found. Installing %s..." % pkg)
                 install_package(pkg, dependencies=dependencies, 
                         repos=repos)
+            else:
+                self.logging.info("Package %s found. " % pkg)
+                install_package(pkg, dependencies=dependencies, 
+                        repos=repos)
+                
+                
         self.update()
 
-    def install(self, pkg, require=None):
+    def install(self, pkg, require=None, update=True, reinstall=False):
         """install a package automatically scanning CRAN and biocLite repos
 
+        if require is not set and update is True, when a newest version of a package
+        is available, it is installed
 
         """
+        # LOCAL file
         if self._isLocal(pkg):
             # if a local file, we do not want to jump to biocLite or CRAN. Let
             # us install it directly. We cannot check version yet so we will
@@ -331,31 +350,44 @@ class RPackageManager(object):
             self._install_packages(pkg)
             return
 
-        if pkg in self.installed.index:
+        # From CRAN
+        if self.is_installed(pkg):
             currentVersion = self.get_package_version(pkg)
-            if require == None:
+            # if not provided, require should be the latest version
+            if require is None and update is True:
+                try:
+                    require = self.get_package_latest_version(pkg)
+                except:
+                    # a non-cran package (bioclite maybe)
+                    pass
+
+            if require is None:
                 self.logging.info("%s already installed with version %s" % \
                     (pkg, currentVersion))
                 return
-            # nothing to do except the required version
-            if StrictVersion(currentVersion) >= StrictVersion(require):
+            
+            # if require is not none, is it the required version ?
+            if StrictVersion(currentVersion) >= StrictVersion(require) and reinstall is False:
                 self.logging.info("%s already installed with required version %s" \
                     % (pkg, currentVersion))
+                # if so, nothing to do
             else:
                 # Try updating
+                self.logging.info("Updating")
                 self._install_packages(pkg)
-                if require == None:
+                if require is None:
                     return
                 currentVersion = self.get_package_version(pkg)
-                if StrictVersion(currentVersion) >= StrictVersion(require):
+                if StrictVersion(currentVersion) < StrictVersion(require):
                     self.logging.warning("%s installed but current version (%s) does not fulfill your requirement" % \
                         (pkg, currentVersion))
 
         elif pkg in self.available.index:
             self._install_packages(pkg)
         else:
-            # maybe a biocLite package:
+            # maybe a biocLite package ?
             # require is ignored. The latest will be installed
+            self.logging.info("Trying to find the package on bioconductor")
             self.biocLite(pkg)
             if require == None:
                 return
@@ -363,7 +395,11 @@ class RPackageManager(object):
             if StrictVersion(currentVersion) >= StrictVersion(require):
                 self.logging.warning("%s installed but version is %s too small (even after update)" % \
                     (pkg, currentVersion, require))
-
-
+            self.update()
+    def is_installed(self, pkg_name):
+        if pkg_name in self.installed.index:
+            return True
+        else:
+            return False
 
 
