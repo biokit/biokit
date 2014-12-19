@@ -275,10 +275,12 @@ class RPackageManager(object):
                 biocLite(package, suppressUpdates, verbose=verbose)
         elif isinstance(package, list):
             for pkg in package:
-                if pkg not in self.installed.index:
+                self.logging.info("Installing %s" % pkg)
+                if self.is_installed(pkg) is False:
                     biocLite(pkg, suppressUpdates, verbose=verbose)
         else: # trying other cases (e.g., None updates biocLite itself). 
-             biocLite(package, suppressUpdates)
+            biocLite(package, suppressUpdates, verbose=verbose)
+        self.update()
 
     def _isLocal(self, pkg):
         if os.path.exists(pkg):
@@ -310,9 +312,8 @@ class RPackageManager(object):
         else:
             return False
 
-    def _install_packages(self, packageName, dependencies=True):
+    def _install_package(self, packageName, dependencies=True):
         """Installs one or more CRAN packages
-        
         
         .. todo:: check if it is already available to prevent renstallation ?
         """
@@ -330,8 +331,6 @@ class RPackageManager(object):
                 self.logging.info("Package %s found. " % pkg)
                 install_package(pkg, dependencies=dependencies, 
                         repos=repos)
-                
-                
         self.update()
 
     def install(self, pkg, require=None, update=True, reinstall=False):
@@ -341,13 +340,17 @@ class RPackageManager(object):
         is available, it is installed
 
         """
+        for pkg in pkg:
+            self._install(pkg)
+
+    def _install(self, pkg, require=require, update=update, reinstall=False):
         # LOCAL file
         if self._isLocal(pkg):
             # if a local file, we do not want to jump to biocLite or CRAN. Let
             # us install it directly. We cannot check version yet so we will
             # overwrite what is already installed
             self.logging.warning("Installing from source")
-            self._install_packages(pkg)
+            self._install_package(pkg)
             return
 
         # From CRAN
@@ -374,7 +377,7 @@ class RPackageManager(object):
             else:
                 # Try updating
                 self.logging.info("Updating")
-                self._install_packages(pkg)
+                self._install_package(pkg)
                 if require is None:
                     return
                 currentVersion = self.get_package_version(pkg)
@@ -383,7 +386,7 @@ class RPackageManager(object):
                         (pkg, currentVersion))
 
         elif pkg in self.available.index:
-            self._install_packages(pkg)
+            self._install_package(pkg)
         else:
             # maybe a biocLite package ?
             # require is ignored. The latest will be installed
@@ -395,7 +398,7 @@ class RPackageManager(object):
             if StrictVersion(currentVersion) >= StrictVersion(require):
                 self.logging.warning("%s installed but version is %s too small (even after update)" % \
                     (pkg, currentVersion, require))
-            self.update()
+
     def is_installed(self, pkg_name):
         if pkg_name in self.installed.index:
             return True
