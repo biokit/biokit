@@ -14,6 +14,7 @@ class VizInput(object):
     def __init__(self, verbose=False):
         self.verbose = verbose
 
+
 class Hist2d(VizInput):
     """data can be a dataframe with 2 columns or a numpy 2D array with 2 columns
     or 2 rows, or a list of arrays or a dictionary.
@@ -24,13 +25,13 @@ class Hist2d(VizInput):
         super(Hist2d, self).__init__(verbose=verbose)
         self.df = pd.DataFrame(data)
 
-        if self.df.shape[1] !=2:
+        if self.df.shape[1] != 2:
             if self.df.shape[0] == 2:
                 print("warning transposing data")
                 self.df = self.df.transpose()
 
     def plot(self, bins=100, cmap="hot_r", fontsize=10, Nlevels=4,
-        xlabel=None, ylabel=None, norm=None,
+        xlabel=None, ylabel=None, norm=None, range=[],
         contour=True, **kargs):
         """plots histogram of mean across replicates versus coefficient variation
 
@@ -60,9 +61,8 @@ class Hist2d(VizInput):
             from matplotlib import colors
             res = pylab.hist2d(X, Y, bins=bins,
                cmap=cmap, norm=colors.LogNorm())
-
         else:
-            res = pylab.hist2d(X, Y, bins=bins,cmap=cmap)
+            res = pylab.hist2d(X, Y, bins=bins, cmap=cmap, range=range)
         pylab.colorbar()
 
         if contour:
@@ -76,7 +76,7 @@ class Hist2d(VizInput):
             X, Y = pylab.meshgrid(res[1][0:bins1], res[2][0:bins2])
             if contour:
                 levels = [round(x) for x in pylab.logspace(0, pylab.log10(res[0].max().max()),Nlevels)]
-                pylab.contour(X,Y,res[0].transpose(), levels[2:], color="g")
+                pylab.contour(X, Y, res[0].transpose(), levels[2:], color="g")
                 #pylab.clabel(C, fontsize=fontsize, inline=1)
 
         if ylabel == None:
