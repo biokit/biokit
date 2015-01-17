@@ -7,6 +7,7 @@ from scipy.optimize import minimize, show_options
 import numpy as np
 import pylab
 import seaborn as sns
+from easydev import AttrDict
 
 class Mixture(object):
     """Creates a mix of Gaussian distribution
@@ -71,15 +72,26 @@ class Fitting(object):
         self.model = model
         self.size = float(len(self.data))
 
-    def plot(self, normed=True, N=1000, Xmin=None, Xmax=None, bins=50):
-        pylab.hist(self.data, normed=normed, bins=bins)
+    def plot(self, normed=True, N=1000, Xmin=None, Xmax=None, bins=50, color='red', lw=2, 
+            hist_kw={'color':'#5F9EA0'}):
+
+        pylab.hist(self.data, normed=normed, bins=bins, **hist_kw)
         if Xmin is None:
             Xmin = self.data.min()
         if Xmax is None:
             Xmax = self.data.max()
         X = pylab.linspace(Xmin, Xmax, N)
 
-        pylab.plot(X, [self.model.pdf(x, self.results.x) for x in X])
+        pylab.plot(X, [self.model.pdf(x, self.results.x) for x in X], color=color, lw=lw)
+            
+        K = len(self.results.x)
+        #TODO:
+        #print(K)
+        # The PIs must be normalised
+        #for i in range(0, K/3):
+        #    mu, sigma, pi_ = self.results.x[i*3], self.results.x[i*3+1], self.results.x[i*3+2]
+        #    print(mu,sigma, pi_)
+        #    pylab.plot(X, [pi_ * pylab.normpdf(x, mu, sigma) for x in X], 'r--')
 
 
 class MixtureFitting(Fitting):
@@ -123,6 +135,17 @@ class MixtureFitting(Fitting):
         res = minimize(self.model.log_likelihood, x0=guess, args=(self.data,), 
             method=method, options=dict(maxiter=maxiter, maxfev=maxfev))
         self.results = res
+        pis = np.array(self.results.x[2::3])
+        pis /= pis.sum()
+        k = len(self.results.x)/3
+        params = []
+        for i in range(0, k):
+            params.append(self.results.x[i*3])
+            params.append(self.results.x[(i*3+1)])
+            params.append(pis[i])
+        self.results.x = params 
+        #TODO normalise pis
+
         return res
 
 
@@ -174,8 +197,7 @@ class EM(Fitting):
             # Convergence check
             counter += 1
             converged = counter >= self.max_iter
-        self.results = {'x': p_new}
-        from easydev import AttrDict
+        self.results = {'x': p_new, 'nfev':counter, 'success': converged}
         self.results = AttrDict(**self.results)
 
 
