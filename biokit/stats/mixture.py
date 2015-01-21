@@ -182,11 +182,9 @@ class GaussianMixtureFitting(Fitting):
         if k is not None:
             self.k = k
 
-
         if guess is None:
             # estimate the mu/sigma/pis from the data
             guess = self.get_guess()
-
 
         res = minimize(self.model.log_likelihood, x0=guess, args=(self.data,), 
             method=self.method, options=dict(maxiter=maxiter, maxfev=maxfev),
@@ -220,8 +218,8 @@ class GaussianMixtureFitting(Fitting):
             self.results.BIC = 1000
 
         self.results.pis = self.results.x[2::3]
-        self.results.sigmas = self.results.x[0::3]
-        self.results.mus = self.results.x[1::3]
+        self.results.sigmas = self.results.x[1::3]
+        self.results.mus = self.results.x[0::3]
 
         #TODO normalise pis
 
