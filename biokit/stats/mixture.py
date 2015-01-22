@@ -84,6 +84,7 @@ class Fitting(object):
         self._method = method
         # initialise the model
         self.k = k
+        self.verbose = True
 
     def _get_method(self):
         return self._method
@@ -126,22 +127,31 @@ class Fitting(object):
         return params
 
     def plot(self, normed=True, N=1000, Xmin=None, Xmax=None, bins=50, color='red', lw=2, 
-            hist_kw={'color':'#5F9EA0'}):
+            hist_kw={'color':'#5F9EA0'}, ax=None):
 
-        pylab.hist(self.data, normed=normed, bins=bins, **hist_kw)
+        if ax:
+            ax.hist(self.data, normed=normed, bins=bins, **hist_kw)
+        else:
+            pylab.hist(self.data, normed=normed, bins=bins, **hist_kw)
         if Xmin is None:
             Xmin = self.data.min()
         if Xmax is None:
             Xmax = self.data.max()
         X = pylab.linspace(Xmin, Xmax, N)
 
-        pylab.plot(X, [self.model.pdf(x, self.results.x) for x in X], color=color, lw=lw)
+        if ax:
+            ax.plot(X, [self.model.pdf(x, self.results.x) for x in X], color=color, lw=lw)
+        else:
+            pylab.plot(X, [self.model.pdf(x, self.results.x) for x in X], color=color, lw=lw)
 
         K = len(self.results.x)
         # The PIs must be normalised
         for i in range(0, K/3):
             mu, sigma, pi_ = self.results.x[i*3], self.results.x[i*3+1], self.results.x[i*3+2]
-            pylab.plot(X, [pi_ * pylab.normpdf(x, mu, sigma) for x in X], 'g--', alpha=0.5)
+            if ax:
+                ax.plot(X, [pi_ * pylab.normpdf(x, mu, sigma) for x in X], 'g--', alpha=0.5)
+            else:
+                pylab.plot(X, [pi_ * pylab.normpdf(x, mu, sigma) for x in X], 'g--', alpha=0.5)
 
 
 class GaussianMixtureFitting(Fitting):
@@ -196,7 +206,8 @@ class GaussianMixtureFitting(Fitting):
         if sum(pis<0) >0:
             unstable = True
             pis /= pis.sum()
-            print("Unstable... found negative pis (k=%s)" % self.k)
+            if self.verbose:
+                print("Unstable... found negative pis (k=%s)" % self.k)
         else:
             unstable = False
             pis /= pis.sum()
@@ -220,8 +231,8 @@ class GaussianMixtureFitting(Fitting):
             self.results.BIC = 1000
 
         self.results.pis = self.results.x[2::3]
-        self.results.sigmas = self.results.x[0::3]
-        self.results.mus = self.results.x[1::3]
+        self.results.sigmas = self.results.x[1::3]
+        self.results.mus = self.results.x[0::3]
 
         #TODO normalise pis
 
@@ -313,6 +324,7 @@ class EM(Fitting):
 class AdaptativeMixtureFitting(object):
     def __init__(self, data, method='Nelder-Mead'):
         self.fitting = GaussianMixtureFitting(data, method=method)
+        self.verbose = True
 
     def run(self, kmin=1, kmax=6, criteria='AICc'):
         self.all_results = {}
@@ -328,7 +340,8 @@ class AdaptativeMixtureFitting(object):
 
         m = np.array([self.all_results[x][criteria] for x in self.x]).min()
         index = np.array([self.all_results[x][criteria] for x in self.x]).argmin()
-        print('Found min ', m, 'for index ',index+1)
+        if self.verbose:
+            print('Found min ', m, 'for index ',index+1)
         self.best_k = self.x[index ]
         self.min_value = m
 
