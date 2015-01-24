@@ -11,15 +11,28 @@ from easydev import AttrDict
 
 import criteria
 
-class Mixture(object):
+class GaussianMixture(object):
     """Creates a mix of Gaussian distribution
 
+    .. plot::
+        :width: 80%
+        :include-source:
+
+        from biokit.stats.mixture import GaussianMixture
+        m = GaussianMixture(mu=[-1,1], sigma=[0.5, 0.5], mixture=[.2, .8], N=1000)
+        m.plot()
 
     """
     def __init__(self, mu=[-1,1], sigma=[1,1], mixture=[0.5,0.5], N=1000):
+        """.. rubric:: constructor
+    
+        :param list mu: list of mean for each model
+        :param list sigma: list of standard deviation for each model
+        :param list mixture: list of amplitude for each model
+
+        """
         assert len(mu) == len(sigma)
         assert len(mu) == len(mixture)
-
         self.mu = mu
         self.sigma = sigma
         self.mixture = mixture
@@ -43,7 +56,21 @@ class Mixture(object):
         pylab.hist(self.data, bins=bins, normed=normed)
 
 
+class Mixture(GaussianMixture):
+    def __init__(self, *args, **kargs):
+        super(Mixture, self).__init__(*args, **kargs)
+        print('Deprecated. Use GaussianMixture')
+
 class GaussianMixtureModel(object):
+    """Gaussian Mixture Model
+
+    .. plot::
+
+        from biokit.stats import mixture
+        m = mixture.GaussianMixtureModel()
+        m.pdf(1, params=[1, 0.5, 0.2, 1, 0.5, 0.8])
+
+    """
     def __init__(self, k=2):
         self.k = k
 
@@ -51,7 +78,9 @@ class GaussianMixtureModel(object):
         """Expected parameters are
 
 
-        mu, sigma, pi, mu2, sigma2, pi2, ...
+        params is a list of gaussian distribution ordered as mu, sigma, pi, 
+        mu2, sigma2, pi2, ...
+
         """
         assert divmod(len(params), 3)[1] == 0
         assert len(params) >= 3 * self.k
@@ -60,6 +89,9 @@ class GaussianMixtureModel(object):
         self.k = k
 
         pis = np.array(params[2::3])
+
+        if any(np.array(pis)<0):
+            return 0
         if normalise is True:
             pis /= pis.sum()
         # !!! sum pi must equal 1 otherwise may diverge badly
@@ -72,11 +104,21 @@ class GaussianMixtureModel(object):
         return data
 
     def log_likelihood(self, params, sample):
-        return -1 * pylab.log(self.pdf(sample, params)).sum()
+        res =  -1 * pylab.log(self.pdf(sample, params)).sum()
+        return res
 
 
 class Fitting(object):
+    """Base class for :class:`EM` and :class:`GaussianMixtureFitting`"""
     def __init__(self, data, k=2, method='Nelder-Mead'):
+        """.. rubric:: constructor
+
+        :param list data:
+        :param int k: number of GMM to use
+        :param str method: minimization method to be used (one of scipy optimise module)
+
+
+        """
         self.data = np.array(data)
         self.size = float(len(self.data))
         self._k = k
@@ -108,6 +150,10 @@ class Fitting(object):
     model = property(_get_model)
 
     def get_guess(self):
+        """Random guess to initialise optimisation
+
+
+        """
         params = {}
         m = self.data.min()
         M = self.data.max()
@@ -147,7 +193,8 @@ class Fitting(object):
         K = len(self.results.x)
         # The PIs must be normalised
         for i in range(0, K/3):
-            mu, sigma, pi_ = self.results.x[i*3], self.results.x[i*3+1], self.results.x[i*3+2]
+            
+            mu, sigma, pi_ = self.results.mus[i], self.results.sigmas[i], self.results.pis[i]
             if ax:
                 ax.plot(X, [pi_ * pylab.normpdf(x, mu, sigma) for x in X], 'g--', alpha=0.5)
             else:
@@ -155,16 +202,17 @@ class Fitting(object):
 
 
 class GaussianMixtureFitting(Fitting):
-    """
+    """GaussianMixtureFitting using scipy minization
 
-        from biokit.stats.mixture import Mixture
-        m = Mixture(mu=[0,0.6], sigma=[0.08,0.12])
-        m.hist()
+    .. plot::
+        :width: 80%
+        :include-source:
 
-        gmm = GaussianMixtureModel()
-
-        mf = GaussianMixtureFitting(m.data, gmm)
-        mf.minimize(guess=[])
+        from biokit.stats.mixture import Mixture, GaussianMixtureFitting
+        m = Mixture(mu=[-1,1], sigma=[0.5,0.5], mixture=[0.2,0.8])
+        mf = GaussianMixtureFitting(m.data)
+        mf.estimate(k=2)
+        mf.plot()
 
 
     """
@@ -172,10 +220,9 @@ class GaussianMixtureFitting(Fitting):
         """
 
         Here we use the function minimize() from scipy.optimization. 
-        The list of
-        (currently) available minimization methods is 'Nelder-Mead' (simplex),
-        'Powell', 'CG', 'BFGS', 'Newton-CG',> 'Anneal', 'L-BFGS-B' (like BFGS
-                but bounded), 'TNC', 'COBYLA', 'SLSQPG'.
+        The list of (currently) available minimization methods is 'Nelder-Mead' (simplex),
+        'Powell', 'CG', 'BFGS', 'Newton-CG',> 'Anneal', 'L-BFGS-B' (like BFGS but bounded), 
+        'TNC', 'COBYLA', 'SLSQPG'.
 
         """
         super(GaussianMixtureFitting, self).__init__(data, k=k, method=method)
@@ -199,9 +246,13 @@ class GaussianMixtureFitting(Fitting):
         res = minimize(self.model.log_likelihood, x0=guess, args=(self.data,), 
             method=self.method, options=dict(maxiter=maxiter, maxfev=maxfev),
             bounds=bounds)
+
         self.results = res
         pis = np.array(self.results.x[2::3])
-        if sum(pis<0) >0:
+        self.results.pis_raw = pis.copy()
+        # The ratio may be negative, in which case we need to normalise.
+        # An example would be to have -0.35, -0.15, which normalise would five 0.7, 0.3 as expected.
+        """if sum(pis<0) > 0:
             unstable = True
             pis /= pis.sum()
             if self.verbose:
@@ -209,7 +260,8 @@ class GaussianMixtureFitting(Fitting):
         else:
             unstable = False
             pis /= pis.sum()
-
+        """
+        unstable = False
         k = len(self.results.x)/3
         params = []
         for i in range(0, k):
@@ -218,36 +270,65 @@ class GaussianMixtureFitting(Fitting):
             params.append(pis[i])
         self.results.x = params 
 
-        self.results.likelihood = pylab.exp(-1*self.model.log_likelihood(params, self.data))
-        if self.results.likelihood and unstable is False:
-            self.results.AIC = criteria.AIC(self.results.likelihood, self.k)
-            self.results.AICc = criteria.AICc(self.results.likelihood, self.k, self.data.size)
-            self.results.BIC = criteria.BIC(self.results.likelihood, self.k, self.data.size)
+        # FIXME shall we multiply by -1 ??
+        self.results.log_likelihood = self.model.log_likelihood(params, self.data)
+        if self.results.log_likelihood and unstable is False:
+            self.results.AIC = criteria.AIC(self.results.log_likelihood, self.k, logL=True)
+            self.results.AICc = criteria.AICc(self.results.log_likelihood, self.k, self.data.size, logL=True)
+            self.results.BIC = criteria.BIC(self.results.log_likelihood, self.k, self.data.size, logL=True)
         else:
             self.results.AIC = 1000
             self.results.AICc = 1000
             self.results.BIC = 1000
 
-        self.results.pis = self.results.x[2::3]
+        pis = np.array(self.results.x[2::3])
+
+        self.results.pis = list(pis / pis.sum())
         self.results.sigmas = self.results.x[1::3]
         self.results.mus = self.results.x[0::3]
 
-        #TODO normalise pis
+        # 
 
         return res
 
 
 
 class EM(Fitting):
+    """Expectation minimization class to estimate parameters of GMM
 
+    .. plot::
+        :width: 50%
+        :include-source:
+
+        from biokit.stats.mixture import Mixture, EM
+        m = Mixture(mu=[-1,1], sigma=[0.5,0.5], mixture=[0.2,0.8])
+        em = EM(m.data)
+        em.estimate(k=2)
+        em.plot()
+
+    """
     def __init__(self, data, model=None, max_iter=100):
+        """.. rubric:: constructor
+
+        :param data: 
+        :param model: not used. Model is the :class:`GaussianMixtureModel` but
+            could be other model.
+        :param int max_iter: max iteration for the minization 
+
+        """
         if model is None:
             model = GaussianMixtureModel(k=2)
         super(EM, self).__init__(data, model)
         self.max_iter = max_iter
 
     def estimate(self, guess=None, k=2):
-        #
+        """
+
+        :param list guess: a list to provide the initial guess. Order is mu1, sigma1, 
+            pi1, mu2, ...
+        :param int k: number of models to be used.
+        """
+        #print("EM estimation")
         self.k = k
         # Initial guess of parameters and initializations
         if guess is None:
@@ -315,11 +396,36 @@ class EM(Fitting):
 
 
         self.results = AttrDict(**self.results)
+        self.results.mus = self.results.x[0::3]
+        self.results.sigmas = self.results.x[1::3]
+        self.results.pis = self.results.x[2::3]
 
+        log_likelihood = self.model.log_likelihood(self.results.x, self.data)
+        self.results.AIC = criteria.AIC(log_likelihood, k, logL=True)
+
+        self.results.log_likelihood = log_likelihood
+        self.results.AIC = criteria.AIC(log_likelihood, self.k, logL=True)
+        self.results.AICc = criteria.AICc(log_likelihood, self.k, self.data.size, logL=True)
+        self.results.BIC = criteria.BIC(log_likelihood, self.k, self.data.size, logL=True)
 
 
 
 class AdaptativeMixtureFitting(object):
+    """Automatic Adaptative Mixture Fitting
+
+    .. plot::
+        :width: 80%
+        :include-source: 
+
+        from biokit.stats.mixture import AdaptativeMixtureFitting, Mixture
+        m = Mixture(mu=[-1,1], sigma=[0.5,0.5], mixture=[0.2,0.8])
+        amf = AdaptativeMixtureFitting(m.data)
+        amf.run(kmin=1, kmax=6)
+        amf.diagnostic(k=amf.best_k)
+
+
+    """
+    # TODO: propose to use EM or Minimization.
     def __init__(self, data, method='Nelder-Mead'):
         self.fitting = GaussianMixtureFitting(data, method=method)
         self.verbose = True
@@ -339,8 +445,8 @@ class AdaptativeMixtureFitting(object):
         m = np.array([self.all_results[x][criteria] for x in self.x]).min()
         index = np.array([self.all_results[x][criteria] for x in self.x]).argmin()
         if self.verbose:
-            print('Found min ', m, 'for index ',index+1)
-        self.best_k = self.x[index ]
+            print('Found min ', m, 'for k  ', self.x[index])
+        self.best_k = self.x[index]
         self.min_value = m
 
 

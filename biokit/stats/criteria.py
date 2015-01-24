@@ -1,19 +1,22 @@
 # -*- coding: utf-8 -*-
+"""Akaike and other criteria 
+
+"""
 import math
 
 __all__ = ['AIC', 'AICc', 'BIC']
 
 
-def AIC(L, k):
-    """Return Akaike information criterion (AIC)
+def AIC(L, k, logL=False):
+    r"""Return Akaike information criterion (AIC)
 
-    :param int k: number of parameters
     :param float L: maximised value of the likelihood function
-    
+    :param int k: number of parameters
+    :param bool logL: L is the log likelihood.
     
     Suppose that we have a statistical model of some data, from which we computed
-    its likelihood function and let k be the number of parameters in the model 
-    (i.e. degrees of freedom). Then the AIC value is ::
+    its likelihood function and let :math:`k` be the number of parameters in the model 
+    (i.e. degrees of freedom). Then the AIC value is:
 
     :math:`\mathrm{AIC} = 2k - 2\ln(L)`
 
@@ -39,7 +42,7 @@ def AIC(L, k):
     the first two (3) take a weighted average of the first two models, 
     with weights 1 and 0.368.
 
-    The quantity exp((AICmin - AICi)/2) is the relative likelihood of model i.
+    The quantity `exp((AIC_{min} - AIC_i)/2)` is the relative likelihood of model i.
 
     If all the models in the candidate set have the same number of parameters, 
     then using AIC might at first appear to be very similar to using the 
@@ -47,19 +50,23 @@ def AIC(L, k):
     In particular, the likelihood-ratio test is valid only for nested models, 
     whereas AIC (and AICc) has no such restriction.
 
-    Reference: Burnham, K. P.; Anderson, D. R. (2002), Model Selection and 
+    :Reference: Burnham, K. P.; Anderson, D. R. (2002), Model Selection and 
         Multimodel Inference: A Practical Information-Theoretic Approach (2nd ed.), 
         Springer-Verlag, ISBN 0-387-95364-7.
     """
-    return 2*k -2 * math.log(L)
+    if logL is True:
+        return 2 * k + 2 * L
+    else:
+        return 2 * k -2 * math.log(L)
 
 
-def AICc(L, k, n):
-    """AICc criteria
+def AICc(L, k, n, logL=False):
+    r"""AICc criteria
     
+    :param float L: maximised value of the likelihood function
     :param int k: number of parameters
     :param int n: sample size
-    :param float L: maximised value of the likelihood function
+    :param bool logL: L is the log likelihood.
 
     AIC with a correction for finite sample sizes. 
     The formula for AICc depends upon the statistical model. 
@@ -72,22 +79,30 @@ def AICc(L, k, n):
     overfitting. The probability of AIC overfitting can be substantial, in some cases.
 
     """
-    res = AIC(L, k) + 2*k*(k+1.) / (n-k-1.)
+    res = AIC(L, k, logL=logL) + 2*k*(k+1.) / (n-k-1.)
     return res
 
 
 
-def BIC(L, k, n):
-    """Bayesian information criterion 
+def BIC(L, k, n, logL=False):
+    r"""Bayesian information criterion 
     
+    :param float L: maximised value of the likelihood function
+    :param int k: number of parameters
+    :param int n: sample size
+    :param bool logL: L is the log likelihood.
     
     Given any two estimated models, the model with the lower value of BIC is the one to be preferred. 
     """
 
-    res = -2 * math.log(L) + k * (math.log(n) - math.log(2 * math.pi))
-    # For large n
-    #res = -2 * math.log(L) + k * math.log(n)
-    return res
+    if logL is False:
+        res = -2 * math.log(L) + k * (math.log(n) - math.log(2 * math.pi))
+        # For large n
+        #res = -2 * math.log(L) + k * math.log(n)
+        return res
+    else:
+        res = 2 * logL + k * (math.log(n) - math.log(2 * math.pi))
+        return res
 
 
 
