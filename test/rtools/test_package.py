@@ -67,7 +67,7 @@ def test_pm():
 
     d = dun.CreateDummy()
     d()
-    pm.install('dummytest_1.0.0.tar.gz') 
+    pm.install('dummy/dummytest_1.0.0.tar.gz') 
     pm.remove('dummytest')
     d._clean()
 

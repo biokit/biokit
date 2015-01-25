@@ -23,3 +23,4 @@ from biokit import services
 from biokit.viz import *
 from biokit.services import EUtils, KEGG, UniProt
 
+from biokit import stats
