@@ -289,8 +289,8 @@ class Corrplot(object):
 
         patches = []
         colors = []
-        for x in xrange(width):
-            for y in xrange(height):
+        for x in range(width):
+            for y in range(height):
                 if fill == 'lower' and x > y:
                     continue
                 elif fill == 'upper' and x < y:

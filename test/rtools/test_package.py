@@ -1,6 +1,6 @@
 from biokit.rtools import package
 from nose.plugins.attrib import attr
-import create_dummy_package as dun
+from . import create_dummy_package as dun
 
 # This will not work on travis since you will need R
 
