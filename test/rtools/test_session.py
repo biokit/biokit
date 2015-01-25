@@ -13,5 +13,14 @@ def test_session():
         assert True
 
 
+def test_attribute():
+    s = session.RSession()
+    s.run("b=1")
+    assert 1 == s.b
+    try:
+        s.c
+        assert False
+    except:
+        assert True
+    assert 1 == s.b
 
-    #sess = session.RSession(RCMD='R --quiet')

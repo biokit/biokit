@@ -47,6 +47,18 @@ BioServices
 BioServices is used in BioKit to access to web services (e.g., KEGG, UniProt, Ensembl...) but documentation for bioservices itself is not provided. See BioServices instead.
 
 
+Stats
+========
+
+.. automodule:: biokit.stats.mixture
+    :members:
+    :undoc-members:
+    :synopsis: 
+
+.. automodule:: biokit.stats.criteria
+    :members:
+    :undoc-members:
+    :synopsis: 
 
 
 

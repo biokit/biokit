@@ -35,8 +35,14 @@ Overview
     biokit.viz
     biokit.rtools
     biokit.services
+    biokit.stats
 
+References
+============
 
+.. toctree::
+
+    references
 
 .. _installation:
 

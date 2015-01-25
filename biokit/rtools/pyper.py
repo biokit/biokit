@@ -11,10 +11,12 @@ Examples that fail:
     packageVersion("CellNOptR")  --> special unicode not interpreted
 
 
+The get() function fails with S4 objects such as CNOlist
+We return None to avoid the failure::
 
+    else if (is.object(x)) 'None'
 
 ----------------------------------------------------------------------------
-
 
          PypeR (PYthon-piPE-R)
 
@@ -84,7 +86,7 @@ DEBUG model:
     the codes passed to it, PypeR is set to "DEBUG" model by default. This
     means that any code blocks send to R will be wrapped in the function
     "try()", which will prevent R from crashing. To disable the "DEBUG" model,
-    the user can simple set the variable "_DEBUG_MODE" in the R class or in its
+    the user can simple set the variable "DEBUG_MODE" in the R class or in its
     instance to False.
 
     To model the behavior of the "get" method of a Python dictionary, the
@@ -92,7 +94,6 @@ DEBUG model:
     Then the R expression will always be wrapped in "try()" to avoid R crashing
     if the method "get" is called.
 """
-
 # the module "subprocess" requires Python 2.4
 
 import os
@@ -192,13 +193,17 @@ else:
         return(rv)
 
 
-def NoneStr(obj): return('NULL')
+def NoneStr(obj): 
+    return('NULL')
+
 
 def BoolStr(obj):
     return(obj and 'TRUE' or 'FALSE')
 
+
 def ReprStr(obj):
     return(repr(obj))
+
 
 if has_numpy:
     def FloatStr(f):
@@ -376,7 +381,7 @@ class RError(Exception):
 
 class R(object): # "del r.XXX" fails on FePy-r7 (IronPython 1.1 on .NET 2.0.50727.42) if using old-style class
     """
-    A Python class to enclose an R process.
+*    A Python class to enclose an R process.
     """
     __Rfun = r'''.getRvalue4Python__ <- function(x, use_dict=NULL, has_numpy=FALSE, has_pandas=FALSE) {
     if (has_pandas) has_numpy <- TRUE
@@ -521,7 +526,9 @@ class R(object): # "del r.XXX" fails on FePy-r7 (IronPython 1.1 on .NET 2.0.5072
             else if (is.matrix(x) || is.array(x)) ArrayStr(x)
             else if (is.data.frame(x)) DataFrameStr(x)
             else if (is.list(x)) ListStr(x)
-            else Str4Py(as.character(x)) } # other objects will be convert to character (instead of NullStr), or use "gettext"
+            else if (is.object(x)) 'None'
+            else Str4Py(as.character(x)) }
+            # other objects will be convert to character (instead of NullStr), or use "gettext"
         return(rlt) }
     Str4Py(x) }
     # initalize library path for TCL/TK based environment on Windows, e.g. Python IDLE
@@ -543,7 +550,8 @@ class R(object): # "del r.XXX" fails on FePy-r7 (IronPython 1.1 on .NET 2.0.5072
     _DEBUG_MODE = True
 
     def __init__(self, RCMD='R', max_len=10000, use_numpy=True, use_pandas=True, use_dict=None,
-                 host='localhost', user=None, ssh='ssh', return_err=True, dump_stdout=False):
+                 host='localhost', user=None, ssh='ssh', return_err=True, dump_stdout=False, 
+                 verbose=False):
         '''
         RCMD: The name of a R interpreter, path information should be included
             if it is not in the system search path.
@@ -582,19 +590,21 @@ class R(object): # "del r.XXX" fails on FePy-r7 (IronPython 1.1 on .NET 2.0.5072
         # "Warning: In 2.5, magic names (typically those with a double
         # underscore (DunderAlias) at both ends of the name) may look at the
         # class rather than the instance even for old-style classes."
-        self.__dict__.update({'prog': None,
+        self.__dict__.update({
+            'prog': None,
             'has_numpy': use_numpy and has_numpy,
             'has_pandas': use_pandas and has_pandas,
             'Rfun': self.__class__.__Rfun,
             'max_len': max_len,
             'use_dict': use_dict,
+            'verbose': verbose,
             'dump_stdout': dump_stdout,
             'localhost': host == 'localhost',
             'newline': sys.platform == 'win32' and '\r\n' or '\n',
             'sendAll' : sendAll # keep a reference to the global function "sendAll" which will be used by __del__
             })
 
-        RCMD = [RCMD]  #shlex.split(RCMD) - shlex do not work properly on Windows! #re.split(r'\s', RCMD)
+        RCMD = [RCMD]  
         if not self.localhost:
             RCMD.insert(0, host)
             if user:
@@ -605,6 +615,7 @@ class R(object): # "del r.XXX" fails on FePy-r7 (IronPython 1.1 on .NET 2.0.5072
         for arg in args:
             if arg not in RCMD:
                 RCMD.append(arg)
+
         if _has_subp and hasattr(subprocess, 'STARTUPINFO'):
             info = subprocess.STARTUPINFO()
             try:
@@ -618,6 +629,7 @@ class R(object): # "del r.XXX" fails on FePy-r7 (IronPython 1.1 on .NET 2.0.5072
                 info = None
         else:
             info = None
+
         # create stderr to replace None for py2exe:
         # http://www.py2exe.org/index.cgi/Py2ExeSubprocessInteractions
         if sys.platform != 'win32':
@@ -630,13 +642,32 @@ class R(object): # "del r.XXX" fails on FePy-r7 (IronPython 1.1 on .NET 2.0.5072
             else:  # Give up and point child stderr at nul
                 childstderr = file('nul', 'a')
 
-        self.__dict__['prog'] = Popen(RCMD, stdin=PIPE, stdout=PIPE, stderr=return_err and _STDOUT or childstderr, startupinfo=info)
+        self.__dict__['subprocess_args'] = {
+                'RCMD': RCMD, 
+                'PIPE': PIPE, 
+                'stderr': return_err and _STDOUT or childstderr, 
+                'info': info}
+
+        self.reconnect()
+
+    def reconnect(self):
+        """TC: Nov 2014
+        
+        If CTRL+C is called, the pipe is broken, in which case, reconnecting could 
+        be handy.
+        
+        """
+        args = self.subprocess_args
+        RCMD = args['RCMD']
+        PIPE = args['PIPE']
+        stderr = args['stderr']
+        info = args['info']
+        self.__dict__['prog'] = Popen(RCMD, stdin=PIPE, stdout=PIPE, 
+                stderr=stderr, startupinfo=info)
         self.__call__(self.Rfun)
 
     def __runOnce(self, CMD, use_try=None):
-        '''
-        CMD: a R command string
-        '''
+        """CMD: a R command string"""
         use_try = use_try or self._DEBUG_MODE
         newline = self.newline
         tail_token = 'R command at time: %s' % repr(time.time())
@@ -644,17 +675,38 @@ class R(object): # "del r.XXX" fails on FePy-r7 (IronPython 1.1 on .NET 2.0.5072
         tail_cmd = 'print("%s")%s' % (tail_token, newline)
         tail_token = tail_token.replace(' ', '\\s').replace('.', '\\.').replace('+', '\\+')
         re_tail = re.compile(r'>\sprint\("%s"\)\r?\n\[1\]\s"%s"\r?\n$' % (tail_token, tail_token))
+
         if len(CMD) <= self.max_len or not self.localhost:
             fn = None
-            CMD = (use_try and 'try({%s})%s%s' or '%s%s%s') % (CMD.replace('\\', '\\\\'), newline, tail_cmd)
+            CMD = (use_try and 'try({%s})%s%s' or '%s%s%s') % (CMD.replace('\\', '\\\\'), 
+                    newline, tail_cmd)
         else:
             fh, fn = tempfile.mkstemp()
             os.fdopen(fh, 'wb').write(_mybytes(CMD))
             if sys.platform == 'cli':
                 os.close(fh)  # this is necessary on IronPython
             fn = fn.replace('\\', '/')
-            CMD = (use_try and 'try({source("%s")})%sfile.remove(%r)%s%s' or '%s%s%s') % (fn, newline, fn, newline, tail_cmd)
-        self.sendAll(self.prog, CMD)
+
+            params = {'fn':fn , 'newline':newline, 'tail_cmd':tail_cmd}
+            if use_try is True:
+                CMD = 'try({source("%(fn)s")})%(newline)s ' % params
+                CMD += 'dummy=file.remove(%(fn)r)%(newline)s%(tail_cmd)s' % params
+            else:
+                CMD = '({source("%(fn)s")})%(newline)s ' % params
+                CMD += 'dummy=file.remove(%(fn)r)%(newline)s%(tail_cmd)s' % params
+
+
+        try:
+            self.sendAll(self.prog, CMD)
+        except IOError:
+            if self.verbose:
+                print("PIPE was broken. Reconnecting...")
+            self.reconnect()
+            self.sendAll(self.prog, CMD)
+        except Exception as err:
+            print("Failed")
+            raise err
+
         rlt = ''
         while not re_tail.search(rlt):
             try:
@@ -688,7 +740,7 @@ class R(object): # "del r.XXX" fails on FePy-r7 (IronPython 1.1 on .NET 2.0.5072
         return(rlt)
 
     def __getitem__(self, obj, use_try=None, use_dict=None): # to model a dict: "r['XXX']"
-        '''
+        """
         Get the value of an R variable or expression. The return value is
         converted to the corresponding Python object.
 
@@ -697,7 +749,7 @@ class R(object): # "del r.XXX" fails on FePy-r7 (IronPython 1.1 on .NET 2.0.5072
             crashing if the obj does not exist in R.
         use_dict: named list will be returned a dict if use_dict is True,
             otherwise it will be a list of tuples (name, value)
-        '''
+        """
         if obj.startswith('_'):
             raise RError('Leading underscore ("_") is not permitted in R variable names!')
         use_try = use_try or self._DEBUG_MODE

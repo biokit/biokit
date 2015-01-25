@@ -49,6 +49,7 @@ class RSession(pyper.R):
 
     """
 
+
     def __init__(self, RCMD='R', max_len=1000, use_numpy=True, use_pandas=True,
             use_dict=None, host='localhost', user=None, ssh='ssh',
             return_err=True, verbose=False):
@@ -86,8 +87,14 @@ class RSession(pyper.R):
     def get_version(self):
         """Return the R version"""
         return self.version
+    
 
-    def reconnect(self):
-        raise NotImplementedError
+    def __repr__(self):
+        txt = "Rsession information:" 
+        txt += "\nverbosity: " + str(self.verbose)
+        txt += "\ndump_stdout: " + str(self.dump_stdout)
+        txt += "\ndebug mode: " + str(self.DEBUG_MODE)
+        return txt
+
 
 

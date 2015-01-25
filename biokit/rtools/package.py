@@ -4,7 +4,8 @@ import os.path
 
 from biokit.rtools import bool2R, RSession
 from distutils.version import StrictVersion
-from easydev import Logging
+from easydev import Logging, TempFile
+
 
 __all__ = ["get_R_version", "biocLite", "RPackage", 
     'install_package', 'RPackageManager']
@@ -40,9 +41,9 @@ def install_package(query, dependencies=False, verbose=True,
     
     try:
         # PART for fetching a file on the web, download and install locally
-        print("Trying from the web ?")
+        if verbose:
+            print("Trying from the web ?")
         data = urllib2.urlopen(query)
-        from easydev import TempFile
         fh = TempFile(suffix=".tar.gz")
         with open(fh.name, 'w') as fh:
             for x in data.readlines():
@@ -53,9 +54,10 @@ def install_package(query, dependencies=False, verbose=True,
         session.run(code)
 
     except Exception as err:
-        print(err.message)
-        print("trying local or from repos")
-        print("RTOOLS warning: URL provided does not seem to exist %s. Trying from CRAN" % query)
+        if verbose:
+            print(err.message)
+            print("trying local or from repos")
+            print("RTOOLS warning: URL provided does not seem to exist %s. Trying from CRAN" % query)
         code = """install.packages("%s", dependencies=%s """ % \
             (query, bool2R(dependencies))
 
@@ -119,6 +121,9 @@ class RPackage(object):
         '1.11.3'
 
     .. todo:: do we need the version_required attribute/parameter anywhere ?
+
+    .. note:: R version includes dashes, which are not recognised
+       by distutils so they should be replaced. 
     """
     def __init__(self, name, version_required=None, install=False, verbose=False):
         self.name = name
@@ -141,11 +146,14 @@ class RPackage(object):
         if self.version is None and install is True:
             self.install(name)
         if self.version and self.version_required:
-            if StrictVersion(self.version) >= StrictVersion(self.version_required):
+            if self._get_val_version(self.version) >= self._get_val_version(self.version_required):
                 pass
             else:
                 print("Found %s (version %s) but version %s required." % (
                     self.name, self.version, self.version_required))
+
+    def _get_val_version(self, version):
+        return StrictVersion(version.replace("-", "a"))
 
     def install(self):
         install_package(self.name)
@@ -226,7 +234,14 @@ class RPackageManager(object):
     def update(self):
         """If you install/remove packages yourself elsewhere, you may need to 
         call this function to update the package manager"""
-        self._update()
+        try:
+            #self.session.reconnect()          
+            self._update()
+        except:
+            self.logging.warning("Could not update the packages. Call update() again")
+
+    def _compat_version(self, version):
+        return version.replace("-", "a")
 
     def _get_installed(self):
         # we do not buffer because packages may be removed manually or from R of
@@ -247,6 +262,10 @@ class RPackageManager(object):
         return self._packages
     packages = property(_get_packages)
 
+    def get_package_latest_version(self, package):
+        """Get latest version available of a package"""
+        return self.available['Version'].ix[package]
+
     def get_package_version(self, package):
         """Get version of an install package"""
         if package not in self.installed.index:
@@ -266,10 +285,12 @@ class RPackageManager(object):
                 biocLite(package, suppressUpdates, verbose=verbose)
         elif isinstance(package, list):
             for pkg in package:
-                if pkg not in self.installed.index:
+                self.logging.info("Installing %s" % pkg)
+                if self.is_installed(pkg) is False:
                     biocLite(pkg, suppressUpdates, verbose=verbose)
         else: # trying other cases (e.g., None updates biocLite itself). 
-             biocLite(package, suppressUpdates)
+            biocLite(package, suppressUpdates, verbose=verbose)
+        self.update()
 
     def _isLocal(self, pkg):
         if os.path.exists(pkg):
@@ -296,14 +317,13 @@ class RPackageManager(object):
             self.logging.info("Package %s not installed" % pkg)
             return False
         currentVersion = self.packageVersion(pkg)
-        if StrictVersion(currentVersion) >= StrictVersion(version):
+        if self._get_version(currentVersion) >= self._get_version(version):
             return True
         else:
             return False
 
-    def _install_packages(self, packageName, dependencies=True):
+    def _install_package(self, packageName, dependencies=True):
         """Installs one or more CRAN packages
-        
         
         .. todo:: check if it is already available to prevent renstallation ?
         """
@@ -313,57 +333,91 @@ class RPackageManager(object):
         if isinstance(packageName, str):
             packageName = [packageName]
         for pkg in packageName:
-            if pkg not in self.installed.index:
+            if self.is_installed(pkg) is False:
+                self.logging.info("Package not found. Installing %s..." % pkg)
+                install_package(pkg, dependencies=dependencies, 
+                        repos=repos)
+            else:
+                self.logging.info("Package %s found. " % pkg)
                 install_package(pkg, dependencies=dependencies, 
                         repos=repos)
         self.update()
 
-    def install(self, pkg, require=None):
+    def install(self, pkg, require=None, update=True, reinstall=False):
         """install a package automatically scanning CRAN and biocLite repos
 
+        if require is not set and update is True, when a newest version of a package
+        is available, it is installed
 
         """
+        from easydev import to_list
+        pkgs = to_list(pkg)
+        for pkg in pkgs:
+            self._install(pkg, require=require, update=update, reinstall=reinstall)
+
+    def _install(self, pkg, require=None, update=update, reinstall=False):
+        # LOCAL file
         if self._isLocal(pkg):
             # if a local file, we do not want to jump to biocLite or CRAN. Let
             # us install it directly. We cannot check version yet so we will
             # overwrite what is already installed
             self.logging.warning("Installing from source")
-            self._install_packages(pkg)
+            self._install_package(pkg)
             return
 
-        if pkg in self.installed.index:
+        # From CRAN
+        if self.is_installed(pkg):
             currentVersion = self.get_package_version(pkg)
-            if require == None:
+            # if not provided, require should be the latest version
+            if require is None and update is True:
+                try:
+                    require = self.get_package_latest_version(pkg)
+                except:
+                    # a non-cran package (bioclite maybe)
+                    pass
+
+            if require is None:
                 self.logging.info("%s already installed with version %s" % \
                     (pkg, currentVersion))
                 return
-            # nothing to do except the required version
-            if StrictVersion(currentVersion) >= StrictVersion(require):
+            
+            # if require is not none, is it the required version ?
+            if self._get_version(currentVersion) >= self._get_version(require) and reinstall is False:
                 self.logging.info("%s already installed with required version %s" \
                     % (pkg, currentVersion))
+                # if so, nothing to do
             else:
                 # Try updating
-                self._install_packages(pkg)
-                if require == None:
+                self.logging.info("Updating")
+                self._install_package(pkg)
+                if require is None:
                     return
                 currentVersion = self.get_package_version(pkg)
-                if StrictVersion(currentVersion) >= StrictVersion(require):
+                if self._get_version(currentVersion) < self._get_version(require):
                     self.logging.warning("%s installed but current version (%s) does not fulfill your requirement" % \
                         (pkg, currentVersion))
 
         elif pkg in self.available.index:
-            self._install_packages(pkg)
+            self._install_package(pkg)
         else:
-            # maybe a biocLite package:
+            # maybe a biocLite package ?
             # require is ignored. The latest will be installed
+            self.logging.info("Trying to find the package on bioconductor")
             self.biocLite(pkg)
-            if require == None:
+            if require is None:
                 return
-            currentVersion = self.packageVersion(pkg)
-            if StrictVersion(currentVersion) >= StrictVersion(require):
+            currentVersion = self.get_package_version(pkg)
+            if self._get_version(currentVersion) >= self._get_version(require):
                 self.logging.warning("%s installed but version is %s too small (even after update)" % \
                     (pkg, currentVersion, require))
 
+    def _get_version(self, version):
+        return StrictVersion(version.replace("-", "a"))
 
+    def is_installed(self, pkg_name):
+        if pkg_name in self.installed.index:
+            return True
+        else:
+            return False
 
 
