@@ -31,7 +31,7 @@ class Hist2d(VizInput):
                 self.df = self.df.transpose()
 
     def plot(self, bins=100, cmap="hot_r", fontsize=10, Nlevels=4,
-        xlabel=None, ylabel=None, norm=None, range=[],
+        xlabel=None, ylabel=None, norm=None, range=None,
         contour=True, **kargs):
         """plots histogram of mean across replicates versus coefficient variation
 
@@ -39,6 +39,7 @@ class Hist2d(VizInput):
         :param fontsize: fontsize for the labels
         :param contour: show some contours
         :param int Nlevels: must be more than 2
+        :param range: as in pylab.hist2d : a 2x2 shape [[-3,3],[-4,4]]
 
         .. plot::
             :include-source:
@@ -63,6 +64,7 @@ class Hist2d(VizInput):
                cmap=cmap, norm=colors.LogNorm())
         else:
             res = pylab.hist2d(X, Y, bins=bins, cmap=cmap, range=range)
+
         pylab.colorbar()
 
         if contour:
