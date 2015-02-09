@@ -339,15 +339,14 @@ class Corrplot(object):
                     #ax.add_artist(patch)
                     patches.append(patch)
                 elif method in ['number', 'text']:
-                    from easydev import precision
-                    #FIXME
                     if d<0:
-                        edgecolor = 'red'
+                        edgecolor = self.cm(-1.0)
                     elif d>0:
-                        edgecolor = 'blue'
-                    ax.text(x,y, precision(d, 2), color=edgecolor,
+                        edgecolor = self.cm(1.0)
+                    d_str = "{:.2f}".format(d).replace("0.", ".").replace(".00", "")
+                    ax.text(x,y, d_str, color=edgecolor,
                             fontsize=self.fontsize, horizontalalignment='center',
-                            weight='bold', alpha=d_abs,
+                            weight='bold', alpha=alpha=max(0.5, d_abs), # FIX this ,
                             withdash=False)
                 elif method == 'pie':
                     S = 360 * d_abs
