@@ -32,6 +32,7 @@ Overview
 
 .. autosummary::
 
+    biokit.network
     biokit.viz
     biokit.rtools
     biokit.services
@@ -51,12 +52,5 @@ Other resources
 ===============
 
 Set of `Notebooks <http://nbviewer.ipython.org/github/biokit/biokit/tree/master/notebooks/>`_
-
-
-.. toctree::
-
-    definitions.rst
-
-
 
 

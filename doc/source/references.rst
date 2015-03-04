@@ -5,7 +5,17 @@
 Utilities
 ##############
 
-Some visualisation tools
+Tools related to network (e.g., protein networks)
+=========================================================
+.. automodule:: biokit.network
+
+.. automodule:: biokit.network.complexes
+    :members:
+    :undoc-members:
+    :synopsis: 
+
+
+Common visualisation tools
 ===================================================================
 .. automodule:: biokit.viz
 
@@ -49,6 +59,7 @@ BioServices is used in BioKit to access to web services (e.g., KEGG, UniProt, En
 
 Stats
 ========
+.. automodule:: biokit.stats
 
 .. automodule:: biokit.stats.mixture
     :members:
@@ -59,7 +70,4 @@ Stats
     :members:
     :undoc-members:
     :synopsis: 
-
-
-
 
