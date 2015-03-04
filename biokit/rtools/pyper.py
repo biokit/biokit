@@ -94,7 +94,6 @@ DEBUG model:
     Then the R expression will always be wrapped in "try()" to avoid R crashing
     if the method "get" is called.
 """
-# the module "subprocess" requires Python 2.4
 
 import os
 import sys
@@ -102,6 +101,7 @@ import time
 import re
 import tempfile
 from types import *
+import subprocess
 
 __version__ = '1.1.2'
 
@@ -167,18 +167,13 @@ if sys.platform == 'cli':  # for IronPython
 
 else:
 
-    try:
-        import subprocess
-        _has_subp = True
-        Popen, PIPE, _STDOUT = subprocess.Popen, subprocess.PIPE, subprocess.STDOUT
-    except:  # Python 2.3 or older
-        PIPE, _STDOUT = None, None
-        def Popen(CMD, *a, **b):
-            class A:
-                None
-            p = A()
-            p.stdin, p.stdout = os.popen4(' '.join(CMD))
-            return(p)
+    PIPE, _STDOUT = None, None
+    def Popen(CMD, *a, **b):
+        class A:
+            None
+        p = A()
+        p.stdin, p.stdout = os.popen4(' '.join(CMD))
+        return(p)
 
     def sendAll(p, s):
         p.stdin.write(_mybytes(s))
@@ -191,10 +186,6 @@ else:
             sys.stdout.write(rv)
             sys.stdout.flush()
         return(rv)
-
-
-def NoneStr(obj): 
-    return('NULL')
 
 
 def BoolStr(obj):
@@ -326,7 +317,7 @@ def OtherStr(obj):
     return(repr(obj))
 
 str_func = {
-        type(None): NoneStr, 
+        type(None): 'NULL', 
         bool: BoolStr, 
         long: LongStr, 
         int: repr, 
@@ -373,16 +364,18 @@ def Str4R(obj):
     # for any other objects
     return(OtherStr(obj))
 
+
 class RError(Exception):
     def __init__(self, value):
         self.value = value
     def __str__(self):
         return(repr(self.value))
 
-class R(object): # "del r.XXX" fails on FePy-r7 (IronPython 1.1 on .NET 2.0.50727.42) if using old-style class
-    """
-*    A Python class to enclose an R process.
-    """
+
+class R(object): 
+    # "del r.XXX" fails on FePy-r7 (IronPython 1.1 on .NET 2.0.50727.42) if using old-style class
+    """A Python class to enclose an R process."""
+
     __Rfun = r'''.getRvalue4Python__ <- function(x, use_dict=NULL, has_numpy=FALSE, has_pandas=FALSE) {
     if (has_pandas) has_numpy <- TRUE
     if (has_numpy) {
@@ -595,6 +588,7 @@ class R(object): # "del r.XXX" fails on FePy-r7 (IronPython 1.1 on .NET 2.0.5072
             'has_numpy': use_numpy and has_numpy,
             'has_pandas': use_pandas and has_pandas,
             'Rfun': self.__class__.__Rfun,
+            'Rexecutable': RCMD,
             'max_len': max_len,
             'use_dict': use_dict,
             'verbose': verbose,
@@ -642,19 +636,19 @@ class R(object): # "del r.XXX" fails on FePy-r7 (IronPython 1.1 on .NET 2.0.5072
             else:  # Give up and point child stderr at nul
                 childstderr = file('nul', 'a')
 
-        self.__dict__['subprocess_args'] = {
+        from easydev import AttrDict
+        self.__dict__['subprocess_args'] = AttrDict(**{
                 'RCMD': RCMD, 
                 'PIPE': PIPE, 
                 'stderr': return_err and _STDOUT or childstderr, 
-                'info': info}
-
+                'info': info})
         self.reconnect()
 
     def reconnect(self):
         """TC: Nov 2014
         
-        If CTRL+C is called, the pipe is broken, in which case, reconnecting could 
-        be handy.
+        If CTRL+C is called, the pipe is broken, in which case, reconnecting 
+        should be called.
         
         """
         args = self.subprocess_args
@@ -665,6 +659,15 @@ class R(object): # "del r.XXX" fails on FePy-r7 (IronPython 1.1 on .NET 2.0.5072
         self.__dict__['prog'] = Popen(RCMD, stdin=PIPE, stdout=PIPE, 
                 stderr=stderr, startupinfo=info)
         self.__call__(self.Rfun)
+
+    def _get_rcmd(self):
+        return self.subprocess_args.RCMD
+    def _set_rcmd(self, RCMD):
+        print(RCMD)
+        self.subprocess_args.RCMD = RCMD
+        self.reconnect()
+    RCMD = property(_get_rcmd, _set_rcmd)
+
 
     def __runOnce(self, CMD, use_try=None):
         """CMD: a R command string"""
