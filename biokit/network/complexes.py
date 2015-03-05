@@ -16,6 +16,7 @@
 from easydev import Logging, DevTools
 from bioservices import IntactComplex
 import pylab
+import pandas as pd
 
 
 __all__ = ['Complexes']
@@ -138,7 +139,7 @@ class Complexes(Logging):
         """
         N = []
         count = {}
-        for i, identifier in enumerate(self.df.complexAC):
+        for i, identifier in enumerate(self.complexes.keys()):
             n = len(self.complexes[identifier]['participants'])
             N.append(n)
             count[identifier] = n
@@ -239,16 +240,30 @@ class Complexes(Logging):
 
         and_gates = {}
         candidates = {}
-        for k, this in self.identifiers.items():
-            N = len(this)
-            found = [spec for spec in user_species if spec in this]
+
+        identifiers = self.identifiers.values()
+
+        for k, identifiers in self.identifiers.items():
+
+            # get rid of suffixes such as -1 or -PRO_xxx
+            prefixes = [x.split("-")[0] if x is not None else x for x in identifiers]
+
+
+            # You may have a complex with ['P12222', 'P33333-PRO1',
+            # 'P33333-PRO2'], in which case P33333 is found only once and
+            # thereofre the final number of found participants is not the length
+            # of the complexes...so we need to get rid of the duplicates if any
+            prefixes = list(set(prefixes))
+            N = len(prefixes)
+            found = [spec for spec in user_species if spec in prefixes]
 
             if len(found) == N:
                 self.logging.info('Found entire complex %s ' % k)
-                and_gates[k] = this[:]
+                and_gates[k] = identifiers[:]
             elif len(found) >= 1:
-                self.logging.info('Found partial complex %s with %s participants out of %s' % (k, len(found), len(this)))
-                candidates[k] = {'participants': this, 'found':found}
+                self.logging.info('Found partial complex %s with %s participants out of %s' % 
+                        (k, len(found), len(identifiers)))
+                candidates[k] = {'participants': identifiers, 'found': found}
         self.debugLevel = level[:]
         return and_gates, candidates
 
@@ -258,9 +273,11 @@ class Complexes(Logging):
         :return: list of complex identifiers where the name was found
         """
         found = []
-        for k, this in self.identifiers.items():
-            if name in this:
-                self.logging.info("Found %s in complex %s (%s)" % (name, k, this))
+        for k, identifiers in self.identifiers.items():
+            prefixes = [x.split("-")[0] if x is not None else x for x in identifiers ]
+            if name in prefixes:
+                self.logging.info("Found %s in complex %s (%s)" % (name, k,
+                    identifiers))
                 found.append(k)
         return found
 
@@ -276,12 +293,46 @@ class Complexes(Logging):
         from bioservices import UniProt
         c = UniProt(cache=True)
         import StringIO
-        import pandas as pd
         try:
             res = pd.read_csv(StringIO.StringIO(c.search(name, limit=1)), sep='\t')
             return list(res['Gene names'].values)
         except:
             print("Could not find %s" % name)
+
+    def report(self, species):
+        complete, partial = self.search_complexes(species, verbose=False)
+        res = {'Found':[], 'Participants':[], 'Complete':[],
+                'Identifier':[], 'Number found':[], 'Number of participants':[],
+                'Name':[]}
+
+        for k, v in complete.items():
+            res['Name'].append(self.complexes[k]['name'])
+            res['Found'].append(";".join(v))
+            res['Number found'].append(len(v))
+            res['Participants'].append(";".join(self.identifiers[k]))
+            res['Number of participants'].append(len(self.identifiers[k]))
+            res['Complete'].append(True)
+            res['Identifier'].append(k)
+
+        for k, v in partial.items():
+            res['Name'].append(self.complexes[k]['name'])
+            res['Found'].append(";".join(v['found']))
+            res['Number found'].append(len(v['found']))
+            res['Participants'].append(";".join(self.identifiers[k]))
+            res['Number of participants'].append(len(self.identifiers[k]))
+            res['Complete'].append(False)
+            res['Identifier'].append(k)
+
+        res = pd.DataFrame(res, columns=['Found', 'Participants', 'Identifier', 'Name', 'Number found', 
+            'Number of participants', 'Complete'])
+        return res
+
+
+
+
+
+
+
 
 
 
