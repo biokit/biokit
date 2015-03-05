@@ -341,12 +341,12 @@ class Corrplot(object):
                 elif method in ['number', 'text']:
                     if d<0:
                         edgecolor = self.cm(-1.0)
-                    elif d>0:
+                    elif d>=0:
                         edgecolor = self.cm(1.0)
                     d_str = "{:.2f}".format(d).replace("0.", ".").replace(".00", "")
                     ax.text(x,y, d_str, color=edgecolor,
                             fontsize=self.fontsize, horizontalalignment='center',
-                            weight='bold', alpha=alpha=max(0.5, d_abs), # FIX this ,
+                            weight='bold', alpha=max(0.5, d_abs), 
                             withdash=False)
                 elif method == 'pie':
                     S = 360 * d_abs
