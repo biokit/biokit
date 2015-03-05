@@ -2,7 +2,7 @@
 #
 #  This file is part of biokit software
 #
-#  Copyright (c) 2014
+#  Copyright (c) 2014-
 #
 #  File author(s): Thomas Cokelaer <cokelaer@ebi.ac.uk>
 #
@@ -48,45 +48,41 @@ class RSession(pyper.R):
     additional features. This is to create a common API.
 
     """
-
-    def __init__(self, RCMD='R', max_len=1000, use_numpy=True, use_pandas=True,
+    def __init__(self, RExecutable='R', max_len=1000,
             use_dict=None, host='localhost', user=None, ssh='ssh',
-            return_err=True, verbose=False):
+            verbose=False, return_err=True):
         """
 
         :param str RCMD: the name of the R executable
         :param max_len: define the upper limitation for the length of command string. A
            command string will be passed to R by a temporary file if it is longer
            than this value.
-        :param bool use_numpy: A False value will disable numpy even
-           if it has been imported.
-        :param bool use_pandas: A False value will disable pandas even
-           if it has been imported.
-        :param use_dict: named list will be returned a dict if use_dict is True, otherwise
-           it will be a list of tuples (name, value).
         :param host: The computer name (or IP) on which the R interpreter is
            installed. The value "localhost" means that the R locates on the
            the localhost computer. On POSIX systems (including Cygwin
            environment on Windows), it is possible to use R on a remote
            computer if the command "ssh" works. To do that, the user need set
-           this value, and perhaps the parameter "user". not tested.
+           this value, and perhaps the parameter "user".
         :param user: The user name on the remote computer. This value need to be set
            only if the user name is different on the remote computer. In
            interactive environment, the password can be input by the user if
            prompted. If running in a program, the user need to be able to
-           login without typing password! not tested.
-        :param ssh: The program to login to remote computer. not tested
-
+           login without typing password! (i.e., you need to set your SSH keys)
+        :param ssh: The program to login to remote computer.
+        :param kargs: must be empty. Error raised otherwise
         """
-        super(RSession, self).__init__(RCMD=RCMD, max_len=max_len,
-                use_numpy=use_numpy, use_pandas=use_pandas,
-                use_dict=use_dict, host=host, user=user, ssh=ssh,
-                dump_stdout=verbose)
+        from easydev import cmd_exists
+        if host == 'localhost' and cmd_exists(RExecutable) is False:
+            raise Exception('Could not find the R executable %s in your path' % RExecutable)
+
+        super(RSession, self).__init__(RCMD=RExecutable, max_len=max_len,
+            use_dict=use_dict, host=host, user=user, ssh=ssh, return_err=return_err,
+            dump_stdout=verbose)
+
 
     def get_version(self):
         """Return the R version"""
         return self.version
-    
 
     def __repr__(self):
         txt = "Rsession information:" 
