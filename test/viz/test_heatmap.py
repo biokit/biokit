@@ -3,7 +3,7 @@ from biokit.data.viz.heatmap_sample import load_heatmap_sample
 
 
 
-def test_heatmap():
+def _test_heatmap():
     data = load_heatmap_sample()
     h = heatmap.HiearchicalHeatmap(data)
     h.plot(
