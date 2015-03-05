@@ -2,7 +2,7 @@
 #
 #  This file is part of biokit software
 #
-#  Copyright (c) 2014
+#  Copyright (c) 2014-
 #
 #  File author(s): Thomas Cokelaer <cokelaer@ebi.ac.uk>
 #
@@ -25,7 +25,7 @@ def bool2R(value):
     if value is False:
         return "F"
     else:
-        raise ValueError("excepting a boolean value")
+        raise ValueError("expecting a boolean value")
 
 
 def rcode(code, verbose=True):
