@@ -340,10 +340,9 @@ class Corrplot(object):
                     patches.append(patch)
                 elif method in ['number', 'text']:
                     from easydev import precision
-                    #FIXME
                     if d<0:
                         edgecolor = 'red'
-                    elif d>0:
+                    elif d>=0:
                         edgecolor = 'blue'
                     ax.text(x,y, precision(d, 2), color=edgecolor,
                             fontsize=self.fontsize, horizontalalignment='center',
