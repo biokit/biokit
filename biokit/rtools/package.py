@@ -1,7 +1,21 @@
+# -*- python -*-
+#
+#  This file is part of biokit software
+#
+#  Copyright (c) 2014-
+#
+#  File author(s): Thomas Cokelaer <cokelaer@ebi.ac.uk>
+#
+#  Distributed under the GPLv3 License.
+#  See accompanying file LICENSE.txt or copy at
+#      http://www.gnu.org/licenses/gpl-3.0.html
+#
+#  website: https://github.com/biokit
+#
+##############################################################################
 import tempfile
-import urllib
+import urllib2
 import os.path
-from easydev import TempFile
 
 from biokit.rtools import bool2R, RSession
 from distutils.version import StrictVersion
@@ -44,7 +58,7 @@ def install_package(query, dependencies=False, verbose=True,
         # PART for fetching a file on the web, download and install locally
         if verbose:
             print("Trying from the web ?")
-        data = urllib.request(query)
+        data = urllib2.urlopen(query)
         fh = TempFile(suffix=".tar.gz")
         with open(fh.name, 'w') as fh:
             for x in data.readlines():
