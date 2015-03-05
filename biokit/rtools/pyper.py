@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""FORK of PyperR version 1.1.2 rfom pypi
+"""FORK of PyperR version 1.1.2 from pypi
 
 Reason for the fork. Code are written on top of pyper inside biokit.
 Yet, PypeR is failing sometimes (see examples below) and we may need to
@@ -25,8 +25,6 @@ ABSOLUTELY NO WARRANT. This package provides a light-weight interface to use R
 in Python by pipe.  It can be used on multiple platforms since it is written in
 pure python.
 
-Prerequisites:
-    1. Python 2.3 or later is required.
 
 Usage:
     The usage of this packages is very simple. Examples are presented in the
@@ -103,13 +101,12 @@ import tempfile
 from types import *
 import subprocess
 
-__version__ = '1.1.2'
+from biokit.rtools.r4python import r4python
 
-if sys.version < '2.3':  # actually python >= 2.3 is required by tempfile.mkstemp used in this module !!!
-    set = frozenset = tuple
-    basestring = str
-elif sys.version < '2.4':
-    from sets import Set as set, ImmutableSet as frozenset
+import pandas
+import numpy
+
+
 
 if sys.version < '3.0':
     _mystr = _mybytes = lambda s: s
@@ -120,16 +117,7 @@ else:
     _mybytes = lambda s: bytes(s, 'utf8')  # 'ascii')
     _mystr = lambda s: str(s, 'utf8')
     _in_py3 = True
-try:
-    import pandas
-    has_pandas = True
-except:
-    has_pandas = False
-try:
-    import numpy
-    has_numpy = True
-except:
-    has_numpy = False
+
 
 _has_subp = False
 if sys.platform == 'cli':  # for IronPython
@@ -196,19 +184,17 @@ def ReprStr(obj):
     return(repr(obj))
 
 
-if has_numpy:
-    def FloatStr(f):
-        if f is numpy.NaN or f is numpy.nan:
-            return('NaN') # or 'NA'
-        if has_pandas and pandas.isnull(f):
-            return('NaN')
-        if numpy.isposinf(f):
-            return('Inf')
-        if numpy.isneginf(f):
-            return('-Inf')
-        return(repr(f))
-else:
-    FloatStr = repr
+def FloatStr(f):
+    if f is numpy.NaN or f is numpy.nan:
+        return('NaN') # or 'NA'
+    if pandas.isnull(f):
+        return('NaN')
+    if numpy.isposinf(f):
+        return('Inf')
+    if numpy.isneginf(f):
+        return('-Inf')
+    return(repr(f))
+
 
 def LongStr(obj):
     rv = repr(obj)
@@ -254,10 +240,12 @@ def SeqStr(obj, head='c(', tail=')', enclose=True):
     # convert
     return((is_int and 'as.integer(' or '') + head + ','.join(map(Str4R, obj)) + tail + (is_int and ')' or ''))
 
+
 def DictStr(obj):
     return('list(' + ','.join(['%s=%s' % (Str4R(a[0]), Str4R(a[1])) for a in obj.items()]) + ')')
 
-# 'b':boolean, 'i':integer, 'u':unsigned int, 'f':float, c complex-float
+# 'b':boo
+# lean, 'i':integer, 'u':unsigned int, 'f':float, c complex-float
 # 'S'/'a':string, 'U':unicode, 'V':raw data. 'O':string?
 _tpdic = {'i':'as.integer(c(%s))', 'u':'as.integer(c(%s))', 'f':'as.double(c(%s))', 'c':'as.complex(c(%s))',
         'b':'c(%s)', 'S':'c(%s)', 'a':'c(%s)', 'U':'c(%s)', 'V':'list(%s)', 'O':'as.character(c(%s))'}
@@ -272,6 +260,7 @@ def getVec(ary):
     # record array
     ary = list(map(SeqStr, ary)) # each record will be mapped to vector or list
     return(_tpdic.get(tp, 'list(%s)') % (', '.join(ary))) # use str here instead of repr since it has already been converted to str by SeqStr
+
 
 def NumpyNdarrayStr(obj):
     shp = obj.shape
@@ -294,8 +283,10 @@ def NumpyNdarrayStr(obj):
         newaxis[-2:] = [len(shp)-1, len(shp)-2]
         return('array(%s, dim=c(%s))' % (getVec(obj.transpose(newaxis)), repr(dim)[1:-1]))
 
+
 def PandasSerieStr(obj):
     return('data.frame(%s=%s, row.names=%s)' % (obj.name, getVec(obj.values), getVec(obj.index)))
+
 
 def PandasDataFrameStr(obj):
     # DataFrame will be converted to data.frame, have to explicitly name columns
@@ -308,6 +299,7 @@ def PandasDataFrameStr(obj):
     # print 'data.frame(%s row.names=%s)' % (s, getVec(obj.index))
     return('data.frame(%s row.names=%s)' % (s, getVec(obj.index)))
 
+
 def OtherStr(obj):
     if hasattr(obj, '__iter__'):  # for iterators
         if hasattr(obj, '__len__') and len(obj) <= 10000:
@@ -315,6 +307,7 @@ def OtherStr(obj):
         else:  # waiting for better solution for huge-size containers
             return(SeqStr(list(obj)))
     return(repr(obj))
+
 
 str_func = {
         type(None): 'NULL', 
@@ -335,13 +328,11 @@ base_tps = [type(None), bool, int, long, float, complex, str, unicode, list,
         tuple, set, frozenset, dict] # use type(None) instead of NoneType since 
         #the latter cannot be found in the types module in Python 3
 
-if has_numpy:
-    str_func[numpy.ndarray] = NumpyNdarrayStr
-    base_tps.append(numpy.ndarray)
+str_func[numpy.ndarray] = NumpyNdarrayStr
+base_tps.append(numpy.ndarray)
 
-if has_pandas:
-    str_func.update({pandas.Series: PandasSerieStr, pandas.DataFrame: PandasDataFrameStr})
-    base_tps.extend([pandas.Series, pandas.DataFrame])
+str_func.update({pandas.Series: PandasSerieStr, pandas.DataFrame: PandasDataFrameStr})
+base_tps.extend([pandas.Series, pandas.DataFrame])
 base_tps.reverse()
 
 if _in_py3:
@@ -353,7 +344,6 @@ def Str4R(obj):
     """
     convert a Python basic object into an R object in the form of string.
     """
-    #return str_func.get(type(obj), OtherStr)(obj)
     # for objects known by PypeR
     if type(obj) in str_func:
         return(str_func[type(obj)](obj))
@@ -372,186 +362,19 @@ class RError(Exception):
         return(repr(self.value))
 
 
-class R(object): 
+class R(object):
     # "del r.XXX" fails on FePy-r7 (IronPython 1.1 on .NET 2.0.50727.42) if using old-style class
     """A Python class to enclose an R process."""
 
-    __Rfun = r'''.getRvalue4Python__ <- function(x, use_dict=NULL, has_numpy=FALSE, has_pandas=FALSE) {
-    if (has_pandas) has_numpy <- TRUE
-    if (has_numpy) {
-        headstr <- 'numpy.array('
-        tailstr <- ')' }
-    else headstr <- tailstr <- ''
-    SpecialLocs <- function(x) { # find locations of special values: NULL, NA, NaN, Inf
-        rlt <- list()
-        if (!has_numpy) {
-            idx <- which(is.null(x) | is.na(x) | is.nan(x) | is.infinite(x))
-            if (length(idx) > 0) list$None <- idx
-            }
-        else {
-            idx <- which(is.null(x) | is.na(x))
-            if (length(idx) > 0) rlt$None <- idx
-            idx <- which(is.nan(x))
-            if (length(idx) > 0) rlt$numpy.NaN <- idx
-            idx <- which(is.infinite(x))
-            if (length(idx) > 0) {
-                v <- x[idx]
-                iidx <- which(v > 0)
-                if (length(iidx) > 0) rlt$numpy.Inf <- idx[iidx]
-                iidx <- which(v < 0)
-                if (length(iidx) > 0) rlt['-numpy.Inf'] <- idx[iidx]
-                }
-            }
-        return(rlt)
-        }
-    SpecialVals <- function(x, valoc) {
-        for (val in names(valoc)) x[valoc[[val]]] <- val
-        return(x)
-        }
-    NullStr <- function(x) 'None'
-    VectorStr <- function(x) {
-        #nms <- names(x)
-        #if (!is.null(nms) &&  length(nms)>0) return(ListStr(as.list(x)))
-        complx <- is.complex(x)
-        special_locs <- SpecialLocs(x)
-        if (is.character(x)) {
-            x <- gsub('\\\\', '\\\\\\\\', x)
-            x <- gsub('"', '\\\\"', x)
-            x <- paste('"', x, '"', sep='') }
-        else if (is.logical(x)) x <- ifelse(x, 'True', 'False')
-        if (length(special_locs) > 0) x <- SpecialVals(x, special_locs)
-        if (length(x)==1) x <- paste(x) # convert to character using paste, "gettext", or "as.character"
-        else x <- paste(headstr, '[', paste(x, collapse=','), ']', tailstr, sep='')
-        if (complx) x <- gsub('i', 'j', x)
-        return(x) }
-    MatrixStr <- function(x) {
-        complx <- is.complex(x)
-        special_locs <- SpecialLocs(x)
-        if (is.character(x)) x <- matrix(paste('"', x, '"', sep=''), nrow=nrow(x))
-        else if (is.logical(x)) x <- ifelse(x, 'True', 'False')
-        if (length(special_locs) > 0) x <- SpecialVals(x, special_locs)
-        x <- apply(x, 1, function(r) paste('[', paste(r, collapse=','), ']', sep=''))
-        x <- paste(headstr, '[', paste(x, collapse=','), ']', tailstr, sep='')
-        if (complx) x <- gsub('i', 'j', x)
-        return(x) }
-    ArrayStr <- function(x) {
-        complx <- is.complex(x)
-        ndim <- length(dim(x))
-        if (ndim == 1) return(VectorStr(x))
-        if (ndim == 2) return(MatrixStr(x))
-        # ndim >= 3
-        if (is.character(x)) x <- array(paste('"', x, '"', sep=''), dim=dim(x))
-        else if (is.logical(x)) x <- ifelse(x, 'True', 'False')
-        # do col first
-        x <- apply(x, seq(dim(x))[-2], function(r) paste('[', paste(r, collapse=','), ']', sep=''))
-        for (i in seq(ndim-2))
-            x <- apply(x, seq(dim(x))[-1], function(r) paste('[', paste(r, collapse=','), ']', sep=''))
-        x <- paste(headstr, '[', paste(x, collapse=','), ']', tailstr, sep='')
-        if (complx) x <- gsub('i', 'j', x)
-        return(x) }
-    DataFrameStr <- function(x) {
-        if (ncol(x) == 0) {
-            if (has_pandas) return('pandas.DataFrame()')
-            if (has_numpy) return('numpy.array([])')
-            return('[]')}
-        if (has_numpy) {
-            cnms <- colnames(x) # get column names
-            ctp <- list()
-            for (i in seq(x)) {
-                xi <- as.vector(x[[i]])
-                special_locs <- SpecialLocs(xi)
-                if (is.character(xi)) {
-                    ctp[i] <- sprintf('("%s", "|S%d")', cnms[i], if (length(xi) > 0) max(nchar(xi)) else 0 )
-                    xi <- paste('"', xi, '"', sep='') }
-                else if (is.logical(xi)) {
-                    xi <- ifelse(xi, 'True', 'False')
-                    ctp[i] <- paste('("', cnms[i], '", "<?")' ) }
-                else if (is.integer(xi)) {
-                    xi <- paste(xi)
-                    ctp[i] <- paste('("', cnms[i], '", "<q")' ) }
-                else if (is.double(xi)) {
-                    xi <- paste(xi)
-                    ctp[i] <- paste('("', cnms[i], '", "<g")' ) }
-                else if (is.complex(xi)) {
-                    xi <- gsub('i', 'j', paste(xi))
-                    ctp[i] <- paste('("', cnms[i], '", "<G")') }
-                if (length(special_locs) > 0) xi <- SpecialVals(xi, special_locs)
-                if (nrow(x) > 0) x[[i]] <- xi }
-            tailstr <- paste(', dtype=[', paste(ctp, collapse=','), ']', tailstr, sep='') }
-        else if (nrow(x) > 0)
-            for (i in seq(x)) {
-                xi <- as.vector(x[[i]])
-                special_locs <- SpecialLocs(xi)
-                if (is.character(xi)) xi <- paste('"', xi, '"', sep='')
-                else if (is.logical(xi)) xi <- ifelse(xi, 'True', 'False')
-                else if (is.integer(xi)) xi <- paste(xi)
-                else if (is.double(xi)) xi <- paste(xi)
-                else if (is.complex(xi)) xi <- gsub('i', 'j', paste(xi))
-                if (length(special_locs) > 0) xi <- SpecialVals(xi, special_locs)
-                if (nrow(x) > 0) x[[i]] <- xi }
-        x <- as.matrix(x)
-        x <- apply(x, 1, function(r) paste('(', paste(r, collapse=','), if(length(r)<2) ',)' else ')', sep=''))
-        x <- paste(headstr, '[', paste(x, collapse=','), ']', tailstr, sep='')
-        if (has_pandas) x <- paste('pandas.DataFrame(', x, ')', sep='')
-        return(x) }
-    ListStr <- function(x) {
-        nms <- names(x) # get column names
-        x <- sapply(x, Str4Py)
-        return(zipVecWithName(x, nms))}
-    zipVecWithName <- function(x, nms) {
-        if (!is.null(nms) &&  length(nms)>0) {
-            nms <- paste('"', nms, '"', sep='')
-            x <- sapply(seq(nms), function(i) paste('(', nms[i], ',', x[i], ')') )
-            if (identical(use_dict, TRUE)) x <- paste('dict([', paste(x, collapse=','), '])', sep='')
-            else if (identical(use_dict, FALSE))  x <- paste('[', paste(x, collapse=','), ']', sep='')
-            else { # should be NULL or something else
-                if (any(duplicated(nms))) x <- paste('[', paste(x, collapse=','), ']', sep='')
-                else x <- paste('dict([', paste(x, collapse=','), '])', sep='') } }
-        else x <- paste('[', paste(x, collapse=','), ']', sep='')
-        return(x) }
-    Str4Py <- function(x) {
-        # no considering on NA, Inf, ...
-        # use is.XXX, typeof, class, mode, storage.mode, sprintf
-        if (is.factor(x)) x <- as.vector(x)
-        rlt <- {
-            if (is.null(x)) NullStr(x)
-            else if (is.vector(x) && !is.list(x)) VectorStr(x)
-            else if (is.matrix(x) || is.array(x)) ArrayStr(x)
-            else if (is.data.frame(x)) DataFrameStr(x)
-            else if (is.list(x)) ListStr(x)
-            else if (is.object(x)) 'None'
-            else Str4Py(as.character(x)) }
-            # other objects will be convert to character (instead of NullStr), or use "gettext"
-        return(rlt) }
-    Str4Py(x) }
-    # initalize library path for TCL/TK based environment on Windows, e.g. Python IDLE
-    .addLibs <- function() {
-        ruser <- Sys.getenv('R_USER')
-        userpath <- Sys.getenv('R_LIBS_USER')
-        libpaths <- .libPaths()
-        for (apath in userpath) {
-            if (length(grep(apath, libpaths)) > 0) next
-            if (file.exists(apath)) .libPaths(apath)
-            else {
-                d <- '/Documents'
-                if (substr(ruser, nchar(ruser)-nchar(d)+1, nchar(ruser)) != d) {
-                    apath <- paste(ruser,d, substr(apath, nchar(ruser)+1, nchar(apath)), sep='')
-                    if (file.exists(apath)) .libPaths(apath)} } } }
-    if(identical(.Platform$OS.type, 'windows')) .addLibs()
-    rm(.addLibs)
-    '''
+    __Rfun = r4python
     _DEBUG_MODE = True
 
-    def __init__(self, RCMD='R', max_len=10000, use_numpy=True, use_pandas=True, use_dict=None,
+    def __init__(self, RCMD='R', max_len=10000, use_dict=None,
                  host='localhost', user=None, ssh='ssh', return_err=True, dump_stdout=False, 
-                 verbose=False):
+                 verbose=False, options=('--quiet', '--no-save', '--no-restore')):
         '''
         RCMD: The name of a R interpreter, path information should be included
             if it is not in the system search path.
-        use_numpy: Used as a boolean value. A False value will disable numpy
-            even if it has been imported.
-        use_pandas: Used as a boolean value. A False value will disable pandas
-            even if it has been imported.
         use_dict: A R named list will be returned as a Python dictionary if
             "use_dict" is True, or a list of tuples (name, value) if "use_dict"
             is False. If "use_dict" is None, the return value will be a
@@ -585,8 +408,6 @@ class R(object):
         # class rather than the instance even for old-style classes."
         self.__dict__.update({
             'prog': None,
-            'has_numpy': use_numpy and has_numpy,
-            'has_pandas': use_pandas and has_pandas,
             'Rfun': self.__class__.__Rfun,
             'Rexecutable': RCMD,
             'max_len': max_len,
@@ -598,15 +419,14 @@ class R(object):
             'sendAll' : sendAll # keep a reference to the global function "sendAll" which will be used by __del__
             })
 
-        RCMD = [RCMD]  
+        RCMD = [RCMD]
         if not self.localhost:
             RCMD.insert(0, host)
             if user:
                 RCMD.insert(0, '-l%s' % user)
             RCMD.insert(0, ssh)
-        # args = ('--vanilla',) # equal to --no-save, --no-restore, --no-site-file, --no-init-file and --no-environ
-        args = ('--quiet', '--no-save', '--no-restore') # "--slave" cannot be used on Windows!
-        for arg in args:
+
+        for arg in options:
             if arg not in RCMD:
                 RCMD.append(arg)
 
@@ -642,6 +462,7 @@ class R(object):
                 'PIPE': PIPE, 
                 'stderr': return_err and _STDOUT or childstderr, 
                 'info': info})
+
         self.reconnect()
 
     def reconnect(self):
@@ -660,17 +481,10 @@ class R(object):
                 stderr=stderr, startupinfo=info)
         self.__call__(self.Rfun)
 
-    def _get_rcmd(self):
-        return self.subprocess_args.RCMD
-    def _set_rcmd(self, RCMD):
-        print(RCMD)
-        self.subprocess_args.RCMD = RCMD
-        self.reconnect()
-    RCMD = property(_get_rcmd, _set_rcmd)
-
-
     def __runOnce(self, CMD, use_try=None):
         """CMD: a R command string"""
+
+
         use_try = use_try or self._DEBUG_MODE
         newline = self.newline
         tail_token = 'R command at time: %s' % repr(time.time())
@@ -698,7 +512,6 @@ class R(object):
                 CMD = '({source("%(fn)s")})%(newline)s ' % params
                 CMD += 'dummy=file.remove(%(fn)r)%(newline)s%(tail_cmd)s' % params
 
-
         try:
             self.sendAll(self.prog, CMD)
         except IOError:
@@ -709,6 +522,7 @@ class R(object):
         except Exception as err:
             print("Failed")
             raise err
+
 
         rlt = ''
         while not re_tail.search(rlt):
@@ -722,35 +536,31 @@ class R(object):
             rlt = re_tail.sub('', rlt)
             if rlt.startswith('> '):
                 rlt = rlt[2:]
-        # if fn is not None: os.unlink(fn)
         return(rlt)
 
     def __call__(self, CMDS=[], use_try=None):
-        '''
-        Run a (list of) R command(s), and return the output message from the STDOUT of R.
+        """Run a (list of) R command(s),
 
-        CMDS: an R command string or a list of R commands
-        '''
-        rlt = []
+        :param list CMDS: either a list of commands or a single command as a string.
+        :return: nothing but debugLevel is filled
+
+        """
         if isinstance(CMDS, basestring):  # a single command
-            rlt.append(self.__runOnce(CMDS, use_try=use_try))
-        else: # should be a list of commands
-            # for CMD in CMDS:
-            #   rlt.append(self.__runOnce(CMD, use_try=use_try))
-            rlt.append(self.__runOnce('; '.join(CMDS), use_try=use_try)) # now, ['sink("output.txt")', ..., 'sink()'] is allowed!
-        if len(rlt) == 1:
-            rlt = rlt[0]
-        return(rlt)
+            rlt = self.__runOnce(CMDS, use_try=use_try)
+        else:
+            rlt = self.__runOnce('; '.join(CMDS), use_try=use_try)
+        return rlt
 
     def __getitem__(self, obj, use_try=None, use_dict=None): # to model a dict: "r['XXX']"
-        """
-        Get the value of an R variable or expression. The return value is
-        converted to the corresponding Python object.
+        """Get the value of an R variable or expression.
 
-        obj: a string - the name of an R variable, or an R expression
-        use_try: use "try" function to wrap the R expression. This can avoid R
+
+        :return: a Python object.
+
+        :param obj: a string - the name of an R variable, or an R expression
+        :param use_try: use "try" function to wrap the R expression. This can avoid R
             crashing if the obj does not exist in R.
-        use_dict: named list will be returned a dict if use_dict is True,
+        :param use_dict: named list will be returned a dict if use_dict is True,
             otherwise it will be a list of tuples (name, value)
         """
         if obj.startswith('_'):
@@ -758,7 +568,7 @@ class R(object):
         use_try = use_try or self._DEBUG_MODE
         if use_dict is None:
             use_dict = self.use_dict
-        cmd = '.getRvalue4Python__(%s, use_dict=%s, has_numpy=%s, has_pandas=%s)' % (obj, use_dict is None and 'NULL' or use_dict and 'TRUE' or 'FALSE', self.has_numpy and 'TRUE' or 'FALSE', self.has_pandas and 'TRUE' or 'FALSE')
+        cmd = '.getRvalue4Python__(%s, use_dict=%s)' % (obj, use_dict is None and 'NULL' or use_dict and 'TRUE' or 'FALSE')
         rlt = self.__call__(cmd, use_try=use_try)
         head = (use_try and 'try({%s})%s[1] ' or '%s%s[1] ') % (cmd, self.newline)
         # sometimes (e.g. after "library(fastICA)") the R on Windows uses '\n' instead of '\r\n'
@@ -781,12 +591,11 @@ class R(object):
         return(rlt)
 
     def __setitem__(self, obj, val):  # to model a dict: "r['XXX'] = YYY"
-        '''
-        Assign a value (val) to an R variable (obj).
+        """ Assign a value (val) to an R variable (obj).
 
-        obj: a string - the name of an R variable
-        val: a python object - the value to be passed to an R object
-        '''
+        :param obj: a string - the name of an R variable
+        :param val: a python object - the value to be passed to an R object
+        """
         if obj.startswith('_'):
             raise RError('Leading underscore ("_") is not permitted in R variable names!')
         self.__call__('%s <- %s' % (obj, Str4R(val)))
@@ -797,6 +606,11 @@ class R(object):
         self.__call__('rm(%s)' % obj)
 
     def __del__(self):  # to model "del r"
+        # if we do not have those 2 lines, prog may not be in the dictionary
+        # and we enter in an infite recursion loop ....
+        if 'prog' not in self.__dict__.keys():
+            return
+
         if self.prog:
             try:
                 self.sendAll(self.prog, 'q("no")'+self.newline)
@@ -805,11 +619,11 @@ class R(object):
             self.prog = None
 
     def __getattr__(self, obj, use_dict=None):  # to model object attribute: "r.XXX"
-        '''
-        obj: a string - the name of an R variable
-        use_dict: named list will be returned a dict if use_dict is True,
+        """
+        :param obj: a string - the name of an R variable
+        :param use_dict: named list will be returned a dict if use_dict is True,
             otherwise it will be a list of tuples (name, value)
-        '''
+        """
         # Overriding __getattr__ is safer than __getattribute__ since it is
         # only called as a last resort i.e. if there are no attributes in the
         # instance that match the name
@@ -822,7 +636,7 @@ class R(object):
                 use_dict = self.use_dict
             rlt = self.__getitem__(obj, use_dict=use_dict)
         except:
-            raise  # RError('No this object!')
+            raise
         return(rlt)
 
     def __setattr__(self, obj, val):  # to model object attribute: "r.XXX = YYY"
@@ -839,13 +653,13 @@ class R(object):
             self.__delitem__(obj)
 
     def get(self, obj, default=None, use_dict=None):  # to model a dict: "r.get('XXX', 'YYY')"
-        '''
-        obj: a string - the name of an R variable, or an R expression
-        default: a python object - the value to be returned if failed to get data from R
-        use_dict: named list will be returned a dict if use_dict is True,
+        """
+        :param obj: a string - the name of an R variable, or an R expression
+        :param default: a python object - the value to be returned if failed to get data from R
+        :param use_dict: named list will be returned a dict if use_dict is True,
             otherwise it will be a list of tuples (name, value). If use_dict is
             None, the value of self.use_dict will be used instead.
-        '''
+        """
         try:
             rlt = self.__getitem__(obj, use_try=True, use_dict=use_dict)
         except:
