@@ -5,7 +5,8 @@ __all__ = ['imshow']
 
 
 def imshow(data, interpolation='None', aspect='auto', cmap='hot', tight_layout=True,
-        colorbar=True, fontsize_x=None, fontsize_y=None, rotation_x=90, **kargs):
+        colorbar=True, fontsize_x=None, fontsize_y=None, rotation_x=90,
+        xticks_on=True, yticks_on=True, **kargs):
     """wrapper around imshow to plot a dataframe
 
 
@@ -26,10 +27,17 @@ def imshow(data, interpolation='None', aspect='auto', cmap='hot', tight_layout=T
         fontsize_x = 16 #FIXME use default values
     if fontsize_y == None:
         fontsize_y = 16 #FIXME use default values
-    pylab.yticks(range(0, len(data.index)), data.index, 
+
+    if yticks_on is True:
+        pylab.yticks(range(0, len(data.index)), data.index, 
             fontsize=fontsize_y)
-    pylab.xticks(range(0, len(data.columns[:])), data.columns, 
+    else:
+        pylab.yticks([])
+    if xticks_on is True:
+        pylab.xticks(range(0, len(data.columns[:])), data.columns, 
             fontsize=fontsize_x, rotation=rotation_x)
+    else:
+        pylab.xticks([])
 
     if colorbar is True:
         pylab.colorbar()
