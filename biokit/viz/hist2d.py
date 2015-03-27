@@ -3,9 +3,7 @@
 import pylab
 import pandas as pd
 import numpy as np
-#def hist2d(data, *args, **kargs):
-#    h = Hist2d(data)
-#    h.plot(*args, **kargs)
+
 
 __all__ = ["Hist2d"]
 
