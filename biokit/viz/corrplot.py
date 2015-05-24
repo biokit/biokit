@@ -117,7 +117,7 @@ class Corrplot(object):
         #cu[-1] + 0.5, n - cu[-1] + 0.5)
         #rect(mat[,1], mat[,2], mat[,3], mat[,4], border = col, lwd = lwd)
 
-    def plot(self, fig, grid=True,
+    def plot(self, fig=None, grid=True,
             rotation=30, colorbar_width=10, lower=None, upper=None,
             shrink=0.9, axisbg='white', colorbar=True, label_color='black',
             fontsize='small', edgecolor='black', method='ellipse', order=None,
@@ -169,11 +169,13 @@ class Corrplot(object):
         else:
             df = self.df
 
-        if ax is None:
+        if fig is not None:
             fig = plt.figure(num=fig.number, facecolor=axisbg)
+        else:
+            fig = plt.figure(num=None, facecolor=axisbg)
+        if ax is None:
             ax = plt.subplot(1, 1, 1, aspect='equal', axisbg=axisbg)
         else:
-            fig = plt.figure(fig.number, facecolor=axisbg)
             plt.sca(ax)
             ax.clear()
         # subplot resets the bg color, let us set it again
