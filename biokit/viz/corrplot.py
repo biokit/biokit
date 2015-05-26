@@ -1,49 +1,37 @@
+""".. rubric:: Corrplot utilities
+
+:author: Thomas Cokelaer
+:references: http://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html
+
+"""
 import string
-
 from colormap import cmap_builder
-
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from matplotlib.patches import Ellipse, Circle, Rectangle, Wedge
 from matplotlib.collections import PatchCollection
 import pandas as pd
-"""
 
-references: http://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html
-
-
-todo::
-
- - addrect if clustering
-
-"""
 
 class Corrplot(object):
     """An implementation of correlation plotting tools (corrplot)
 
-    Input must be a dataframe (Pandas) with data (any values) or a correlation
-    matrix (square) with values between -1 and 1.
-
-    If NAs are found in the correlation matrix, there are replaced with zeros.
-
-    Data can also be a correlation matrix as a 2-D numpy array containing
-    the pairwise correlations between variables. Labels will be numerical
-    indices though.
-
-    By default from red for positive correlation to blue for negative ones but
-    other colormaps can easily be provided.
+    Here is a simple example with a correlation matrix as an input (stored in
+    a pandas dataframe):
 
     .. plot::
         :width: 50%
         :include-source:
 
-        from biokit.viz import corrplot
+        # create a correlation-like data set stored in a Pandas' dataframe.
         import string
         letters = string.uppercase[0:10]
         import pandas as pd
         df = pd.DataFrame(dict(( (k, np.random.random(10)+ord(k)-65) for k in letters)))
 
+        # and use corrplot
+        from biokit.viz import corrplot
         c = corrplot.Corrplot(df)
         c.plot()
 
@@ -51,16 +39,38 @@ class Corrplot(object):
         `notebook <http://nbviewer.ipython.org/github/biokit/biokit/blob/master/notebooks/viz/corrplot.ipynb>`_
 
     """
-    def __init__(self, data, pvalues=None, na=0):
-        #input data can be a dataframe only
-        #try:
+    #def __init__(self, data, pvalues=None, na=0):
+    def __init__(self, data, na=0):
+        """.. rubric:: Constructor
+
+        Plots the content of square matrix that contains correlation values. 
+        
+        :param data: input can be a dataframe (Pandas), or list of lists (python) or
+            a numpy matrix. Note, however, that values must be between -1 and 1. If not, 
+            or if the matrix (or list of lists) is not squared, then correlation is
+            computed. The data or computed correlation is stored in :attr:`df` attribute.
+        :param bool compute_correlation: if the matrix is non-squared or values are not
+            bounded in -1,+1, correlation is computed. If you do not want that behaviour, 
+            set this parameter to False. (True by default).
+        :param na: replace NA values with this value (default 0)
+
+        The :attr:`params` contains some tunable parameters for the colorbar in the
+        :meth:`plot` method.
+
+        :: 
+
+            # can be a list of lists, the correlation matrix is then a 2x2 matrix
+            c = corrplot.Corrplot([[1,1], [2,4], [3,3], [4,4]])
+
+        """
+        #: The input data is stored in a dataframe and must therefore be 
+        #: compatible (list of lists, dictionary, matrices...)
         self.df = pd.DataFrame(data, copy=True)
-        #except:
-        #    self.df = pd.DataFrame(data)
 
         compute_correlation = False
+
         w, h = self.df.shape
-        if self.df.max().max() >1 or self.df.min().min()<-1:
+        if self.df.max().max() > 1 or self.df.min().min()<-1:
             compute_correlation = True
         if w !=h:
             compute_correlation = True
@@ -75,9 +85,11 @@ class Corrplot(object):
         # replace NA with zero
         self.df.fillna(na, inplace=True)
 
-        self.params = {'colorbar.N': 100, 'colorbar.orientation':'vertical'}
-
-
+        #: tunable parameters for the :meth:`plot` method.
+        self.params = {
+                'colorbar.N': 100, 
+                'colorbar.shrink': .8, 
+                'colorbar.orientation':'vertical'}
 
     def _set_default_cmap(self):
         self.cm = cmap_builder('#AA0000','white','darkblue')
@@ -85,10 +97,14 @@ class Corrplot(object):
     def order(self, method='complete', metric='euclidean',inplace=False):
         """Rearrange the order of rows and columns after clustering
 
-        :param method: any scipy method
-        :param metric: any scipy distance
+        :param method: any scipy method (e.g., single, average, centroid, 
+            median, ward). See scipy.cluster.hierarchy.linkage
+        :param metric: any scipy distance (euclidean, hamming, jaccard)
+            See scipy.spatial.distance or scipy.cluster.hieararchy
         :param bool inplace: if set to True, the dataframe is replaced
 
+        You probably do not need to use that method. Use :meth:`plot` and
+        the two parameters order_metric and order_method instead.
         """
         import scipy.cluster.hierarchy as hierarchy
         import scipy.spatial.distance as distance
@@ -118,35 +134,55 @@ class Corrplot(object):
         #rect(mat[,1], mat[,2], mat[,3], mat[,4], border = col, lwd = lwd)
 
     def plot(self, fig=None, grid=True,
-            rotation=30, colorbar_width=10, lower=None, upper=None,
+            rotation=30, lower=None, upper=None,
             shrink=0.9, axisbg='white', colorbar=True, label_color='black',
-            fontsize='small', edgecolor='black', method='ellipse', order=None,
-            cmap=None, ax=None
+            fontsize='small', edgecolor='black', method='ellipse', order_method='complete',
+            order_metric='euclidean', cmap=None, ax=None
             ):
         """plot the correlation matrix from the content of :attr:`df`
         (dataframe)
 
-        :param grid: add grid (Defaults to True)
+        By default, the correlation is shown on the upper and lower triangle and is
+        symmetric wrt to the diagonal. The symbols are ellipses. The symbols can
+        be changed to e.g. rectangle. The symbols are shown on upper and lower sides but
+        you could choose a symbol for the upper side and another for the lower side using 
+        the **lower** and **upper** parameters. 
+
+        :param fig: Create a new figure by default. If an instance of an existing
+            figure is provided, the corrplot is overlayed on the figure provided. 
+            Can also be the number of the figure.
+        :param grid: add grid (Defaults to grey color). You can set it to False or a color. 
         :param rotation: rotate labels on y-axis
         :param lower: if set to a valid method, plots the data on the lower
             left triangle
         :param upper: if set to a valid method, plots the data on the upper
             left triangle
+        :param float shrink: maximum space used (in percent) by a symbol.
+            If negative values are provided, the absolute value is taken. 
+            If greater than 1, the symbols wiill overlap.
+        :param axisbg: color of the background (defaults to white).
+        :param colorbar: add the colorbar (defaults to True).
+        :param str label_color: (defaults to black).
+        :param fontsize: size of the fonts defaults to 'small'.
         :param method: shape to be used in 'ellipse', 'square', 'rectangle', 
             'color', 'text', 'circle',  'number', 'pie'.
-        :param cmap: a valid cmap from matplotlib of colormap package (e.g.,
-        jet, or 
 
-        Here are some examples provided that the data is created and pass to c::
+        :param order_method: see :meth:`order`.
+        :param order_metric: see : meth:`order`.
+        :param cmap: a valid cmap from matplotlib or colormap package (e.g.,
+            'jet', or 'copper'). Default is red/white/blue colors. 
+        :param ax: a matplotlib axes.
 
-            c = corrplot.Corrplor(dataframe)
+        The colorbar can be tuned with the parameters stored in :attr:`params`.
+
+        Here is an example. See notebook for other examples::
+
+            c = corrplot.Corrplot(dataframe)
             c.plot(cmap=('Orange', 'white', 'green'))
             c.plot(method='circle')
             c.plot(colorbar=False, shrink=.8, upper='circle'  )
 
-
         """
-
         # default
         if cmap != None:
             try:
@@ -160,24 +196,29 @@ class Corrplot(object):
         else:
             self._set_default_cmap()
 
-        self.shrink = shrink
+        self.shrink = abs(shrink)
         self.fontsize = fontsize
         self.edgecolor = edgecolor
 
-        if order == 'hclust':
-            df = self.order(method='hclust')
-        else:
-            df = self.df
+        df = self.order(method=order_method, metric=order_metric)
 
-        if fig is not None:
+        # figure can be a number or an instance; otherwise creates it
+        if isinstance(fig, int):
+            fig = plt.figure(num=fig, facecolor=axisbg)
+        elif fig is not None:
             fig = plt.figure(num=fig.number, facecolor=axisbg)
         else:
             fig = plt.figure(num=None, facecolor=axisbg)
+
+        # do we have an axes to plot the data in ?
         if ax is None:
             ax = plt.subplot(1, 1, 1, aspect='equal', axisbg=axisbg)
         else:
+            # if so, clear the axes. Colorbar cannot be removed easily.
             plt.sca(ax)
             ax.clear()
+
+
         # subplot resets the bg color, let us set it again
         fig.set_facecolor(axisbg)
 
@@ -229,7 +270,10 @@ class Corrplot(object):
         ax.set_yticklabels(labels, fontsize=fontsize, color=label_color)
         plt.tight_layout()
 
-        if grid is True:
+
+        if grid is not False:
+            if grid is True:
+                grid = 'grey'
             for i in range(0, width):
                 ratio1 = float(i)/width
                 ratio2 = float(i+2)/width
@@ -237,14 +281,14 @@ class Corrplot(object):
                 # 2 - set xlabels along the diagonal
                 # set colorbar either on left or bottom
                 if mode == 'lower':
-                    plt.axvline(i+.5, ymin=1-ratio1, ymax=0., color='grey')
-                    plt.axhline(i+.5, xmin=0, xmax=ratio2, color='grey')
+                    plt.axvline(i+.5, ymin=1-ratio1, ymax=0., color=grid)
+                    plt.axhline(i+.5, xmin=0, xmax=ratio2, color=grid)
                 if mode == 'upper':
-                    plt.axvline(i+.5, ymin=1 - ratio2, ymax=1, color='grey')
-                    plt.axhline(i+.5, xmin=ratio1, xmax=1, color='grey')
+                    plt.axvline(i+.5, ymin=1 - ratio2, ymax=1, color=grid)
+                    plt.axhline(i+.5, xmin=ratio1, xmax=1, color=grid)
                 if mode in ['method', 'both']:
-                    plt.axvline(i+.5, color='grey')
-                    plt.axhline(i+.5, color='grey')
+                    plt.axvline(i+.5, color=grid)
+                    plt.axhline(i+.5, color=grid)
 
             # can probably be simplified
             if mode == 'lower':
@@ -281,9 +325,11 @@ class Corrplot(object):
         ax.tick_params(axis='both',which='both', length=0)
 
         if colorbar:
-            N = self.params['colorbar.N']
+            N = self.params['colorbar.N'] + 1
+            assert N >=2
             cb = plt.gcf().colorbar(self.collection,
-                    orientation=self.params['colorbar.orientation'], shrink=.9,
+                    orientation=self.params['colorbar.orientation'], 
+                    shrink=self.params['colorbar.shrink'],
                 boundaries= np.linspace(0,1,N), ticks=[0,.25, 0.5, 0.75,1])
             cb.ax.set_yticklabels([-1,-.5,0,.5,1])
             cb.set_clim(0,1) # make sure it goes from -1 to 1 even though actual values may not reach that range
@@ -380,6 +426,6 @@ class Corrplot(object):
 
 if __name__ == "__main__":
     import pandas as pd
-    df = pd.DataFrame(dict(( (k, np.random.random(10)) for k in ['ABCDEF'])))
+    df = pd.DataFrame(dict(( (k, np.random.random(10)) for k in 'ABCDEF')))
     fig = Corrplot(df, None).plot()
-    fig.show()
+    plt.show()
