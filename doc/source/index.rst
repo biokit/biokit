@@ -48,9 +48,19 @@ References
 .. _installation:
 
 
-Other resources
-===============
+Examples in notebooks
+========================
 
 Set of `Notebooks <http://nbviewer.ipython.org/github/biokit/biokit/tree/master/notebooks/>`_
 
+
+
+Others
+#################################
+
+.. toctree::
+    :maxdepth: 2
+    :numbered:
+
+    ChangeLog.rst
 
