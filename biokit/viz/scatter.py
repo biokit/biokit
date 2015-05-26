@@ -29,7 +29,19 @@ def scatter_hist(x,y, kargs_scatter={'s':20, 'c':'b'},
 
 
 class ScatterHist(VizInput2D):
+    """Scatter plots and histograms
+
+
+    """
     def __init__(self, x, y=None, verbose=True):
+        """.. rubric:: constructor
+
+        :param x:
+        :param y:
+        :param verbose:
+
+
+        """
         super(ScatterHist, self).__init__(x,y,verbose)
 
 

@@ -15,14 +15,12 @@ class VizInput2D(object):
         self.verbose = verbose
 
         if isinstance(x, pd.DataFrame) is True:
-            print 1
             self.df = x.copy()
             columns = list(self.df.columns)
             columns[0] = 'x'
             columns[1] = 'y'
             self.df.columns = columns
         elif y is None:
-            print 2
             # could be a list of lists, a pandas-compatible dictionary
             self.df = pd.DataFrame(x)
             if self.df.shape[1] != 2:
@@ -30,7 +28,6 @@ class VizInput2D(object):
                     print("warning transposing data")
                     self.df = self.df.transpose()
         elif x is not None and y is not None:
-            print 3
             self.df = pd.DataFrame({'x':x, 'y':y})
         else:
             raise ValueError('not a dataframe or list of items or dictionary.')

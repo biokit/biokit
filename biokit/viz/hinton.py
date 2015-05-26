@@ -9,7 +9,7 @@ __all__ = ['hinton']
 
 def hinton(df, fig=1, shrink=2, method='square', bgcolor='grey', 
         cmap='gray_r', binarise_color=True):
-    """
+    """Hinton plot (simplified version of correlation plot)
 
     :param df: the input data as a dataframe or list of items (list, array). See
         :class:`~biokit.viz.corrplot.Corrplot` for details.
