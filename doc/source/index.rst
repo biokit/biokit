@@ -54,9 +54,8 @@ Examples in notebooks
 Set of `Notebooks <http://nbviewer.ipython.org/github/biokit/biokit/tree/master/notebooks/>`_
 
 
-
-Others
-#################################
+ChangeLog
+===========
 
 .. toctree::
     :maxdepth: 2
