@@ -9,7 +9,7 @@ Tools related to network (e.g., protein networks)
 =========================================================
 .. automodule:: biokit.network
 
-.. automodule:: biokit.network.complexes
+.. .. automodule:: biokit.network.complexes
     :members:
     :undoc-members:
     :synopsis: 
@@ -24,7 +24,12 @@ Common visualisation tools
     :undoc-members:
     :synopsis: 
 
-.. automodule:: biokit.viz.extra
+.. automodule:: biokit.viz.scatter
+    :members:
+    :undoc-members:
+    :synopsis: 
+
+.. automodule:: biokit.viz.imshow
     :members:
     :undoc-members:
     :synopsis: 
@@ -33,6 +38,27 @@ Common visualisation tools
     :members:
     :undoc-members:
     :synopsis: 
+
+.. automodule:: biokit.viz.hinton
+    :members:
+    :undoc-members:
+    :synopsis: 
+
+.. automodule:: biokit.viz.volcano
+    :members:
+    :undoc-members:
+    :synopsis: 
+
+.. automodule:: biokit.viz.hist2d
+    :members:
+    :undoc-members:
+    :synopsis: 
+
+.. automodule:: biokit.viz.core
+    :members:
+    :undoc-members:
+    :synopsis: 
+
 
 Tools to handle R packages
 ===============================

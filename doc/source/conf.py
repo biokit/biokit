@@ -17,13 +17,6 @@ import sys, os
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
-pkg_name = "biokit"
-
-try:
-    exec("import %s" % pkg_name)
-except Exception, e:
-    print "Install %s or set your PYTHONPATH properly" % pkg_name
-    raise Exception
 
 try:
     import easydev
@@ -32,14 +25,13 @@ except Exception, e:
     print "Install easydev or set your PYTHONPATH properly"
     raise Exception
 
-
 import pkg_resources
-version = pkg_resources.require(pkg_name)[0].version
+version = pkg_resources.require('biokit')[0].version
 release = version
 author = "BioKit developers"
 title = "BioKit"
 copyright = author + ", 2014"
-project = pkg_name
+project = 'biokit'
 
 
 
@@ -62,7 +54,7 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.coverage',
     'sphinx.ext.ifconfig',
-    'sphinx.ext.viewcode',
+    'sphinx.ext.viewcode',	
     'easydev.copybutton',
     'matplotlib.sphinxext.plot_directive',
     'matplotlib.sphinxext.only_directives',
