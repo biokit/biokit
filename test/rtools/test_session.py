@@ -5,6 +5,7 @@ from nose.plugins.attrib import attr
 def test_session():
 
     sess = session.RSession()
+    print sess
     sess.get_version()
     try:
         sess.reconnect()
