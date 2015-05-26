@@ -10,3 +10,11 @@ def test1():
             'alpha':0.5},
         kargs_histx={'color': 'red'},
         kargs_histy={'color': 'green'})
+
+    from biokit.viz import ScatterHist
+
+    s = ScatterHist(x=[1,2,3,4], y=[3,4,5,6])
+    s.plot()
+    s.plot(scatter_position='top right')
+    s.plot(scatter_position='top left')
+    s.plot(scatter_position='bottom right')

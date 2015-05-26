@@ -239,8 +239,6 @@ class Corrplot(object):
         elif upper is not None:
             mode = 'upper'
             diagonal = True
-        else:
-            raise ValueError
 
         self.binarise_color = binarise_color
         if mode == 'upper':
@@ -417,6 +415,8 @@ class Corrplot(object):
                     #ax.add_artist(patch[1])
                     patches.append(patch[0])                    
                     patches.append(patch[1])
+                else:
+                    raise ValueError('Method for the symbols is not known. Use e.g, square, circle')
 
         if self.binarise_color:
             colors = [1 if color >0.5 else -1 for color in colors]
@@ -428,8 +428,3 @@ class Corrplot(object):
             self.collection = col1
 
 
-if __name__ == "__main__":
-    import pandas as pd
-    df = pd.DataFrame(dict(( (k, np.random.random(10)) for k in 'ABCDEF')))
-    fig = Corrplot(df, None).plot()
-    plt.show()

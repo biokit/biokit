@@ -6,4 +6,4 @@ from .hist2d import *
 from .imshow import *
 from .scatter import *
 from .volcano import *
-
+from .heatmap import *

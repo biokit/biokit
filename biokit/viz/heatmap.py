@@ -65,7 +65,7 @@ class Heatmap(object):
         .. todo:: if row_method id none, no ordering in the dendogram
 
         """
-        # should be a copy since it is reshuffled ?
+        # should be a copy since it may be reshuffled ?
         try:
             if data is None and verbose is True:
                 print("No data provided, please fill the `df` attribute manually")
