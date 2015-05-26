@@ -1,55 +1,67 @@
-#from biokit.viz.base import VizInput
+"""2D histograms
 
+
+
+"""
 import pylab
 import pandas as pd
 import numpy as np
+from .core import VizInput2D
 
 
-__all__ = ["Hist2d"]
+__all__ = ["Hist2D"]
 
 
-class VizInput(object):
-    def __init__(self, verbose=False):
-        self.verbose = verbose
+class Hist2D(VizInput2D):
+    """2D histogram
+    
+    
+    .. plot::
+        :include-source:
+        :width: 80%
 
+        from numpy import random
+        from biokit.viz import hist2d
+        X = random.randn(10000)
+        Y = random.randn(10000)
+        h = hist2d.Hist2D(X,Y)
+        h.plot(bins=100, contour=True)
 
-class Hist2d(VizInput):
-    """data can be a dataframe with 2 columns or a numpy 2D array with 2 columns
-    or 2 rows, or a list of arrays or a dictionary.
-
-
+    
+    
     """
-    def __init__(self, data, verbose=False):
-        super(Hist2d, self).__init__(verbose=verbose)
-        self.df = pd.DataFrame(data)
 
-        if self.df.shape[1] != 2:
-            if self.df.shape[0] == 2:
-                print("warning transposing data")
-                self.df = self.df.transpose()
+    def __init__(self, x, y=None, verbose=False):
+        """.. rubric:: constructor
 
-    def plot(self, bins=100, cmap="hot_r", fontsize=10, Nlevels=4,
-        xlabel=None, ylabel=None, norm=None, range=None,
-        contour=True, **kargs):
-        """plots histogram of mean across replicates versus coefficient variation
-
-        :param int bins: binning for the 2D histogram
-        :param fontsize: fontsize for the labels
-        :param contour: show some contours
-        :param int Nlevels: must be more than 2
-        :param range: as in pylab.hist2d : a 2x2 shape [[-3,3],[-4,4]]
-
-        .. plot::
-            :include-source:
-            :width: 50%
-
-            >>> from msdas import *
-            >>> r = replicates.ReplicatesYeast(get_yeast_raw_data())
-            >>> r.drop_na_count(54) # to speed up the plot creation
-            >>> r.hist2d_mu_versus_cv()
+        :param x: an array for X values. See :class:`~biokit.viz.core.VizInput2D` for details.
+        :param y: an array for Y values. See :class:`~biokit.viz.core.VizInput2D` for details.
 
         """
+        super(Hist2D, self).__init__(x=x, y=y, verbose=verbose)
 
+    def plot(self, bins=100, cmap="hot_r", fontsize=10, Nlevels=4,
+        xlabel=None, ylabel=None, norm=None, range=None, normed=False,
+        colorbar=True, contour=True, grid=True, **kargs):
+        """plots histogram of mean across replicates versus coefficient variation
+
+        :param int bins: binning for the 2D histogram (either a float or list 
+            of 2 binning values).
+        :param cmap: a valid colormap (defaults to hot_r)
+        :param fontsize: fontsize for the labels
+        :param int Nlevels: must be more than 2
+        :param str xlabel: set the xlabel (overwrites content of the dataframe)
+        :param str ylabel: set the ylabel (overwrites content of the dataframe)
+        :param norm: set to 'log' to show the log10 of the values.
+        :param normed: normalise the data
+        :param range: as in pylab.Hist2D : a 2x2 shape [[-3,3],[-4,4]]
+        :param contour: show some contours (default to True)
+        :param bool grid: Show unerlying grid (defaults to True)
+
+        If the input is a dataframe, the xlabel and ylabel will be populated
+        with the column names of the dataframe.
+
+        """
         X = self.df[self.df.columns[0]].values
         Y = self.df[self.df.columns[1]].values
         if len(X) > 10000:
@@ -58,12 +70,14 @@ class Hist2d(VizInput):
         pylab.clf()
         if norm == 'log':
             from matplotlib import colors
-            res = pylab.hist2d(X, Y, bins=bins,
+            res = pylab.hist2d(X, Y, bins=bins, normed=normed,
                cmap=cmap, norm=colors.LogNorm())
         else:
-            res = pylab.hist2d(X, Y, bins=bins, cmap=cmap, range=range)
+            res = pylab.hist2d(X, Y, bins=bins, cmap=cmap, 
+                    normed=normed, range=range)
 
-        pylab.colorbar()
+        if colorbar is True:
+            pylab.colorbar()
 
         if contour:
             try:
@@ -79,15 +93,17 @@ class Hist2d(VizInput):
                 pylab.contour(X, Y, res[0].transpose(), levels[2:], color="g")
                 #pylab.clabel(C, fontsize=fontsize, inline=1)
 
-        if ylabel == None:
+        if ylabel is None:
             ylabel = self.df.columns[1]
-        if xlabel == None:
+        if xlabel is None:
             xlabel = self.df.columns[0]
 
         pylab.xlabel(xlabel, fontsize=fontsize)
         pylab.ylabel(ylabel, fontsize=fontsize)
 
-        pylab.grid(True)
+        if grid is True:
+            pylab.grid(True)
+
         return res
 
 

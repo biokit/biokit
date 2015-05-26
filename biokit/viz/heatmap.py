@@ -1,9 +1,4 @@
-"""
-
-
-
-
-"""
+"""Heatmap and dendograms"""
 import matplotlib
 import pylab
 import scipy.cluster.hierarchy as hierarchy
@@ -63,7 +58,7 @@ class Heatmap(object):
                  col_side_colors=None, row_side_colors=None,
                          verbose=True
                  ):
-        """
+        """.. rubric:: constructor
 
         :param data: a dataframe or possibly a numpy matrix.
 
@@ -156,7 +151,8 @@ class Heatmap(object):
 
 
         :param gradient_span: None is default in R
-        iusing::
+        
+        Using::
 
             df = pd.DataFrame({'A':[1,0,1,1],
                                'B':[.9,0.1,.6,1],

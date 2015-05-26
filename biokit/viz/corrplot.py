@@ -136,9 +136,9 @@ class Corrplot(object):
     def plot(self, fig=None, grid=True,
             rotation=30, lower=None, upper=None,
             shrink=0.9, axisbg='white', colorbar=True, label_color='black',
-            fontsize='small', edgecolor='black', method='ellipse', order_method='complete',
-            order_metric='euclidean', cmap=None, ax=None
-            ):
+            fontsize='small', edgecolor='black', method='ellipse', 
+            order_method='complete', order_metric='euclidean', cmap=None, 
+            ax=None, binarise_color=False):
         """plot the correlation matrix from the content of :attr:`df`
         (dataframe)
 
@@ -218,7 +218,6 @@ class Corrplot(object):
             plt.sca(ax)
             ax.clear()
 
-
         # subplot resets the bg color, let us set it again
         fig.set_facecolor(axisbg)
 
@@ -243,6 +242,7 @@ class Corrplot(object):
         else:
             raise ValueError
 
+        self.binarise_color = binarise_color
         if mode == 'upper':
             self._add_patches(df, upper, 'upper',  ax, diagonal=True)
         elif mode == 'lower':
@@ -417,6 +417,10 @@ class Corrplot(object):
                     #ax.add_artist(patch[1])
                     patches.append(patch[0])                    
                     patches.append(patch[1])
+
+        if self.binarise_color:
+            colors = [1 if color >0.5 else -1 for color in colors]
+
         if len(patches):                    
             col1 = PatchCollection(patches, array=np.array(colors), cmap=self.cm)
             ax.add_collection(col1)
