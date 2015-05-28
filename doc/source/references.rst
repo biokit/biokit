@@ -9,7 +9,7 @@ Tools related to network (e.g., protein networks)
 =========================================================
 .. automodule:: biokit.network
 
-.. .. automodule:: biokit.network.complexes
+.. automodule:: biokit.network.complexes
     :members:
     :undoc-members:
     :synopsis: 
@@ -74,7 +74,44 @@ Tools to handle R packages
     :synopsis: 
 
 .. automodule:: biokit.rtools.package
+    :members:
+    :undoc-members:
+    :synopsis: 
 
+.. automodule:: biokit.rtools.py2r
+    :members:
+    :undoc-members:
+    :synopsis: 
+
+.. automodule:: biokit.rtools.r4python
+    :members:
+    :undoc-members:
+    :synopsis: 
+
+
+Genomics
+==========
+.. automodule:: biokit.sequence
+
+.. automodule:: biokit.sequence.seq
+    :members:
+    :undoc-members:
+    :synopsis: 
+
+.. automodule:: biokit.sequence.dna
+    :members:
+    :undoc-members:
+    :synopsis: 
+
+.. automodule:: biokit.sequence.rna
+    :members:
+    :undoc-members:
+    :synopsis: 
+
+.. automodule:: biokit.sequence.peptide
+    :members:
+    :undoc-members:
+    :synopsis: 
 
 BioServices
 ================

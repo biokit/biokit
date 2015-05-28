@@ -36,6 +36,7 @@ Overview
     biokit.viz
     biokit.rtools
     biokit.services
+    biokit.sequence
     biokit.stats
 
 References
