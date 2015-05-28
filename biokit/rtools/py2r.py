@@ -13,14 +13,14 @@
 #  website: https://github.com/biokit
 #
 ##############################################################################
-from easydev import check_params_in_list
+from easydev import check_param_in_list
 
 
 class Py2R(object):
     """Simple class to convert Python object to R objects as strings"""
     @staticmethod
     def from_bool(self, value):
-        check_params_in_list(value, [True, False])
+        check_param_in_list(value, [True, False])
         if value is True:
             return "T"
         if value is False:
