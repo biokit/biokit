@@ -71,12 +71,12 @@ setup(
 
     # distutils in rtools.package
     install_requires = [ 'pandas', 'bioservices', 'colormap'],
-    ext_modules=[
-        Extension('biokit.sequence.complement', 
-                sources=['biokit/sequence/complement.c', ],
-                 )
-        
-        ],
+#    ext_modules=[
+#        Extension('biokit.sequence.complement', 
+#                sources=['biokit/sequence/cpp/complement.c', ],
+#                 )
+#        
+#        ],
 
     )
 
