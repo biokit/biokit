@@ -14,6 +14,9 @@ from matplotlib.collections import PatchCollection
 import pandas as pd
 
 
+__all__ = ['Corrplot']
+
+
 class Corrplot(object):
     """An implementation of correlation plotting tools (corrplot)
 
