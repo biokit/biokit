@@ -13,6 +13,7 @@
 #  website: https://github.com/biokit
 #
 ##############################################################################
+"""Utilities to install/remove R packages"""
 import tempfile
 import urllib2
 import os.path
@@ -44,7 +45,7 @@ def install_package(query, dependencies=False, verbose=True,
         >>> rtools.install_package("hash") # a CRAN package
         >>> rtools.install_package("path to a valid R package directory")
 
-    .. seealso:: :class:`biokit.rtools.RPackageManager`
+    .. seealso:: :class:`biokit.rtools.package.RPackageManager`
     """
     session = RSession(verbose=verbose)
 
@@ -80,8 +81,9 @@ def install_package(query, dependencies=False, verbose=True,
         session.run(code)
         return
 
+
 def get_R_version():
-    """Return R version"""
+    """Return version of the R program installed on your system"""
     r = RSession()
     r.run("version")
     return r.version
@@ -91,7 +93,7 @@ def biocLite(package=None, suppressUpdates=True, verbose=True):
     """Install a bioconductor package
 
     This function does not work like the R function. Only a few options are
-    implemented so far. However, you can use rcode function directly if needed.
+    implemented so far. However, you can use :func:`rcode` function directly if needed.
 
     :param str package: name of the bioconductor package to install. If None, no
         package is installed but installed packages are updated. If not provided, 
@@ -124,7 +126,9 @@ def biocLite(package=None, suppressUpdates=True, verbose=True):
     
 
 class RPackage(object):
-    """
+    """Handle a single R package
+
+    can be used to check the version installed.
 
     ::
 
@@ -171,6 +175,7 @@ class RPackage(object):
         return StrictVersion(version.replace("-", "a"))
 
     def install(self):
+        """Install the package"""
         install_package(self.name)
 
     def _get_isinstalled(self):
@@ -178,11 +183,13 @@ class RPackage(object):
             return True
         else:
             return False
-    isinstalled = property(_get_isinstalled)
+    isinstalled = property(_get_isinstalled, 
+            doc="Getter returning true if the package is installed")
 
     def _get_version(self):
         return self._version
-    version = property(_get_version)
+    version = property(_get_version, 
+            doc="Getter returning the package version")
 
     def __str__(self):
         if self.version:
@@ -199,8 +206,8 @@ class RPackageManager(object):
 
     ::
 
-        pm = PackageManager()
-        [(x, pm.installed[x][2]) for x in pm.installed.keys()]
+        >>> pm = PackageManager()
+        >>> [(x, pm.installed[x][2]) for x in pm.installed.keys()]
 
 
     You can access to all information within a dataframe called **packages** where
