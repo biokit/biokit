@@ -7,9 +7,9 @@ import numpy as np # get rid of this dependence
 
 import easydev
 import colormap
+from biokit.viz.linkage import Linkage
 
-
-__all__ = ['heatmap', 'Heatmap']
+__all__ = ['Heatmap']
 
 
 def get_heatmap_df():
@@ -23,14 +23,14 @@ def get_heatmap_df():
     return df
 
 
-def heatmap(data, *args, **kargs):
-    """alias to Heatmap class"""
-    h = Heatmap(data, *args, **kargs)
-    h.plot()
-    return h
+#def heatmap(data, *args, **kargs):
+#    """alias to Heatmap class"""
+#    h = Heatmap(data, *args, **kargs)
+#    h.plot()
+#    return h
 
 
-class Heatmap(object):
+class Heatmap(Linkage):
     """Heatmap and dendograms of an input matrix
 
     A heat map is an image representation of a matrix with a
@@ -88,6 +88,9 @@ class Heatmap(object):
         self.params.row_side_colors = ['r', 'g', 'b', 'y', 'w', 'k', 'm']
         self.params.cmap = cmap
 
+        self.category_row = None
+        self.category_column = None
+
         if col_side_colors:
             self.params.col_side_colors = col_side_colors
         if row_side_colors:
@@ -100,53 +103,37 @@ class Heatmap(object):
     df = property(_get_df, _set_df)
     frame = property(_get_df, _set_df)
 
-    def _check_metric(self, value):
-        easydev.check_param_in_list(value,
-            ['braycurtis', 'canberra', 'chebyshev', 'cityblock',
-             'correlation', 'cosine', 'dice', 'euclidean', 'hamming',
-             'jaccard', 'kulsinski', 'mahalanobis', 'matching',
-             'minkowski', 'rogerstanimoto', 'russellrao', 'seuclidean',
-             'kalmichener', 'sokalsneath', 'sqeuclidean', 'yule'])
-
-    def _check_method(self, value):
-        # None is possible
-        # in R, in addition to single, complete, average, centroid, median and ward
-        # there are  ward.D, wardD2 and mcquitty
-        # default is complete
-
-        easydev.check_param_in_list(str(value), ['linkage', 'single', 'complete', 'None',
-                                           'average',' weighted', 'centroid',
-                                           'median', 'ward'])
     def _get_row_method(self):
         return self._row_method
     def _set_row_method(self, value):
-        self._check_method(value)
+        self.check_method(value)
         self._row_method = value
     row_method = property(_get_row_method, _set_row_method)
 
     def _get_col_method(self):
         return self._column_method
     def _set_col_method(self, value):
-        self._check_method(value)
+        self.check_method(value)
         self._column_method = value
     column_method = property(_get_col_method, _set_col_method)
 
     def _get_col_metric(self):
         return self._column_metric
     def _set_col_metric(self, value):
-        self._check_metric(value)
+        self.check_metric(value)
         self._column_metric = value
     column_metric = property(_get_col_metric, _set_col_metric)
 
     def _get_row_metric(self):
         return self._row_metric
     def _set_row_metric(self, value):
-        self._check_metric(value)
+        self.check_metric(value)
         self._row_metric = value
     row_metric = property(_get_row_metric, _set_row_metric)
 
-    def plot(self, num=1, cmap="heat", colorbar=True, vmin=None,
-             vmax=None, colorbar_position='right', gradient_span='None'):
+    def plot(self, num=1, cmap=None, colorbar=True, vmin=None,
+             vmax=None, colorbar_position='right', gradient_span='None'
+             ):
         """
 
 
@@ -185,20 +172,22 @@ class Heatmap(object):
         # save all parameters in a dict
         layout = {}
 
-        cmap = colormap.cmap_builder(cmap)
+        if cmap is None:
+            cmap = self.params.cmap
+        try:cmap = colormap.cmap_builder(cmap)
+        except:pass
 
         # keep track of row and column names for later.
         row_header = self.frame.index
         column_header = self.frame.columns
 
-        # FIXME sometinh clever for the fontsize
-        if len(row_header)>100 or len(column_header)>100:
+        # FIXME something clever for the fontsize
+        if len(row_header) > 100 or len(column_header) > 100:
             matplotlib.rcParams['font.size'] = 6
-        if len(row_header)>50 or len(column_header)>50:
+        if len(row_header) > 50 or len(column_header) > 50:
             matplotlib.rcParams['font.size'] = 7
         else:
             matplotlib.rcParams['font.size'] = 12
-
 
         # scaling min/max range
         self.gradient_span  = gradient_span #'only_max'
@@ -218,7 +207,6 @@ class Heatmap(object):
         # Scale the figure window size #
         fig = pylab.figure(num=num, figsize=(12, 8))
         fig.clf()
-
 
         # LAYOUT --------------------------------------------------
         # ax1 (dendrogram 1) on the left of the heatmap
@@ -263,7 +251,7 @@ class Heatmap(object):
 
         # COMPUTATION DENDOGRAM 1 -------------------------------------
         if self.column_method:
-            Y = self.get_linkage(self.frame.transpose(),self.column_method,
+            Y = self.linkage(self.frame.transpose(),self.column_method,
                                   self.column_metric )
             ax2 = fig.add_axes([ax2_x, ax2_y, ax2_w, ax2_h], frame_on=True)
             Z = hierarchy.dendrogram(Y)
@@ -282,8 +270,7 @@ class Heatmap(object):
 
         # COMPUTATION DENDOGRAM 2 ---------------------------------
         if self.row_method:
-            Y = self.get_linkage(self.frame,self.row_method,
-                                  self.row_metric )
+            Y = self.linkage(self.frame, self.row_method, self.row_metric )
 
             ax1 = fig.add_axes([ax1_x, ax1_y, ax1_w, ax1_h], frame_on=True)
             Z = hierarchy.dendrogram(Y, orientation='right')
@@ -324,10 +311,12 @@ class Heatmap(object):
 
 
         # CATEGORY column ------------------------------
-        if self.column_method:
+        if self.category_column:
             axc = fig.add_axes([axc_x, axc_y, axc_w, axc_h])
             cmap_c = matplotlib.colors.ListedColormap(self.params.col_side_colors)
-            dc = np.array(ind2, dtype=int)
+            category_col = [self.category_column[self.df.columns[i]] for i in idx2]
+
+            dc = np.array(category_col, dtype=int)
             dc.shape = (1,len(ind2))
             axc.matshow(dc, aspect='auto', origin='lower', cmap=cmap_c)
             axc.set_xticks([])
@@ -335,15 +324,21 @@ class Heatmap(object):
             layout['category_column'] = axc
 
         # CATEGORY row -------------------------------
-        if self.row_method:
+        if self.category_row:
             axr = fig.add_axes([axr_x, axr_y, axr_w, axr_h])
-            dr = np.array(ind1, dtype=int)
-            dr.shape = (len(ind1),1)
+            # self.category_row must be a dictionary with names as found in the columns
+            # of the dataframe.
+
+            category_row = [self.category_row[self.df.columns[i]] for i in idx1]
+            
+            dr = np.array(category_row, dtype=int)
+            dr.shape = (len(category_row),1)
             cmap_r = matplotlib.colors.ListedColormap(self.params.col_side_colors)
             axr.matshow(dr, aspect='auto', origin='lower', cmap=cmap_r)
             axr.set_xticks([])
             axr.set_yticks([])
             layout['category_row'] = axr
+            
 
         # COLORBAR ----------------------
         if colorbar == True:
@@ -360,12 +355,7 @@ class Heatmap(object):
             layout['colorbar'] = cb
 
         #   could be useful
-        d = {'ordered': self.frame.copy(),  'rorder': idx1, 'corder': idx2} 
+        self.d = {'ordered': self.frame.copy(),  'rorder': idx1, 'corder': idx2} 
 
         return layout
 
-    def get_linkage(self, df, method, metric):
-        d = distance.pdist(df)
-        D = distance.squareform(d)
-        Y = hierarchy.linkage(D, method=method, metric=metric)
-        return Y

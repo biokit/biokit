@@ -13,11 +13,13 @@ from matplotlib.patches import Ellipse, Circle, Rectangle, Wedge
 from matplotlib.collections import PatchCollection
 import pandas as pd
 
+from biokit.viz.linkage import Linkage
+
 
 __all__ = ['Corrplot']
 
 
-class Corrplot(object):
+class Corrplot(Linkage):
     """An implementation of correlation plotting tools (corrplot)
 
     Here is a simple example with a correlation matrix as an input (stored in
@@ -42,7 +44,6 @@ class Corrplot(object):
         `notebook <http://nbviewer.ipython.org/github/biokit/biokit/blob/master/notebooks/viz/corrplot.ipynb>`_
 
     """
-    #def __init__(self, data, pvalues=None, na=0):
     def __init__(self, data, na=0):
         """.. rubric:: Constructor
 
@@ -66,6 +67,7 @@ class Corrplot(object):
             c = corrplot.Corrplot([[1,1], [2,4], [3,3], [4,4]])
 
         """
+        super(Corrplot, self).__init__()
         #: The input data is stored in a dataframe and must therefore be 
         #: compatible (list of lists, dictionary, matrices...)
         self.df = pd.DataFrame(data, copy=True)
@@ -109,11 +111,7 @@ class Corrplot(object):
         You probably do not need to use that method. Use :meth:`plot` and
         the two parameters order_metric and order_method instead.
         """
-        import scipy.cluster.hierarchy as hierarchy
-        import scipy.spatial.distance as distance
-        d = distance.pdist(self.df)
-        D = distance.squareform(d)
-        Y = hierarchy.linkage(D, method=method, metric=metric)
+        Y = self.linkage(self.df, method=method, metric=metric)
         ind1 = hierarchy.fcluster(Y, 0.7*max(Y[:,2]), 'distance')
         Z = hierarchy.dendrogram(Y, no_plot=True)
         idx1 = Z['leaves']
