@@ -25,7 +25,7 @@ class GaussianMixture(object):
     """
     def __init__(self, mu=[-1,1], sigma=[1,1], mixture=[0.5,0.5], N=1000):
         """.. rubric:: constructor
-    
+
         :param list mu: list of mean for each model
         :param list sigma: list of standard deviation for each model
         :param list mixture: list of amplitude for each model
@@ -61,6 +61,7 @@ class Mixture(GaussianMixture):
         super(Mixture, self).__init__(*args, **kargs)
         print('Deprecated. Use GaussianMixture')
 
+
 class GaussianMixtureModel(object):
     """Gaussian Mixture Model
 
@@ -78,7 +79,7 @@ class GaussianMixtureModel(object):
         """Expected parameters are
 
 
-        params is a list of gaussian distribution ordered as mu, sigma, pi, 
+        params is a list of gaussian distribution ordered as mu, sigma, pi,
         mu2, sigma2, pi2, ...
 
         """
@@ -150,10 +151,7 @@ class Fitting(object):
     model = property(_get_model)
 
     def get_guess(self):
-        """Random guess to initialise optimisation
-
-
-        """
+        """Random guess to initialise optimisation"""
         params = {}
         m = self.data.min()
         M = self.data.max()
@@ -167,12 +165,12 @@ class Fitting(object):
 
         params['pis'] = [1./self.k] * self.k
 
-        params = [ [mu,sigma,pi]  for mu,sigma,pi in 
+        params = [ [mu,sigma,pi]  for mu,sigma,pi in
                     zip(params['mus'], params['sigmas'], params['pis'])]
         params = list(pylab.flatten(params))
         return params
 
-    def plot(self, normed=True, N=1000, Xmin=None, Xmax=None, bins=50, color='red', lw=2, 
+    def plot(self, normed=True, N=1000, Xmin=None, Xmax=None, bins=50, color='red', lw=2,
             hist_kw={'color':'#5F9EA0'}, ax=None):
 
         if ax:
@@ -186,19 +184,23 @@ class Fitting(object):
         X = pylab.linspace(Xmin, Xmax, N)
 
         if ax:
-            ax.plot(X, [self.model.pdf(x, self.results.x) for x in X], color=color, lw=lw)
+            ax.plot(X, [self.model.pdf(x, self.results.x) for x in X],
+                    color=color, lw=lw)
         else:
-            pylab.plot(X, [self.model.pdf(x, self.results.x) for x in X], color=color, lw=lw)
+            pylab.plot(X, [self.model.pdf(x, self.results.x) for x in X],
+                    color=color, lw=lw)
 
         K = len(self.results.x)
         # The PIs must be normalised
         for i in range(0, K/3):
-            
+
             mu, sigma, pi_ = self.results.mus[i], self.results.sigmas[i], self.results.pis[i]
             if ax:
-                ax.plot(X, [pi_ * pylab.normpdf(x, mu, sigma) for x in X], 'g--', alpha=0.5)
+                ax.plot(X, [pi_ * pylab.normpdf(x, mu, sigma) for x in X], 
+                        'g--', alpha=0.5)
             else:
-                pylab.plot(X, [pi_ * pylab.normpdf(x, mu, sigma) for x in X], 'g--', alpha=0.5)
+                pylab.plot(X, [pi_ * pylab.normpdf(x, mu, sigma) for x in X], 
+                        'g--', alpha=0.5)
 
 
 class GaussianMixtureFitting(Fitting):
@@ -219,9 +221,9 @@ class GaussianMixtureFitting(Fitting):
     def __init__(self, data, k=2, method='Nelder-Mead'):
         """
 
-        Here we use the function minimize() from scipy.optimization. 
+        Here we use the function minimize() from scipy.optimization.
         The list of (currently) available minimization methods is 'Nelder-Mead' (simplex),
-        'Powell', 'CG', 'BFGS', 'Newton-CG',> 'Anneal', 'L-BFGS-B' (like BFGS but bounded), 
+        'Powell', 'CG', 'BFGS', 'Newton-CG',> 'Anneal', 'L-BFGS-B' (like BFGS but bounded),
         'TNC', 'COBYLA', 'SLSQPG'.
 
         """
@@ -230,12 +232,11 @@ class GaussianMixtureFitting(Fitting):
     def estimate(self, guess=None, k=None, maxfev=2e4, maxiter=1e3,
             bounds=None):
         """guess is a list of parameters as expected by the model
-        
-        
+
+
         guess = {'mus':[1,2], 'sigmas': [0.5, 0.5], 'pis': [0.3, 0.7]  }
 
         """
-
         if k is not None:
             self.k = k
 
@@ -243,7 +244,7 @@ class GaussianMixtureFitting(Fitting):
             # estimate the mu/sigma/pis from the data
             guess = self.get_guess()
 
-        res = minimize(self.model.log_likelihood, x0=guess, args=(self.data,), 
+        res = minimize(self.model.log_likelihood, x0=guess, args=(self.data,),
             method=self.method, options=dict(maxiter=maxiter, maxfev=maxfev),
             bounds=bounds)
 
@@ -268,7 +269,7 @@ class GaussianMixtureFitting(Fitting):
             params.append(self.results.x[i*3])
             params.append(self.results.x[(i*3+1)])
             params.append(pis[i])
-        self.results.x = params 
+        self.results.x = params
 
         # FIXME shall we multiply by -1 ??
         self.results.log_likelihood = self.model.log_likelihood(params, self.data)
@@ -287,7 +288,7 @@ class GaussianMixtureFitting(Fitting):
         self.results.sigmas = self.results.x[1::3]
         self.results.mus = self.results.x[0::3]
 
-        # 
+        #
 
         return res
 
@@ -310,10 +311,10 @@ class EM(Fitting):
     def __init__(self, data, model=None, max_iter=100):
         """.. rubric:: constructor
 
-        :param data: 
+        :param data:
         :param model: not used. Model is the :class:`GaussianMixtureModel` but
             could be other model.
-        :param int max_iter: max iteration for the minization 
+        :param int max_iter: max iteration for the minization
 
         """
         if model is None:
@@ -324,7 +325,7 @@ class EM(Fitting):
     def estimate(self, guess=None, k=2):
         """
 
-        :param list guess: a list to provide the initial guess. Order is mu1, sigma1, 
+        :param list guess: a list to provide the initial guess. Order is mu1, sigma1,
             pi1, mu2, ...
         :param int k: number of models to be used.
         """
@@ -382,7 +383,7 @@ class EM(Fitting):
                 self.debug = {'N':N_, 'pis':pi_}
                 self.status = False
                 break
-                
+
             self.mus.append(mu)
 
             # Convergence check
@@ -415,7 +416,7 @@ class AdaptativeMixtureFitting(object):
 
     .. plot::
         :width: 80%
-        :include-source: 
+        :include-source:
 
         from biokit.stats.mixture import AdaptativeMixtureFitting, Mixture
         m = Mixture(mu=[-1,1], sigma=[0.5,0.5], mixture=[0.2,0.8])
@@ -451,7 +452,7 @@ class AdaptativeMixtureFitting(object):
 
 
     def plot(self, criteria='AICc'):
-        
+
         pylab.plot(self.x, [self.all_results[x]['BIC'] for x in self.x], 'o-', label='BIC')
         pylab.plot(self.x, [self.all_results[x]['AIC'] for x in self.x], 'o-',  label='AIC')
         pylab.plot(self.x, [self.all_results[x]['AICc'] for x in self.x], 'o-', label='AICc')
@@ -467,7 +468,7 @@ class AdaptativeMixtureFitting(object):
 
 
     def diagnostic(self, kmin=1, kmax=8, k=None, ymax=None):
-        self.run(kmin=kmin, kmax=kmax); 
+        self.run(kmin=kmin, kmax=kmax);
         pylab.clf()
         pylab.subplot(3,1,2);
         self.plot()
@@ -488,11 +489,11 @@ class AdaptativeMixtureFitting(object):
         min_value = np.array([self.all_results[x]['AIC'] for x in self.x]).min()
         pylab.plot(self.x, [pylab.exp((min_value-self.all_results[k]['AIC'])/2)
             for k in  self.x], 'o-', label='AIC')
-        
+
         pylab.xlabel('probability of information loss (based on AICc')
         pylab.legend()
 
 
-        
+
 
 
