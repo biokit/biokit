@@ -214,47 +214,39 @@ class Taxonomy(object):
         children = [child['id'] for child in children]
         return children
 
-    def get_family_tree(self, taxon, limits=100):        
-        """root is taxon and we return the corresponding tree
-        
-        ::
-
-            from biokit import Taxonomy
-            t = Taxonomy()
-            ret = t.get_family_tree()
-            from cno import CNOGraph
-            for x in ret:
-                keys = t.records.keys() 
-                    if int(x[0]) in keys and int(x[1]) in keys:
-                        e1 = t.records[int(x[0])]['scientific_name'];
-                        e2 = t.records[int(x[1])]['scientific_name'];
-                        if 'Pan' not in e1 and 'Pan' not in e2:
-                            c.add_edge(e1, e2, link='+')
-            c.plot()
-
-        
-        """
+    def get_family_tree(self, taxon):
+        """root is taxon and we return the corresponding tree"""
         # should limit the tree size
         # uniprot flat files has no record about childrent, so we would
-        # need toi reconstruct the tree
-        if method == 'uniprot':
-            self._get_family_tree_uniprot(taxon, limits=limits)
+        # need to reconstruct the tree
+        tree = {}
+        children = self.get_children(taxon)
+        if len(children) == 0:
+            return tree
         else:
-            raise notImplementedError
+            return [self.get_family_tree(child) for child in children]
 
-    def _get_family_tree_uniprot(self, taxon, limits=100):
-        tree = []
-        children = [taxon]
-        while len(children) != 0:
-            new_children = []
-            for parent in children:
-                for this in self.get_children(parent):
-                    new_children.append(this)
-                    tree.append((parent, this))
-            children = new_children[:]
-            if len(tree) > limits:
-                print('Reached limit number of nodes')
-        return tree
+   
+
+class Taxon(object):
+    """Some codecs"""
+    def __init__(self, taxid):
+        self.taxid = taxid
+
+
+    def to_genbank(self, retmax=10000):
+        """Draft: from a TaxID, uses EUtils to retrieve
+        the GenBank identifiers
+
+        :Inspiration: https://gist.github.com/fjossinet/5673672
+        """
+        from bioservices import EUtils
+        e = EUtils()
+        idlist = e.ESearch(db='nucleotide',
+                term='txid%s[Organism:exp]'%self.taxid,
+                restart=0, retmax=retmax)['idlist']
+        results = e.ESummary(db='nucleotide', id=idlist, retmax=retmax)
+        return results
 
 
 
