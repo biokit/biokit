@@ -40,11 +40,11 @@ from biokit import sequence
 from biokit.sequence import *
 
 from biokit import goid
-from goid import *
+from biokit.goid import *
 
 
 from biokit import taxonomy
-from taxonomy import Taxonomy
+from biokit.taxonomy import Taxonomy
 
 
 
