@@ -7,7 +7,7 @@
 __all__ = ['hinton']
 
 
-def hinton(df, fig=1, shrink=2, method='square', bgcolor='grey', 
+def hinton(df, fig=1, shrink=2, method='square', bgcolor='grey',
         cmap='gray_r', binarise_color=True):
     """Hinton plot (simplified version of correlation plot)
 
@@ -34,14 +34,17 @@ def hinton(df, fig=1, shrink=2, method='square', bgcolor='grey',
     .. note:: Idea taken from a matplotlib recipes
         http://matplotlib.org/examples/specialty_plots/hinton_demo.html
         but solely using the implementation within :class:`~biokit.viz.corrplot.Corrplot`
-    
+
+    .. seealso:: :class:`biokit.viz.corrplot.Corrplot`
+
+    .. note:: Values must be between -1 and 1. No sanity check performed.
     """
     from biokit.viz import corrplot
     c = corrplot.Corrplot(df)
-    c.plot(colorbar=False, cmap=cmap, fig=fig, 
-            method=method, axisbg=bgcolor, 
+    c.plot(colorbar=False, cmap=cmap, fig=fig,
+            method=method, axisbg=bgcolor,
             shrink=shrink, label_color=bgcolor, binarise_color=binarise_color)
 
-    
+
 
 

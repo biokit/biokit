@@ -12,6 +12,7 @@ import matplotlib.cm as cm
 from matplotlib.patches import Ellipse, Circle, Rectangle, Wedge
 from matplotlib.collections import PatchCollection
 import pandas as pd
+import scipy.cluster.hierarchy as hierarchy
 
 from biokit.viz.linkage import Linkage
 
