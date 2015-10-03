@@ -1,7 +1,12 @@
 Whats' new, what has changed
 ================================
 
+:Revision 0.0.7:
 
+    * NEWS
+
+      * add taxonomy module.
+      * add goid module.
 
 
 

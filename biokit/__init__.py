@@ -40,7 +40,7 @@ from biokit import sequence
 from biokit.sequence import *
 
 from biokit import db
-from db import *
+from goid import *
 
 
 from biokit import taxonomy
