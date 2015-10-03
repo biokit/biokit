@@ -39,7 +39,7 @@ from biokit.network import *
 from biokit import sequence
 from biokit.sequence import *
 
-from biokit import db
+from biokit import goid
 from goid import *
 
 
