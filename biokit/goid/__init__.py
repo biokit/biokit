@@ -1,1 +1,1 @@
-from godb import *
+from .godb import *
