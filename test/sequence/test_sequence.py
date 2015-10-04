@@ -6,6 +6,7 @@ def test():
     s1 = Sequence('ACGT')
     s2 = Sequence('AAAA')
     s1 + s2
+    s2 + s1
     s1+= s2
     "aa" + s1
 
@@ -16,7 +17,7 @@ def test():
         assert True
 
     s1.histogram()
-   
+    s1.pie() 
 
     d1 = Sequence('GAGCCTACTAACGGGAT')
     d2 = Sequence('CATCGTAATGACGGCCT')
@@ -51,3 +52,7 @@ def test():
     except:
         assert True
 
+
+    s = Sequence(DNA('ACGT'))
+    assert s == 'ACGT'
+    assert s == dna
