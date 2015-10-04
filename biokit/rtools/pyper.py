@@ -3,13 +3,12 @@
 
 Reason for the fork. Code are written on top of pyper inside biokit.
 Yet, PypeR is failing sometimes (see examples below) and we may need to
-hack it.
+hack it. It had also Python 3 compat issues.
 
 Examples that fail:
 
     installed.packages()  --> numpy.array failing
     packageVersion("CellNOptR")  --> special unicode not interpreted
-
 
 The get() function fails with S4 objects such as CNOlist
 We return None to avoid the failure::
@@ -98,10 +97,11 @@ import sys
 import time
 import re
 import tempfile
-from types import *
+from types import *   # need to clean that
 import subprocess
 
 from biokit.rtools.r4python import r4python
+#from biokit.rtools.nbstreamreader import NonBlockingStreamReader as NBSR
 
 import pandas
 import numpy
@@ -120,60 +120,37 @@ else:
 
 
 _has_subp = False
-if sys.platform == 'cli':  # for IronPython
-    from System.Diagnostics import Process
-    PIPE, _STDOUT = None, None
 
-    def Popen(CMD, *a, **b):
-        '''
-        CMD is a list - a command and its arguments
-        '''
-        p = Process()
-        p.StartInfo.UseShellExecute = False
-        p.StartInfo.RedirectStandardInput = True
-        p.StartInfo.RedirectStandardOutput = True
-        p.StartInfo.RedirectStandardError = True
-        p.StartInfo.FileName = CMD[0]
-        p.StartInfo.Arguments = ' '.join(CMD[1:])
-        p.Start()
-        return(p)
 
-    def sendAll(p, s):
-        # remove ending newline since WriteLine will add newline at the end of s!
-        if s.endswith('\r\n'):
-            s = s[:-2]
-        elif s.endswith('\n'):
-            s = s[:-1]
-        p.StandardInput.WriteLine(_mybytes(s))
 
-    def readLine(p, dump_stdout=False, *a, **b):
-        rv = _mystr(p.StandardOutput.ReadLine()) + '\n' # add newline since ReadLine removed it.
-        if dump_stdout:
-            sys.stdout.write(rv)
-            sys.stdout.flush()
-        return(rv)
+PIPE, _STDOUT = None, None
+def Popen(CMD, *a, **b):
+    #original pyper code:
+    #class A:   
+    #    None
+    #p = A()
+    #p.stdin, p.stdout = os.popen4(' '.join(CMD))
+    # popen4 does not work in Python 3, so we use a Popen
+    p = subprocess.Popen(CMD,shell=False, 
+            stdin=subprocess.PIPE, 
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            close_fds=True)
+    return(p)
 
-else:
+def sendAll(p, s):
+    p.stdin.write(_mybytes(s))
+    #os.write(p.stdin.fileno(), s)
+    p.stdin.flush()
 
-    PIPE, _STDOUT = None, None
-    def Popen(CMD, *a, **b):
-        class A:
-            None
-        p = A()
-        p.stdin, p.stdout = os.popen4(' '.join(CMD))
-        return(p)
-
-    def sendAll(p, s):
-        p.stdin.write(_mybytes(s))
-        #os.write(p.stdin.fileno(), s)
-        p.stdin.flush()
-
-    def readLine(p, dump_stdout=False, *a, **b):
-        rv = _mystr(p.stdout.readline())
-        if dump_stdout:
-            sys.stdout.write(rv)
-            sys.stdout.flush()
-        return(rv)
+def readLine(p, dump_stdout=False, *a, **b):
+    #nbsr = NBSR(p.stdout)
+    #rv = _mystr(nbsr.readline())
+    rv = _mystr(p.stdout.readline())
+    if dump_stdout:
+        sys.stdout.write(rv)
+        sys.stdout.flush()
+    return(rv)
 
 
 def BoolStr(obj):

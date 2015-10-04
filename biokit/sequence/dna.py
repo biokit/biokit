@@ -41,7 +41,10 @@ class DNA(Sequence):
     def __init__(self, data=''):
         super(DNA, self).__init__(data)
         self.symbols = 'ACGTacgt'
-        self._translate = string.maketrans('ACGTacgt', 'TGCAtgca')
+        try:
+            self._translate = string.maketrans('ACGTacgt', 'TGCAtgca')
+        except:
+            self._translate = bytes.maketrans(b'ACGTacgt', b'TGCAtgca')
 
     def get_complement(self):
         compl = self._data.translate(self._translate)

@@ -6,10 +6,10 @@ devtools = DevTools()
 from scipy.optimize import minimize, show_options
 import numpy as np
 import pylab
-import seaborn as sns
+#import seaborn as sns
 from easydev import AttrDict
 
-import criteria
+from . import criteria
 
 class GaussianMixture(object):
     """Creates a mix of Gaussian distribution
@@ -97,7 +97,7 @@ class GaussianMixtureModel(object):
             pis /= pis.sum()
         # !!! sum pi must equal 1 otherwise may diverge badly
         data = 0
-        for i in range(0, k):
+        for i in range(0, int(k)):
             mu, sigma, pi_ = params[i*3: (i+1)*3]
             pi_ = pis[i]
             if sigma != 0:
@@ -140,7 +140,7 @@ class Fitting(object):
     def _get_k(self):
         return self._k
     def _set_k(self, k):
-        assert k>0
+        assert k > 0
         gmm = GaussianMixtureModel(k=k)
         self._k = k
         self._model = gmm
@@ -192,7 +192,7 @@ class Fitting(object):
 
         K = len(self.results.x)
         # The PIs must be normalised
-        for i in range(0, K/3):
+        for i in range(0, int(K/3)):
 
             mu, sigma, pi_ = self.results.mus[i], self.results.sigmas[i], self.results.pis[i]
             if ax:
@@ -210,8 +210,8 @@ class GaussianMixtureFitting(Fitting):
         :width: 80%
         :include-source:
 
-        from biokit.stats.mixture import Mixture, GaussianMixtureFitting
-        m = Mixture(mu=[-1,1], sigma=[0.5,0.5], mixture=[0.2,0.8])
+        from biokit.stats.mixture import GaussianMixture, GaussianMixtureFitting
+        m = GaussianMixture(mu=[-1,1], sigma=[0.5,0.5], mixture=[0.2,0.8])
         mf = GaussianMixtureFitting(m.data)
         mf.estimate(k=2)
         mf.plot()
@@ -265,7 +265,7 @@ class GaussianMixtureFitting(Fitting):
         unstable = False
         k = len(self.results.x)/3
         params = []
-        for i in range(0, k):
+        for i in range(0, int(k)):
             params.append(self.results.x[i*3])
             params.append(self.results.x[(i*3+1)])
             params.append(pis[i])
@@ -319,7 +319,9 @@ class EM(Fitting):
         """
         if model is None:
             model = GaussianMixtureModel(k=2)
-        super(EM, self).__init__(data, model)
+
+        #super(EM, self).__init__(data, model)
+        super(EM, self).__init__(data, k=2) # default is k=2
         self.max_iter = max_iter
 
     def estimate(self, guess=None, k=2):

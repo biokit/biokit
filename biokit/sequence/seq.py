@@ -46,7 +46,14 @@ class Sequence(object):
 
         self._N = len(self._data)
         self._counter = None
-        self.symbols = string.punctuation + string.letters
+        try:
+            #python2
+            self.symbols = string.punctuation + string.letters
+        except:
+            # python3
+            self.symbols = string.punctuation + string.ascii_letters
+
+
 
         #: check the sequence contains valid symbols if this is True
         self._check = False
