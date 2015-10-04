@@ -8,6 +8,7 @@ from collections import OrderedDict
 import pandas as pd
 import pylab
 
+
 __all__ = ["FASTA", "MultiFASTA"]
 
 """
@@ -24,13 +25,12 @@ json file like in ensembl:
 class Sequence(str):
     def __init__(self):
         self.description = None
-        
+
     def complement(self):
         pass
 
     def reverse(self):
         pass
-
 
 
 class MultiFASTA(object):
@@ -97,7 +97,6 @@ class MultiFASTA(object):
         return [f for f in self._fasta.keys()]
     ids = property(_get_ids, doc="returns list of keys/accession identifiers")
 
-
     def load_fasta(self, ids):
         """Loads a single FASTA file into the dictionary
 
@@ -133,13 +132,14 @@ class MultiFASTA(object):
         for thisfasta in data.split(">")[1:]:
             f = FASTA()
             f._fasta = f._interpret(thisfasta)
-            try:print(f.accession, self.ids)
+            try: dummy = f.accession, self.ids # just to try
             except:pass
-            if f.accession != None and f.accession not in self.ids:
+            if f.accession is not None and f.accession not in self.ids:
                 self._fasta[f.accession] = f
             else:
                 if self.verbose:
                     print("Accession %s is already in the ids list or could not be interpreted. skipped" % str(f.accession))
+            return
 
     def _get_df(self):
         df =  pd.concat([self.fasta[id_].df for id_ in self.fasta.keys()])
@@ -174,7 +174,7 @@ class FASTA(object):
 
     Wikipedia. A multiple sequence FASTA format would be obtained by concatenating several single sequence FASTA files. This does not imply a contradiction with the format as only the first line in a FASTA file may start with a ";" or ">", hence forcing all subsequent sequences to start with a ">" in order to be taken as different ones (and further forcing the exclusive reservation of ">" for the sequence definition line). Thus, the examples above may as well be taken as a multisequence file if taken together.
 
-    You can read a FASTA sequence from a local file, a string or download one 
+    You can read a FASTA sequence from a local file, a string or download one
     from UniProt using BioServices::
 
     .. doctest::
@@ -233,16 +233,14 @@ class FASTA(object):
     RefSeq 2                          ref|accession|name
     Local Sequence identifier         lcl|identifier
     PDB                               pdb|entry|chain
-    DDBJ                              dbj|accession|locus  
+    DDBJ                              dbj|accession|locus
     Default                           |accession|name
     ================================= ====================================
 
-identifier is mix of integers and characters
+    identifier is mix of integers and characters
 
-
-
-
-    gnl allows databases not included in this list to use the same identifying syntax.
+    gnl allows databases not included in this list to use the same 
+    identifying syntax.
 
     The :meth::`load_fasta` relies on UniProt service.
     """
@@ -273,6 +271,7 @@ identifier is mix of integers and characters
 
     def _get_dbtype(self):
         dbtype = self.header.split("|")[0].replace(">", "")
+
         return dbtype
     dbtype = property(_get_dbtype)
 
@@ -292,7 +291,8 @@ identifier is mix of integers and characters
             return self.identifier.split("|")[1]
         elif self.dbtype == "gi":
             return self.identifier.split("|")[1]
-
+        else:
+            return self.identifier
     accession = property(_get_accession)
 
     # swiss prot only
@@ -430,29 +430,23 @@ identifier is mix of integers and characters
         if self.dbtype not in self.known_dbtypes:
             print("Only sp and gi header are recognised so far but sequence and header are loaded")
 
-
     def _interpret(self, data):
         # cleanup the data in case of empty spaces or \n characters
         return data
 
-
-
-
-
-
     def check(self):
-        """Before submitting a request, any numerical digits in the query 
-        sequence should either be removed or replaced by appropriate letter 
-        codes (e.g., N for unknown nucleic acid residue or X for unknown 
+        """Before submitting a request, any numerical digits in the query
+        sequence should either be removed or replaced by appropriate letter
+        codes (e.g., N for unknown nucleic acid residue or X for unknown
         amino acid residue). The nucleic acid codes supported are:
-            
-         For those programs that use amino acid query sequences (BLASTP 
+
+         For those programs that use amino acid query sequences (BLASTP
          and TBLASTN), the accepted amino acid codes are:
          A, B, C, D, E, F, G, H, I, K, L, M, N, P, Q, R, S, T, U, V, W, Y, Z, X, *, -
 
 
          * is for translation stop and - for gap of indeterminate length
-                                                                                                                        
+
         """
         pass
 
