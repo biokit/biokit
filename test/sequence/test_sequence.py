@@ -32,10 +32,10 @@ def test():
     d1._check_sequence()
 
     # __repr__ and __str__
-    print d1
+    print(d1)
     d1.__repr__()
     d1 = Sequence('AAAAa') # length greater than 10
-    print d1
+    print(d1)
     d1.__repr__()
 
 

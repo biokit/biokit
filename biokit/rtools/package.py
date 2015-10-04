@@ -15,7 +15,29 @@
 ##############################################################################
 """Utilities to install/remove R packages"""
 import tempfile
-import urllib2
+import sys
+
+#PYTHON 2 / 3 compat
+try:
+    #python3
+    from urllib.request import urlopen
+except:
+    from urllib2 import urlopen
+
+
+
+if sys.version < '3.0':
+    _mystr = _mybytes = lambda s: s
+    _in_py3 = False
+else:
+    from functools import reduce
+    long, basestring, unicode = int, str, str
+    _mybytes = lambda s: bytes(s, 'utf8')  # 'ascii')
+    _mystr = lambda s: str(s, 'utf8')
+    _in_py3 = True
+
+
+
 import os.path
 
 from biokit.rtools import bool2R, RSession
@@ -71,7 +93,7 @@ def install_package(query, dependencies=False, verbose=True,
 
     except Exception as err:
         if verbose:
-            print(err.message)
+            print(err)
             print("trying local or from repos")
             print("RTOOLS warning: URL provided does not seem to exist %s. Trying from CRAN" % query)
         code = """install.packages("%s", dependencies=%s """ % \
@@ -290,9 +312,12 @@ class RPackageManager(object):
 
     def get_package_version(self, package):
         """Get version of an install package"""
+        package = _mybytes(package)
         if package not in self.installed.index:
             self.logging.error("package {0} not installed".format(package))
-        return self.installed['Version'].ix[package]
+        # somehow, for Python3, we must convert to bytes, which is 
+        # Python 2 compatible.
+        return self.installed['Version'][package]
 
     def biocLite(self, package=None, suppressUpdates=True, verbose=False):
         """Installs one or more biocLite packages

@@ -47,6 +47,7 @@ class Sequence(object):
 
         self._N = len(self._data)
         self._counter = None
+<<<<<<< HEAD
         self.symbols = string.punctuation + string.letters
         self._type = 'Sequence'
 
@@ -61,6 +62,16 @@ class Sequence(object):
     def _get_N(self):
         return self._N
     N = property(_get_N)
+=======
+        try:
+            #python2
+            self.symbols = string.punctuation + string.letters
+        except:
+            # python3
+            self.symbols = string.punctuation + string.ascii_letters
+
+
+>>>>>>> ed649aae5a4685a7a6b69c8b1b207184e4d1e1c8
 
     def __len__(self):
         return self._N

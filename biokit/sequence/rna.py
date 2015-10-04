@@ -11,8 +11,15 @@ class RNA(Sequence):
     def __init__(self, sequence=''):
         super(RNA, self).__init__(sequence)
         self.symbols = 'ACGUacgu'
+<<<<<<< HEAD
         self._translate = string.maketrans('ACGUacgu', 'UGCAugca')
         self._type = 'RNA'
+=======
+        try:
+            self._translate = string.maketrans('ACGUacgu', 'UGCAugca')
+        except:
+            self._translate = bytes.maketrans(b'ACGUacgu', b'UGCAugca')
+>>>>>>> ed649aae5a4685a7a6b69c8b1b207184e4d1e1c8
 
     def get_complement(self):
         compl = self._data.translate(self._translate)
