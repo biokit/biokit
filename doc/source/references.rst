@@ -113,6 +113,12 @@ Genomics
     :undoc-members:
     :synopsis: 
 
+.. automodule:: biokit.taxonomy.taxonomy
+    :members:
+    :undoc-members:
+    :synopsis: 
+
+
 BioServices
 ================
 .. automodule:: biokit.services
