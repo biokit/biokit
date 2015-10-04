@@ -42,6 +42,7 @@ class DNA(Sequence):
         super(DNA, self).__init__(data)
         self.symbols = 'ACGTacgt'
         self._translate = string.maketrans('ACGTacgt', 'TGCAtgca')
+        self._type = 'DNA'
 
     def get_complement(self):
         compl = self._data.translate(self._translate)

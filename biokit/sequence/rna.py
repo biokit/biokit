@@ -12,12 +12,13 @@ class RNA(Sequence):
         super(RNA, self).__init__(sequence)
         self.symbols = 'ACGUacgu'
         self._translate = string.maketrans('ACGUacgu', 'UGCAugca')
+        self._type = 'RNA'
 
-    def get_complement(self):        
+    def get_complement(self):
         compl = self._data.translate(self._translate)
         return RNA(compl)
     complement = property(get_complement)
-    
+
     def get_reverse_complement(self):
         complement = self.get_complement()
         return RNA(complement._data[::-1])
@@ -34,7 +35,7 @@ class RNA(Sequence):
         """Returns the G+C content in percentage.
 
         Copes mixed case sequences, and with the ambiguous nucleotide S (G or C)
-        when counting the G and C content.  
+        when counting the G and C content.
 
         ::
 
@@ -43,7 +44,7 @@ class RNA(Sequence):
             >>> d.gc_content()
             0.375
 
-        
+
         """
         if len(self) == 0:
             denom = 1.
@@ -53,4 +54,4 @@ class RNA(Sequence):
         letters = list(set(letters))
         counter = sum(self._data.count(x) for x in letters)
         return 100. * counter / denom
- 
+
