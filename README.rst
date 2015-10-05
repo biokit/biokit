@@ -12,8 +12,8 @@ Bioinformatics tools in Python
 .. image:: https://pypip.in/d/biokit/badge.png
     :target: https://crate.io/packages/biokit/
 
-.. image:: https://secure.travis-ci.org/cokelaer/biokit.png
-    :target: http://travis-ci.org/cokelaer/biokit
+.. image:: https://secure.travis-ci.org/biokit/biokit.png
+    :target: http://travis-ci.org/biokit/biokit
 
 .. image:: https://coveralls.io/repos/cokelaer/biokit/badge.png?branch=master 
    :target: https://coveralls.io/r/cokelaer/biokit?branch=master 
