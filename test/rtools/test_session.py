@@ -14,6 +14,7 @@ def test_session():
         assert True
 
 
+@attr('Ronly')
 def test_attribute():
     s = session.RSession()
     s.run("b=1")
