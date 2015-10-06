@@ -2,6 +2,7 @@ import os
 import re
 from biokit import biokitPATH
 
+# for checking : http://www.julesberman.info/cgi-bin/postback.cgi
 
 class Taxonomy(object):
     """This class should ease the retrieval and manipulation of Taxons
@@ -26,7 +27,8 @@ class Taxonomy(object):
 
         >>> t = taxonomy.Taxonomy()
         >>> t.fetch_by_id(9606)   # Get a dictionary from Ensembl
-        >>> t.records[9606]
+        >>> t.records[9606] # or just try with the get
+        >>> t[9606]
         >>> t.get_lineage(9606)
 
 
@@ -226,6 +228,10 @@ class Taxonomy(object):
         else:
             return [self.get_family_tree(child) for child in children]
 
+    def __getitem__(self, iden):
+        if len(self.records) == 0:
+            self.load_records()
+        return self.records[iden]
    
 
 class Taxon(object):

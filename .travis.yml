@@ -6,6 +6,7 @@ matrix:
     - python: 3.4
 
 
+# solution based on https://gist.github.com/dan-blanchard/7045057
 # setup anaconda to install scipy and numpy easily and quickly
 before_install:
     - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
