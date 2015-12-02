@@ -27,7 +27,7 @@ before_install:
 
 # command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
 install:
-  - conda install --yes python=$TRAVIS_PYTHON_VERSION atlas numpy scipy matplotlib nose dateutil pandas coverage
+  - conda install --yes python=$TRAVIS_PYTHON_VERSION atlas numpy scipy matplotlib nose pandas coverage
   # coverage packages are elsewhere
   #- conda install --yes -c python-coveralls nose-cov
   - pip install nose easydev bioservices
