@@ -71,7 +71,8 @@ setup(
     #package_dir  = package_dir,
 
     # distutils in rtools.package
-    install_requires = [ 'pandas', 'bioservices', 'colormap', 'scipy'],
+    install_requires = ['easydev>=0.9.7', 'pandas', 'bioservices', 
+        'colormap', 'scipy'],
 #    ext_modules=[
 #        Extension('biokit.sequence.complement', 
 #                sources=['biokit/sequence/cpp/complement.c', ],
