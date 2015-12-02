@@ -23,7 +23,7 @@ dna_bases_names = {
     "M": "aMino",
     "B": "not A",
     "D": "not C",
-    "H": "not G"
+    "H": "not G",
     "V": "not T/U",
     "N": "Unknown"}
 
