@@ -9,23 +9,20 @@ Bioinformatics tools in Python
 .. image:: https://badge.fury.io/py/biokit.svg
     :target: https://pypi.python.org/pypi/biokit
 
-.. image:: https://pypip.in/d/biokit/badge.png
-    :target: https://crate.io/packages/biokit/
-
 .. image:: https://secure.travis-ci.org/biokit/biokit.png
     :target: http://travis-ci.org/biokit/biokit
 
 .. image:: https://coveralls.io/repos/cokelaer/biokit/badge.png?branch=master 
    :target: https://coveralls.io/r/cokelaer/biokit?branch=master 
 
-.. image:: https://landscape.io/github/cokelaer/biokit/master/landscape.png
-   :target: https://landscape.io/github/cokelaer/biokit/master
+.. image:: https://badge.waffle.io/biokit/biokit.png?label=issues&title=issues
+   :target: https://waffle.io/biokit/biokit
 
 .. image:: https://badge.waffle.io/cokelaer/biokit.png?label=ready&title=Ready 
    :target: https://waffle.io/cokelaer/biokit
 
-:note: BioKit is tested under Python 2.7
-       Note yet fully compatible with python 3.3 but should be easy to fix (import issue)
+:note: BioKit is tested with Travis for the following Python version: 2.7.9
+       3.3.5, 3.4.2 and 3.5.0
 
 :contributions: Please join https://github.com/biokit/biokit and share your notebooks https://github.com/biokit/biobooks/
 :issues: Please use https://github.com/biokit/biokit/issues
