@@ -4,6 +4,7 @@ matrix:
     - python: 2.7
     - python: 3.3
     - python: 3.4
+    - python: 3.5
 
 
 # solution based on https://gist.github.com/dan-blanchard/7045057
