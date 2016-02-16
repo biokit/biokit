@@ -1,7 +1,6 @@
 from biokit.network.complexes import Complexes
-from nose.plugins.attrib import attr
 
-@attr('fixme')
+
 def test_complexes():
     c = Complexes(cache=True)
     c.remove_homodimers()

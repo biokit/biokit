@@ -1,43 +1,5 @@
-# -*- python -*-
-#
-#  This file is part of biokit software
-#
-#  Copyright (c) 2014-
-#
-#  File author(s): Thomas Cokelaer <cokelaer@ebi.ac.uk>
-#
-#  Distributed under the GPLv3 License.
-#  See accompanying file LICENSE.txt or copy at
-#      http://www.gnu.org/licenses/gpl-3.0.html
-#
-#  website: https://github.com/biokit
-#
-##############################################################################
-"""Utilities to install/remove R packages"""
 import tempfile
-import sys
-
-#PYTHON 2 / 3 compat
-try:
-    #python3
-    from urllib.request import urlopen
-except:
-    from urllib2 import urlopen
-
-
-
-if sys.version < '3.0':
-    _mystr = _mybytes = lambda s: s
-    _in_py3 = False
-else:
-    from functools import reduce
-    long, basestring, unicode = int, str, str
-    _mybytes = lambda s: bytes(s, 'utf8')  # 'ascii')
-    _mystr = lambda s: str(s, 'utf8')
-    _in_py3 = True
-
-
-
+import urllib2
 import os.path
 
 from biokit.rtools import bool2R, RSession
@@ -67,7 +29,7 @@ def install_package(query, dependencies=False, verbose=True,
         >>> rtools.install_package("hash") # a CRAN package
         >>> rtools.install_package("path to a valid R package directory")
 
-    .. seealso:: :class:`biokit.rtools.package.RPackageManager`
+    .. seealso:: :class:`biokit.rtools.RPackageManager`
     """
     session = RSession(verbose=verbose)
 
@@ -93,7 +55,7 @@ def install_package(query, dependencies=False, verbose=True,
 
     except Exception as err:
         if verbose:
-            print(err)
+            print(err.message)
             print("trying local or from repos")
             print("RTOOLS warning: URL provided does not seem to exist %s. Trying from CRAN" % query)
         code = """install.packages("%s", dependencies=%s """ % \
@@ -103,9 +65,8 @@ def install_package(query, dependencies=False, verbose=True,
         session.run(code)
         return
 
-
 def get_R_version():
-    """Return version of the R program installed on your system"""
+    """Return R version"""
     r = RSession()
     r.run("version")
     return r.version
@@ -115,7 +76,7 @@ def biocLite(package=None, suppressUpdates=True, verbose=True):
     """Install a bioconductor package
 
     This function does not work like the R function. Only a few options are
-    implemented so far. However, you can use :func:`rcode` function directly if needed.
+    implemented so far. However, you can use rcode function directly if needed.
 
     :param str package: name of the bioconductor package to install. If None, no
         package is installed but installed packages are updated. If not provided, 
@@ -148,9 +109,7 @@ def biocLite(package=None, suppressUpdates=True, verbose=True):
     
 
 class RPackage(object):
-    """Handle a single R package
-
-    can be used to check the version installed.
+    """
 
     ::
 
@@ -197,7 +156,6 @@ class RPackage(object):
         return StrictVersion(version.replace("-", "a"))
 
     def install(self):
-        """Install the package"""
         install_package(self.name)
 
     def _get_isinstalled(self):
@@ -205,13 +163,11 @@ class RPackage(object):
             return True
         else:
             return False
-    isinstalled = property(_get_isinstalled, 
-            doc="Getter returning true if the package is installed")
+    isinstalled = property(_get_isinstalled)
 
     def _get_version(self):
         return self._version
-    version = property(_get_version, 
-            doc="Getter returning the package version")
+    version = property(_get_version)
 
     def __str__(self):
         if self.version:
@@ -228,8 +184,8 @@ class RPackageManager(object):
 
     ::
 
-        >>> pm = PackageManager()
-        >>> [(x, pm.installed[x][2]) for x in pm.installed.keys()]
+        pm = PackageManager()
+        [(x, pm.installed[x][2]) for x in pm.installed.keys()]
 
 
     You can access to all information within a dataframe called **packages** where
@@ -255,8 +211,11 @@ class RPackageManager(object):
         self.session.run(code)
         s = self.session.rvar_packages
         # FIXME. these 4 lines are needed as a hack related to pyper.
-        s = s.replace("\n", "")
-        df = eval(s)
+        try:
+            s = s.replace("\n", "")
+            df = eval(s)
+        except:
+            df = s
 
         df.set_index('Package', inplace=True)
         self._packages = df.copy()
@@ -269,8 +228,11 @@ class RPackageManager(object):
         s = self.session.rvar_status
 
         # FIXME.
-        s = s.replace("\n", "")
-        res = eval(s)
+        try:
+            s = s.replace("\n", "")
+            res = eval(s)
+        except:
+            res = s
         res['inst'].set_index('Package', inplace=True)
         res['avail'].set_index('Package', inplace=True)
         self._status = res
@@ -312,12 +274,9 @@ class RPackageManager(object):
 
     def get_package_version(self, package):
         """Get version of an install package"""
-        package = _mybytes(package)
         if package not in self.installed.index:
             self.logging.error("package {0} not installed".format(package))
-        # somehow, for Python3, we must convert to bytes, which is 
-        # Python 2 compatible.
-        return self.installed['Version'][package]
+        return self.installed['Version'].ix[package]
 
     def biocLite(self, package=None, suppressUpdates=True, verbose=False):
         """Installs one or more biocLite packages

@@ -1,6 +1,6 @@
 from biokit.rtools import package
 from nose.plugins.attrib import attr
-from . import create_dummy_package as dun
+import create_dummy_package as dun
 
 # This will not work on travis since you will need R
 
@@ -49,9 +49,9 @@ def test_pm():
     pm.packages
     pm.installed
     pm.available
+    pm.get_package_version('base')
 
 
-    pm.get_package_version('truncnorm')
     try:
         pm.get_package_version('whatever_is_not_installed')
         assert False

@@ -13,7 +13,6 @@
 #  website: http://github.com/biokit
 #
 ##############################################################################
-"""Class to handle Complexes of proteins."""
 from easydev import Logging, DevTools
 from bioservices import IntactComplex
 import pylab
@@ -33,7 +32,7 @@ class Complexes(Logging):
     The organism can be set to another one during the instanciation or later::
 
         >>> from biokit.network.complexes import Complexes
-        >>> c = Complexes(organism='Homo sapiens', cache=True)
+        >>> c = Complexes(organism='Homo sapiens')
         >>> c.organism = 'Rattus norvegicus'
 
     Valid organisms can be found in :attr:`organisms`. When changing the
@@ -87,7 +86,7 @@ class Complexes(Logging):
     Access to the Intact Complex database is performed using the 
     package BioServices provided in Pypi.
     """
-    def __init__(self, organism='Homo sapiens', verbose=True, cache=True):
+    def __init__(self, organism='human', verbose=True, cache=False):
         """.. rubric:: Constructor
 
         :param str orgamism: the organism to look at. Homo sapiens
@@ -95,9 +94,6 @@ class Complexes(Logging):
             in :attr:`organisms`.
         :param str verbose: a verbose level in ERROR/DEBUG/INFO/WARNING
             compatible with those used in BioServices.
-        :param bool cache: Once loaded, the data is cached for a faster 
-            request next time. If the database has changed, you should
-            use cache False.
 
         """
         super(Complexes, self).__init__(level=verbose)
