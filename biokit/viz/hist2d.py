@@ -89,8 +89,12 @@ class Hist2D(VizInput2D):
 
             X, Y = pylab.meshgrid(res[1][0:bins1], res[2][0:bins2])
             if contour:
-                levels = [round(x) for x in pylab.logspace(0, pylab.log10(res[0].max().max()),Nlevels)]
-                pylab.contour(X, Y, res[0].transpose(), levels[2:], color="g")
+                if res[0].max().max() < 10 and norm == 'log':
+                    pylab.contour(X, Y, res[0].transpose(),  color="g")
+                else:
+                    levels = [round(x) for x in 
+                            pylab.logspace(0, pylab.log10(res[0].max().max()), Nlevels)]
+                    pylab.contour(X, Y, res[0].transpose(), levels[2:], color="g")
                 #pylab.clabel(C, fontsize=fontsize, inline=1)
 
         if ylabel is None:
