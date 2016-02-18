@@ -1,5 +1,11 @@
 import tempfile
-import urllib2
+try:
+    from urllib.request import urlopen
+    from urllib.error import HTTPError, URLError
+except:
+    from urllib2 import urlopen, HTTPError, URLError
+
+
 import os.path
 
 from biokit.rtools import bool2R, RSession
@@ -43,7 +49,7 @@ def install_package(query, dependencies=False, verbose=True,
         # PART for fetching a file on the web, download and install locally
         if verbose:
             print("Trying from the web ?")
-        data = urllib2.urlopen(query)
+        data = urlopen(query)
         fh = TempFile(suffix=".tar.gz")
         with open(fh.name, 'w') as fh:
             for x in data.readlines():
@@ -55,7 +61,7 @@ def install_package(query, dependencies=False, verbose=True,
 
     except Exception as err:
         if verbose:
-            print(err.message)
+            print(err)
             print("trying local or from repos")
             print("RTOOLS warning: URL provided does not seem to exist %s. Trying from CRAN" % query)
         code = """install.packages("%s", dependencies=%s """ % \

@@ -1,6 +1,10 @@
 from biokit.rtools import package
 from nose.plugins.attrib import attr
-import create_dummy_package as dun
+try:
+    import create_dummy_package as dun
+except:
+    from . import create_dummy_package as dun
+
 
 # This will not work on travis since you will need R
 
@@ -9,7 +13,7 @@ import create_dummy_package as dun
 def test_install_packages():
     d = dun.CreateDummy()
     d()
-    package.install_package('dummytest_1.0.0.tar.gz', verbose=True) 
+    package.install_package('./dummy/dummytest_1.0.0.tar.gz', verbose=True) 
     d._clean()
 
 

@@ -17,7 +17,7 @@ from easydev import Logging, DevTools
 from bioservices import IntactComplex
 import pylab
 import pandas as pd
-
+from io import StringIO
 
 __all__ = ['Complexes']
 
@@ -292,9 +292,9 @@ class Complexes(Logging):
         """Return the gene names of a UniProt identifier"""
         from bioservices import UniProt
         c = UniProt(cache=True)
-        import StringIO
+
         try:
-            res = pd.read_csv(StringIO.StringIO(c.search(name, limit=1)), sep='\t')
+            res = pd.read_csv(StringIO(c.search(name, limit=1)), sep='\t')
             return list(res['Gene names'].values)
         except:
             print("Could not find %s" % name)

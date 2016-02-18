@@ -85,7 +85,7 @@ class Sequence(object):
     def histogram(self):
         pylab.clf()
         import pandas as pd
-        pd.TimeSeries(self.counter).plot(kind='bar')
+        pd.Series(self.counter).plot(kind='bar')
 
     def pie(self):
         pylab.clf()
