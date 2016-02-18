@@ -3,6 +3,8 @@ Whats' new, what has changed
 
 
 :Revision 0.1.2:
+    * BUG FIXES: some py3  typos.
+
 :Revision 0.0.7:
 
     * NEWS

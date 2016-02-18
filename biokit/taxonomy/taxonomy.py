@@ -70,7 +70,7 @@ class Taxonomy(object):
         """
         self._load_flat_file(overwrite=overwrite)
         self.records = {}
- 
+
         # TODO: check if it exists otherwise, load it ?
         if os.path.exists(self.filename) is False:
             self.load()
@@ -95,7 +95,7 @@ class Taxonomy(object):
                 identifier = int(dico['id'])
                 self.records[identifier] = dico
             except Exception as err:
-                print(err.message)
+                print(err)
                 print('Could not parse the following record '  + \
                       'Please fill bug report on http://github.com/biokit')
                 print(record)
@@ -210,8 +210,8 @@ class Taxonomy(object):
     def get_children(self, taxon):
         if len(self.records) == 0:
             self.load_records()
-        taxon = str(taxon)    
-        children = [self.records[k] for k in self.records.keys() 
+        taxon = str(taxon)
+        children = [self.records[k] for k in self.records.keys()
                 if self.records[k]['parent'] == taxon]
         children = [child['id'] for child in children]
         return children
@@ -232,7 +232,7 @@ class Taxonomy(object):
         if len(self.records) == 0:
             self.load_records()
         return self.records[iden]
-   
+
 
 class Taxon(object):
     """Some codecs"""
