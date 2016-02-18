@@ -1,6 +1,8 @@
 Whats' new, what has changed
 ================================
 
+
+:Revision 0.1.2:
 :Revision 0.0.7:
 
     * NEWS

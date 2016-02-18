@@ -9,7 +9,7 @@ import glob
 
 _MAJOR               = 0
 _MINOR               = 1
-_MICRO               = 1
+_MICRO               = 2
 version              = '%d.%d.%d' % (_MAJOR, _MINOR, _MICRO)
 release              = '%d.%d' % (_MAJOR, _MINOR)
 
@@ -71,7 +71,7 @@ setup(
     #package_dir  = package_dir,
 
     # distutils in rtools.package
-    install_requires = ['easydev>=0.9.7', 'pandas', 'bioservices', 
+    install_requires = ['easydev>=0.9.11', 'pandas', 'bioservices>=1.4.5', 
         'colormap', 'scipy'],
 #    ext_modules=[
 #        Extension('biokit.sequence.complement', 
