@@ -86,7 +86,7 @@ class Complexes(Logging):
     Access to the Intact Complex database is performed using the 
     package BioServices provided in Pypi.
     """
-    def __init__(self, organism='human', verbose=True, cache=False):
+    def __init__(self, organism='Homo sapiens', verbose=True, cache=False):
         """.. rubric:: Constructor
 
         :param str orgamism: the organism to look at. Homo sapiens
@@ -101,12 +101,20 @@ class Complexes(Logging):
         self.devtools = DevTools()
         self.webserv = IntactComplex(verbose=verbose, cache=cache)
         df = self.webserv.search('*', frmt='pandas')
+        self.df = df
+
         #: list of valid organisms found in the database
         self.valid_organisms = list(set(df['organismName']))
+        self.valid_organisms = [x.split(';')[0] for x in self.valid_organisms]
+
+
         #: list of valid organisms found in the database
         self.organisms = list(set(df['organismName']))
         self._organism = None
-        self.organism = organism
+        if organism in self.organisms:
+            self.organism = organism
+        else:
+            print("Organism not set yet. ")
 
         # This will populated on request as a cache/buffer
         self._details = None
