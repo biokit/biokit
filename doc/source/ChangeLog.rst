@@ -2,6 +2,11 @@ Whats' new, what has changed
 ================================
 
 
+:Revision 0.1.4:
+
+    * BUG FIXES: cleanup MANIFEST
+
+
 :Revision 0.1.3:
 
     * BUG FIXES: 
