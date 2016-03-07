@@ -1,6 +1,12 @@
 Whats' new, what has changed
 ================================
 
+:Revision 0.1.5:
+
+    * NEWS
+
+        * add boxplot module.
+
 
 :Revision 0.1.4:
 

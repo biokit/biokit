@@ -18,7 +18,7 @@ __all__ = ["get_R_version", "biocLite", "RPackage",
 
 
 def install_package(query, dependencies=False, verbose=True,
-    repos="http://cran.univ-lyon1.fr/"):
+    repos = "http://cran.univ-paris1.fr/"):
     """Install a R package
 
     :param str query: It can be a valid URL to a R package (tar ball), a CRAN
@@ -424,7 +424,19 @@ class RPackageManager(object):
                     (pkg, currentVersion, require))
 
     def _get_version(self, version):
-        return StrictVersion(version.replace("-", "a"))
+        # some pacakge do not use the correct version convention
+        try:
+            return StrictVersion(version)
+        except:
+            try:
+                return StrictVersion(version.replace("-", "a"))
+            except:
+                # snowfall package example was 1.86-6.1
+                # This becomes 1.86a61  which is not great but not workaround
+                # for now
+                left, right = version.split("-")
+                version = left + "a" + right.replace('.', '')
+                return StrictVersion(version)
 
     def is_installed(self, pkg_name):
         if pkg_name in self.installed.index:
