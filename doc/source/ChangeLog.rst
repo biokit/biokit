@@ -1,7 +1,10 @@
 Whats' new, what has changed
 ================================
 
-:Revision 0.1.5:
+
+
+
+:Revision 0.2.0
 
     * NEWS
 

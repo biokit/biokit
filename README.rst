@@ -15,11 +15,7 @@ Bioinformatics tools in Python
 .. image:: https://coveralls.io/repos/cokelaer/biokit/badge.png?branch=master 
    :target: https://coveralls.io/r/cokelaer/biokit?branch=master 
 
-.. image:: https://badge.waffle.io/biokit/biokit.png?label=issues&title=issues
-   :target: https://waffle.io/biokit/biokit
 
-.. image:: https://badge.waffle.io/cokelaer/biokit.png?label=ready&title=Ready 
-   :target: https://waffle.io/cokelaer/biokit
 
 :note: BioKit is tested with Travis for the following Python version: 2.7.9
        3.3.5, 3.4.2 and 3.5.0
