@@ -4,7 +4,7 @@ Whats' new, what has changed
 
 
 
-:Revision 0.2.0
+:Revision 0.2.0:
 
     * NEWS
 

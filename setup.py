@@ -9,7 +9,7 @@ import glob
 
 _MAJOR               = 0
 _MINOR               = 2
-_MICRO               = 0
+_MICRO               = 1
 version              = '%d.%d.%d' % (_MAJOR, _MINOR, _MICRO)
 release              = '%d.%d' % (_MAJOR, _MINOR)
 
@@ -71,8 +71,10 @@ setup(
     #package_dir  = package_dir,
 
     # distutils in rtools.package
-    install_requires = ['easydev>=0.9.11', 'pandas', 'bioservices>=1.4.5', 
-        'colormap', 'scipy'],
+    # suds-jurko is used by bioservices so we probab ly do not need it in the
+    # setup.
+    install_requires = ['easydev>=0.9.11', "suds-jurko", 'pandas', 
+        'bioservices>=1.4.5', 'colormap', 'scipy'],
 #    ext_modules=[
 #        Extension('biokit.sequence.complement', 
 #                sources=['biokit/sequence/cpp/complement.c', ],
