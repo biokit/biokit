@@ -1,6 +1,9 @@
 from biokit import Taxonomy
+from nose.plugins.attrib import attr
 
 
+
+@attr("skiptravis")
 def test_taxonomy():
     t = Taxonomy()
     t.load_records()
