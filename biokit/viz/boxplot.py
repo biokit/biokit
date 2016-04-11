@@ -16,10 +16,12 @@ class Boxplot(object):
         self.xmax = self.df.shape[1]
         self.X =  None
 
-    def plot(self, color_line='r', bgcolor='grey', color='yellow', lw=4):
+    def plot(self, color_line='r', bgcolor='grey', color='yellow', lw=4, 
+            hold=False, ax=None):
 
         xmax = self.xmax + 1
-        pylab.clf()
+        if ax:
+            pylab.sca(ax)
         pylab.fill_between([0,xmax], [0,0], [20,20], color='red', alpha=0.3)
         pylab.fill_between([0,xmax], [20,20], [30,30], color='orange', alpha=0.3)
         pylab.fill_between([0,xmax], [30,30], [41,41], color='green', alpha=0.3)
