@@ -141,7 +141,7 @@ class MultiFASTA(object):
             else:
                 if self.verbose:
                     print("Accession %s is already in the ids list or could not be interpreted. skipped" % str(f.accession))
-            return
+        return
 
     def _get_df(self):
         df =  pd.concat([self.fasta[id_].df for id_ in self.fasta.keys()])
