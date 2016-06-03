@@ -130,6 +130,7 @@ class MultiFASTA(object):
 
         # we split according to ">2 character
         for thisfasta in data.split(">")[1:]:
+            print thisfasta
             f = FASTA()
             f._fasta = f._interpret(thisfasta)
             try: dummy = f.accession, self.ids # just to try
