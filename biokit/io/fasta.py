@@ -129,8 +129,8 @@ class MultiFASTA(object):
         fh.close()
 
         # we split according to ">2 character
-        print len(data.split(">"))
-        for thisfasta in data.split(">")[1:]:
+        print len(data.split(">")[1:])
+        for thisfasta in data.split(">"):
             print thisfasta
             f = FASTA()
             f._fasta = f._interpret(thisfasta)
