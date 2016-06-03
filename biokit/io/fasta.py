@@ -129,11 +129,10 @@ class MultiFASTA(object):
         fh.close()
 
         # we split according to ">2 character
-        print len(data.split(">")[1:])
-        for thisfasta in data.split(">"):
-            print thisfasta
+        for thisfasta in data.split(">")[1:]:
             f = FASTA()
             f._fasta = f._interpret(thisfasta)
+            print f._fasta
             try: dummy = f.accession, self.ids # just to try
             except:pass
             if f.accession is not None and f.accession not in self.ids:
@@ -427,6 +426,7 @@ class FASTA(object):
         if data.count(">sp|")>1:
             raise ValueError("""It looks like your FASTA file contains more than
             one FASTA. You must use MultiFASTA class instead""")
+
         self._fasta = data[:]
         self._fasta = self._fasta[0]
         if self.dbtype not in self.known_dbtypes:
