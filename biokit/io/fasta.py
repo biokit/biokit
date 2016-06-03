@@ -133,6 +133,7 @@ class MultiFASTA(object):
             f = FASTA()
             f._fasta = f._interpret(thisfasta)
             print f._fasta
+            print f.accession
             try: dummy = f.accession, self.ids # just to try
             except:pass
             if f.accession is not None and f.accession not in self.ids:
