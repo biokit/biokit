@@ -12,6 +12,10 @@ BioKit
 .. toctree::
     :maxdepth: 2
 
+
+    auto_examples/index
+
+
 Overview and Installation
 ##############################
 Installation

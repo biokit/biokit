@@ -1,7 +1,11 @@
 Whats' new, what has changed
 ================================
 
+:Revision: 0.3.0:
 
+    * Cleanup and doc update
+    * Update notebooks to be py3.5 compatible
+    * Some API changes in the Taxonomy module used in Sequana package
 
 
 :Revision 0.2.0:
