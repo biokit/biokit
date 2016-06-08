@@ -3,6 +3,7 @@
 #  This file is part of biokit software
 #
 #  Copyright (c) 2015 - EBI-EMBL
+#  Copyright (c) 2016 - Institut Pasteur
 #
 #  File author(s): Thomas Cokelaer <cokelaer@ebi.ac.uk>
 #
@@ -196,16 +197,16 @@ class Complexes(Logging):
         doc="""Getter of the complexes (full details""")
 
     def _load_complexes(self, show_progress=True):
-        from easydev import progress_bar
+        from easydev import Progress
         import time
-        pb = progress_bar(len(self.df.complexAC))
+        pb = Progress(len(self.df.complexAC))
         complexes = {}
         self.logging.info("Loading all details from the IntactComplex database")
         for i, identifier in enumerate(self.df.complexAC):
             res = self.webserv.details(identifier)
             complexes[identifier] = res
             if show_progress:
-                pb.animate(i+1, time.time()-pb.start)
+                pb.animate(i+1)
         self._complexes = complexes
 
     def remove_homodimers(self):
