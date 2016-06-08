@@ -74,7 +74,8 @@ setup(
     # suds-jurko is used by bioservices so we probab ly do not need it in the
     # setup.
     install_requires = ['easydev>=0.9.11', "suds-jurko", 'pandas', 
-        'bioservices>=1.4.5', 'colormap', 'scipy'],
+        'bioservices>=1.4.5', 'colormap', 'scipy', "sphinx-gallery",
+	"numpydoc"],
 #    ext_modules=[
 #        Extension('biokit.sequence.complement', 
 #                sources=['biokit/sequence/cpp/complement.c', ],

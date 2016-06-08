@@ -3,10 +3,10 @@
 
 
 Utilities
-##############
+==========
 
 Tools related to network (e.g., protein networks)
-=========================================================
+-------------------------------------------------------
 .. automodule:: biokit.network
 
 .. automodule:: biokit.network.complexes
@@ -16,7 +16,7 @@ Tools related to network (e.g., protein networks)
 
 
 Common visualisation tools
-===================================================================
+-----------------------------
 .. automodule:: biokit.viz
 
 .. automodule:: biokit.viz.corrplot
@@ -61,7 +61,7 @@ Common visualisation tools
 
 
 Tools to handle R packages
-===============================
+------------------------------
 .. automodule:: biokit.rtools
 
 .. automodule:: biokit.rtools.session
@@ -90,7 +90,7 @@ Tools to handle R packages
 
 
 Genomics
-==========
+------------
 .. automodule:: biokit.sequence
 
 .. automodule:: biokit.sequence.seq
@@ -120,14 +120,14 @@ Genomics
 
 
 BioServices
-================
+---------------
 .. automodule:: biokit.services
 
-BioServices is used in BioKit to access to web services (e.g., KEGG, UniProt, Ensembl...) but documentation for bioservices itself is not provided. See BioServices instead.
+BioServices is used in BioKit to access to web services (e.g., KEGG, UniProt, Ensembl...) but documentation for bioservices itself is not provided. See `<BioServices instead <http://bioservices.readthedocs.io>`_
 
 
 Stats
-========
+---------
 .. automodule:: biokit.stats
 
 .. automodule:: biokit.stats.mixture

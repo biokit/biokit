@@ -139,7 +139,7 @@ class Complexes(Logging):
         :return: a dictionary with complex identifiers as keys and
             number of participants as values
 
-        .. plot::
+        ::
 
             from biokit.network.complexes import Complexes
             c = Complexes()
