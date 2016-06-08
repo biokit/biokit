@@ -1,10 +1,11 @@
 from biokit.viz import Heatmap
-from biokit.data.viz.heatmap_sample import load_heatmap_sample
-
-
+from biokit import biokit_data
 
 def test_heatmap():
-    data = load_heatmap_sample()
+    filename = biokit_data("test_heatmap.csv")
+    import pandas as pd
+    data = pd.read_csv(filename, skiprows=2, index_col=0)
+
     h = Heatmap(data)
     h.plot(cmap='hot')
     h.row_method= 'single'
