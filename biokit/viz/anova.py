@@ -35,10 +35,10 @@ class ANOVA(object):
         df = pd.DataFrame(res, index=self.df.columns, columns=self.df.columns)
         #FIXME: may have na, which are set to 1
         df = df.fillna(1)
-        from biokit.viz import imshow
+        from biokit.viz import Imshow
         if log==True:  
-            imshow(-np.log10(df), **kargs)
+            Imshow(-np.log10(df)).plot(**kargs)
         else:
-            imshow(df, **kargs)
+            Imshow(df).plot(**kargs)
         return df
 
