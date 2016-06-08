@@ -11,6 +11,76 @@ from easydev import AttrDict
 
 from . import criteria
 
+import numpy as np
+
+half_log_two_pi = 0.5*np.log(2*np.pi)
+
+class Model(object):
+    """New base model"""
+    def __init__(self):
+        pass
+    def log_density(self, data):
+        raise NotImplementedError
+    def estimate(self, data, weights):
+        raise NotImplementedError
+    def generate(self):
+        raise NotImplementedError
+    def pdf(self):
+        raise NotImplementedError
+    def __repr__(self):
+        raise NotImplementedError
+
+
+class GaussianModel(Model):
+    """New gaussian model not used yet"""
+    def __init__(self, mu=1, sigma=1):
+        super(GaussianModel, self).__init__()
+        self.mu = mu
+        self.sigma = sigma
+    def log_density(self, data):
+        # log of gaussian distribution
+        res = -(data-self.mu)**2 / (2 * self.sigma**2)
+        res += - np.log(self.sigma)  - half_log_two_pi
+        return res
+    def estimate(self, data, weights=None):
+        assert(len(data.shape) == 1), "Expect 1D data!"
+        # d L/ dmu ==0 and dL/dsigma==0
+        if weights:
+            wsum = np.sum(weights)
+            self.mu = np.sum(weights * data) / wsum
+            self.sigma = np.sqrt(np.sum(weights * (data - self.mu) ** 2) / wsum)
+        else:
+            self.mu = np.sum(data)
+            self.sigma = np.sqrt(np.sum( (data - self.mu) ** 2) )
+    def generate(self, N):
+        return np.array([scipy.stats.norm.rvs(self.mu, self.sigma) for this in range(N)])
+    def pdf(self,data):
+        pass
+
+
+class PoissonModel(Model):
+    """New poisson model not used yet"""
+    def __init__(self, lmbda=10):
+        super(PoissonModel, self).__init__()
+        self.lmbda = lmbda
+    def log_density(self, data):
+        # log of gaussian distribution
+        return - self.lmbda + data * np.log(self.lmbda)
+    def estimate(self, data, weights=None):
+        assert(len(data.shape) == 1), "Expect 1D data!"
+        # d L/ dmu ==0 and dL/dsigma==0
+        if weights:
+            wsum = np.sum(weights)
+            self.lmbda = np.sum(weights * data) / wsum
+        else:
+            self.lmbda = np.sum(data)
+    def generate(self, N):
+        return np.array([scipy.stats.poisson.rvs(self.lmbda) for this in range(N)])
+    def __repr__(self):
+        return "Poisson[lmbda={lmbda:.4g}]".format(lmbda=self.lmbda)
+
+
+
 class GaussianMixture(object):
     """Creates a mix of Gaussian distribution
 
@@ -55,11 +125,6 @@ class GaussianMixture(object):
     def hist(self, bins=30, normed=True):
         pylab.hist(self.data, bins=bins, normed=normed)
 
-
-class Mixture(GaussianMixture):
-    def __init__(self, *args, **kargs):
-        super(Mixture, self).__init__(*args, **kargs)
-        print('Deprecated. Use GaussianMixture')
 
 
 class GaussianMixtureModel(object):
@@ -124,18 +189,9 @@ class Fitting(object):
         self.size = float(len(self.data))
         self._k = k
         self._model = None
-        self._method = method
         # initialise the model
         self.k = k
         self.verbose = True
-
-    def _get_method(self):
-        return self._method
-    def _set_method(self, method):
-        devtools.check_param_in_list(method, ['Nelder-Mead',
-            'Powell', 'CG', 'BFGS', 'Newton-CG', 'Anneal', 'L-BFGS-B'])
-        self._method = method
-    method = property(_get_method, _set_method)
 
     def _get_k(self):
         return self._k
@@ -192,15 +248,15 @@ class Fitting(object):
 
         K = len(self.results.x)
         # The PIs must be normalised
-        for i in range(0, int(K/3)):
+        for i in range(self.k):
 
             mu, sigma, pi_ = self.results.mus[i], self.results.sigmas[i], self.results.pis[i]
             if ax:
                 ax.plot(X, [pi_ * pylab.normpdf(x, mu, sigma) for x in X], 
-                        'g--', alpha=0.5)
+                        'k--', alpha=0.7, lw=2)
             else:
                 pylab.plot(X, [pi_ * pylab.normpdf(x, mu, sigma) for x in X], 
-                        'g--', alpha=0.5)
+                        'k--', alpha=0.7, lw=2)
 
 
 class GaussianMixtureFitting(Fitting):
@@ -228,6 +284,15 @@ class GaussianMixtureFitting(Fitting):
 
         """
         super(GaussianMixtureFitting, self).__init__(data, k=k, method=method)
+        self._method = method
+
+    def _get_method(self):
+        return self._method
+    def _set_method(self, method):
+        devtools.check_param_in_list(method, ['Nelder-Mead',
+            'Powell', 'CG', 'BFGS', 'Newton-CG', 'Anneal', 'L-BFGS-B'])
+        self._method = method
+    method = property(_get_method, _set_method)
 
     def estimate(self, guess=None, k=None, maxfev=2e4, maxiter=1e3,
             bounds=None):
@@ -288,10 +353,7 @@ class GaussianMixtureFitting(Fitting):
         self.results.sigmas = self.results.x[1::3]
         self.results.mus = self.results.x[0::3]
 
-        #
-
         return res
-
 
 
 class EM(Fitting):
@@ -420,8 +482,8 @@ class AdaptativeMixtureFitting(object):
         :width: 80%
         :include-source:
 
-        from biokit.stats.mixture import AdaptativeMixtureFitting, Mixture
-        m = Mixture(mu=[-1,1], sigma=[0.5,0.5], mixture=[0.2,0.8])
+        from biokit.stats.mixture import AdaptativeMixtureFitting, GaussianMixture
+        m = GaussianMixture(mu=[-1,1], sigma=[0.5,0.5], mixture=[0.2,0.8])
         amf = AdaptativeMixtureFitting(m.data)
         amf.run(kmin=1, kmax=6)
         amf.diagnostic(k=amf.best_k)
