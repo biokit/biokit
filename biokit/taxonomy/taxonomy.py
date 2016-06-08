@@ -31,12 +31,17 @@ class Taxonomy(object):
         >>> t[9606]
         >>> t.get_lineage(9606)
 
-
-
     """
-    def __init__(self, verbose=True):
-        from bioservices import Ensembl
-        self.ensembl = Ensembl(verbose=False)
+    def __init__(self, verbose=True, online=True):
+        """.. rubric:: constructor
+
+        :param offline: if you do not have internet, the connction to Ensembl
+            may hang for a while and fail. If so, set **offline** to True
+
+        """
+        if online:
+            from bioservices import Ensembl
+            self.ensembl = Ensembl(verbose=False)
         self.records = {} # empty to start with.
         self.verbose = verbose
 
@@ -65,7 +70,6 @@ class Taxonomy(object):
 
     def load_records(self, overwrite=False):
         """Load a flat file and store records in :attr:`records`
-
 
         """
         self._load_flat_file(overwrite=overwrite)
@@ -186,7 +190,11 @@ class Taxonomy(object):
         if len(self.records) == 0:
             self.load_records()
 
-        record = self.records[taxon]
+        try:
+            record = self.records[taxon]
+        except:
+            return [('unknown', 'no rank')]
+
         parent = int(record['parent'])
         if parent not in [0]:
             lineage_rank.append((record['scientific_name'], record['rank']))
@@ -219,7 +227,7 @@ class Taxonomy(object):
     def get_family_tree(self, taxon):
         """root is taxon and we return the corresponding tree"""
         # should limit the tree size
-        # uniprot flat files has no record about childrent, so we would
+        # uniprot flat files has no record about children, so we would
         # need to reconstruct the tree
         tree = {}
         children = self.get_children(taxon)
@@ -253,8 +261,6 @@ class Taxon(object):
                 restart=0, retmax=retmax)['idlist']
         results = e.ESummary(db='nucleotide', id=idlist, retmax=retmax)
         return results
-
-
 
 
 class Lineage(object):
