@@ -36,14 +36,15 @@ class ScatterHist(VizInput2D):
     def __init__(self, x, y=None, verbose=True):
         """.. rubric:: constructor
 
-        :param x:
+        :param x: if x is provided, it should be a dataframe with 2 columns. The
+            first one will be used as your X data, and the second one as 
+            the Y data
         :param y:
         :param verbose:
 
 
         """
         super(ScatterHist, self).__init__(x,y,verbose)
-
 
     def plot(self, 
         kargs_scatter={'s':20, 'c':'b'}, 
@@ -58,6 +59,7 @@ class ScatterHist(VizInput2D):
         gap=0.06,
         axisbg='lightgrey',
         grid=True,
+        show_labels=True,
         **kargs):
         """Scatter plot of set of 2 vectors and their histograms.
     
@@ -168,8 +170,14 @@ class ScatterHist(VizInput2D):
         
         axisbg = kargs.get('axisbg', 'lightgrey')
 
+
+
         ax_scatter = axes((X0, Y0, W, H), axisbg=axisbg, xscale='linear', 
             yscale='linear')#, xticks='auto', yticks='auto')
+
+        if show_labels:
+            ax_scatter.set_xlabel(self.xy_names[0])
+            ax_scatter.set_ylabel(self.xy_names[1])
         ax_hist_x = axes((X0, Yoff, W, Hh), axisbg=axisbg, xscale='linear', 
             yscale='linear')#, xticks='auto', yticks='auto')
         ax_hist_y = axes((Xoff, Y0, Wh, H), axisbg=axisbg, xscale='linear', 
