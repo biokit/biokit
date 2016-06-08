@@ -76,6 +76,16 @@ setup(
     install_requires = ['easydev>=0.9.11', "suds-jurko", 'pandas', 
         'bioservices>=1.4.5', 'colormap', 'scipy', "sphinx-gallery",
 	"numpydoc"],
+
+     # This is recursive include of data files
+    exclude_package_data = {"": ["__pycache__"]},
+    package_data = {
+        '': ['*.csv'],
+        'biokit.data' : ['*csv']
+        },
+
+
+
 #    ext_modules=[
 #        Extension('biokit.sequence.complement', 
 #                sources=['biokit/sequence/cpp/complement.c', ],

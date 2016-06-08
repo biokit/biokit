@@ -1,0 +1,14 @@
+name: biokit_env
+
+channels:
+- bioconda
+
+dependencies:
+- numpy
+- pandas
+- matplotlib
+- scipy
+- pip:
+  - matplotlib
+  - easydev>=0.9.21
+  - bioservices
