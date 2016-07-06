@@ -6,14 +6,13 @@ devtools = DevTools()
 from scipy.optimize import minimize, show_options
 import numpy as np
 import pylab
-#import seaborn as sns
-from easydev import AttrDict
 
 from . import criteria
 
 import numpy as np
 
 half_log_two_pi = 0.5*np.log(2*np.pi)
+
 
 class Model(object):
     """New base model"""
@@ -33,15 +32,18 @@ class Model(object):
 
 class GaussianModel(Model):
     """New gaussian model not used yet"""
+
     def __init__(self, mu=1, sigma=1):
         super(GaussianModel, self).__init__()
         self.mu = mu
         self.sigma = sigma
+
     def log_density(self, data):
         # log of gaussian distribution
         res = -(data-self.mu)**2 / (2 * self.sigma**2)
         res += - np.log(self.sigma)  - half_log_two_pi
         return res
+
     def estimate(self, data, weights=None):
         assert(len(data.shape) == 1), "Expect 1D data!"
         # d L/ dmu ==0 and dL/dsigma==0
@@ -52,8 +54,10 @@ class GaussianModel(Model):
         else:
             self.mu = np.sum(data)
             self.sigma = np.sqrt(np.sum( (data - self.mu) ** 2) )
+
     def generate(self, N):
         return np.array([scipy.stats.norm.rvs(self.mu, self.sigma) for this in range(N)])
+
     def pdf(self,data):
         pass
 
@@ -74,6 +78,10 @@ class PoissonModel(Model):
             self.lmbda = np.sum(weights * data) / wsum
         else:
             self.lmbda = np.sum(data)
+
+        # Log likelihood of poisson of N iid is L = PI_i^n \lambda^{x_i}
+        # e^-\lambda / x_i!  and the loglikelihood is then l = sum_i^n
+        # x_i log\lmabda - n \lambda
     def generate(self, N):
         return np.array([scipy.stats.poisson.rvs(self.lmbda) for this in range(N)])
     def __repr__(self):
@@ -386,6 +394,7 @@ class EM(Fitting):
         super(EM, self).__init__(data, k=2) # default is k=2
         self.max_iter = max_iter
 
+    #@do_profile()
     def estimate(self, guess=None, k=2):
         """
 
@@ -414,29 +423,34 @@ class EM(Fitting):
         converged = False
 
         self.mus = []
+
         while not converged:
         # Compute the responsibility func. and new parameters
             for k in range(0, self.k):
                 # unstable if eslf.model.pdf is made of zeros
 
-
-                if self.model.pdf(self.data, p_new,normalise=False).sum()!=0:
-                    gamma[k, :] = pi_[k]*pylab.normpdf(self.data, mu[k],
-                        sig[k])/(self.model.pdf(self.data, p_new, normalise=False))
-                else:
+                #self.model.pdf(self.data, p_new,normalise=False).sum()!=0:
+                gamma[k, :] = pi_[k] * pylab.normpdf(self.data, mu[k], sig[k])
+                gamma[k, :] /= (self.model.pdf(self.data, p_new, normalise=False))
+                """else:
                     gamma[k, :] = pi_[k]*pylab.normpdf(self.data, mu[k],
                         sig[k])/(self.model.pdf(self.data, p_new,
                             normalise=False)+1e-6)
-                N_[k] = 1.*gamma[k].sum()
-                mu[k] = sum(gamma[k]*self.data)/N_[k]
-                sig[k] = pylab.sqrt( sum(gamma[k]*(self.data - mu[k])**2)/N_[k] )
+                """
+                N_[k] = gamma[k].sum()
+                mu[k] = np.sum(gamma[k]*self.data)/N_[k]
+                sig[k] = pylab.sqrt( np.sum(gamma[k]*(self.data - mu[k])**2)/N_[k] )
                 #N_[k] += 1
                 pi_[k] = N_[k] /  self.size
 
             self.results = {'x': p_new, 'nfev':counter, 'success': converged}
 
-            p_new = [(mu[x], sig[x], pi_[x]) for x in range(0, self.k)]
-            p_new = list(pylab.flatten(p_new))
+            p_new = []
+            for this in range(self.k):
+                p_new.extend([mu[this], sig[this], pi_[this]])
+
+            #p_new = [(mu[x], sig[x], pi_[x]) for x in range(0, self.k)]
+            #p_new = list(pylab.flatten(p_new))
 
             self.status = True
             try:
@@ -502,7 +516,7 @@ class AdaptativeMixtureFitting(object):
         for k in range(kmin, kmax+1):
             self.fitting.estimate(k=k)
 
-            # here ritteria does not matter. if one fails, all fail
+            # here criteria does not matter. if one fails, all fail
             if self.fitting.results['AIC'] != 1000:
                 self.x.append(k)
                 self.all_results[k] = self.fitting.results.copy()
