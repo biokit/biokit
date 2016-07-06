@@ -105,6 +105,8 @@ class Taxonomy(object):
                 print(record)
             if self.verbose:
                 pb.animate(i+1)
+        if self.verbose:
+            print()
 
     def _interpret_record(self, record):
         data = {'raw': record}
