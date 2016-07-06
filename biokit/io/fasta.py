@@ -139,7 +139,7 @@ class MultiFASTA(object):
             else:
                 if self.verbose:
                     print("Accession %s is already in the ids list or could not be interpreted. skipped" % str(f.accession))
-            return
+        return
 
     def _get_df(self):
         df =  pd.concat([self.fasta[id_].df for id_ in self.fasta.keys()])
@@ -425,6 +425,7 @@ class FASTA(object):
         if data.count(">sp|")>1:
             raise ValueError("""It looks like your FASTA file contains more than
             one FASTA. You must use MultiFASTA class instead""")
+
         self._fasta = data[:]
         self._fasta = self._fasta[0]
         if self.dbtype not in self.known_dbtypes:
