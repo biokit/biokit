@@ -6,6 +6,7 @@ devtools = DevTools()
 from scipy.optimize import minimize, show_options
 import numpy as np
 import pylab
+from easydev import AttrDict
 
 from . import criteria
 
@@ -440,7 +441,6 @@ class EM(Fitting):
                 N_[k] = gamma[k].sum()
                 mu[k] = np.sum(gamma[k]*self.data)/N_[k]
                 sig[k] = pylab.sqrt( np.sum(gamma[k]*(self.data - mu[k])**2)/N_[k] )
-                #N_[k] += 1
                 pi_[k] = N_[k] /  self.size
 
             self.results = {'x': p_new, 'nfev':counter, 'success': converged}

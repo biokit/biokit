@@ -1,6 +1,10 @@
 Whats' new, what has changed
 ================================
 
+:Revision: 0.3.1:
+
+    * Update mixture.EM method to speedup the code by factor 4
+
 :Revision: 0.3.0:
 
     * Cleanup and doc update
