@@ -6,7 +6,6 @@ from setuptools import setup, find_packages
 import glob
 
 
-
 _MAJOR               = 0
 _MINOR               = 3
 _MICRO               = 1
