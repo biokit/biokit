@@ -1,5 +1,8 @@
 Whats' new, what has changed
 ================================
+:Revision: 0.3.2:
+
+    * remove deprecated warning 
 
 :Revision: 0.3.1:
 
