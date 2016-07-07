@@ -388,10 +388,6 @@ class EM(Fitting):
         :param int max_iter: max iteration for the minization
 
         """
-        if model is None:
-            model = GaussianMixtureModel(k=2)
-
-        #super(EM, self).__init__(data, model)
         super(EM, self).__init__(data, k=2) # default is k=2
         self.max_iter = max_iter
 
@@ -415,7 +411,7 @@ class EM(Fitting):
         pi_ = np.array(guess[2::3])
         N_ = len(pi_)
 
-        gamma = np.zeros((N_, self.size))
+        gamma = np.zeros((N_, int(self.size)))
         N_ = np.zeros(N_)
         p_new = guess
 
