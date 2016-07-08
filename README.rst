@@ -30,9 +30,10 @@ Bioinformatics tools in Python
 Contents
 ===============
 
-BioKit is a set of tools gathered from several other Python packages. 
-So far, it contains a few plotting tools (viz module), some statistical
-analysis, some tools to access to Taxon and GO identifier, some basic tools to manipulate sequences and so on. It is linked to BioServices package to provide access to biological resources. Lots of biological software are developed in R. We have also added a module to ease the installation and usage of R tools within BioKit.
+BioKit is a set of tools gathered from several other Python packages. The goal
+is to gather tools that should be useful to develop computational biology
+software. Biokit contains a few plotting tools (viz module), some statistical
+analysis (mixture model), some tools to access to Taxon and GO identifier, some basic tools to manipulate sequences and so on. It is linked to BioServices package to provide access to biological resources. Lots of biological software are developed in R. We have also added a module to ease the installation and usage of R tools within BioKit.
 
 Installation
 ==============
