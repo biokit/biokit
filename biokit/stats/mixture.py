@@ -483,6 +483,26 @@ class EM(Fitting):
         self.results.AICc = criteria.AICc(log_likelihood, self.k, self.data.size, logL=True)
         self.results.BIC = criteria.BIC(log_likelihood, self.k, self.data.size, logL=True)
 
+    def plot(self, modele_parameters=None, **kwargs):
+        """ Take a list of dictionnaries with models parameters to plot
+        predicted modeles. If user doesn't provide parameters, the standard
+        plot function from fitting is used.
+
+        Example:
+            modele_parameters=[{"mu": 5, "sigma": 0.5, "pi": 1}]
+        """
+        if not modele_parameters:
+            return super(EM, self).plot(**kwargs)
+        # Set parameters with the dictionnary
+        self.k = len(modele_parameters)
+        self.results = AttrDict()
+        self.results.mus = [model["mu"] for model in modele_parameters]
+        self.results.sigmas = [model["sigma"] for model in modele_parameters]
+        self.results.pis = [model["pi"] for model in modele_parameters]
+        parms_keys = ("mu", "sigma", "pi")
+        self.results.x = [model[key] for model in modele_parameters for key in
+                          parms_keys]
+        return super(EM, self).plot(**kwargs)
 
 
 class AdaptativeMixtureFitting(object):
