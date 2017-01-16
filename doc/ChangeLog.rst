@@ -1,5 +1,12 @@
 Whats' new, what has changed
 ================================
+
+:Revision: 0.3.3:
+
+    * EM class has a new plot function so that a plot can be run without doing
+      the estimation but by providing the parameter of the model. This is a
+      better model/data/view abstraction.
+
 :Revision: 0.3.2:
 
     * remove deprecated warning 
