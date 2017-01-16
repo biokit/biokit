@@ -492,7 +492,7 @@ class EM(Fitting):
             modele_parameters=[{"mu": 5, "sigma": 0.5, "pi": 1}]
         """
         if not modele_parameters:
-            return super().plot(**kwargs)
+            return super(EM, self).plot(**kwargs)
         # Set parameters with the dictionnary
         self.k = len(modele_parameters)
         self.results = AttrDict()
@@ -502,7 +502,7 @@ class EM(Fitting):
         parms_keys = ("mu", "sigma", "pi")
         self.results.x = [model[key] for model in modele_parameters for key in
                           parms_keys]
-        return super().plot(**kwargs)
+        return super(EM, self).plot(**kwargs)
 
 
 class AdaptativeMixtureFitting(object):
