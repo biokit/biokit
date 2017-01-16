@@ -10,7 +10,7 @@ from biokit.viz.core import VizInput2D
 __all__ = ["scatter_hist", "ScatterHist"]
 
 
-def scatter_hist(x,y, kargs_scatter={'s':20, 'c':'b'}, 
+def scatter_hist(x,y=None, kargs_scatter={'s':20, 'c':'b'}, 
         kargs_grids={},
         kargs_histx={},
         kargs_histy={},
@@ -101,16 +101,16 @@ class ScatterHist(VizInput2D):
             Y = pylab.randn(1000)
             df = pd.DataFrame({'X':X, 'Y':Y})
 
-            from biokit.viz import scatter_hist
-            scatter_hist(df)
+            from biokit.viz import ScatterHist
+            ScatterHist(df).plot()
 
 
         .. plot::
             :include-source:
             :width: 50%
 
-            from biokit.viz import scatter_hist
-            scatter_hist(x=[1,2,3,4], y=[3,5,6,4], 
+            from biokit.viz import ScatterHist
+            ScatterHist(x=[1,2,3,4], y=[3,5,6,4]).plot( 
                 kargs_scatter={
                     's':[200,400,600,800], 
                     'c': ['red', 'green', 'blue', 'yellow'], 

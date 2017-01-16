@@ -32,7 +32,8 @@ class Corrplot(Linkage):
 
         # create a correlation-like data set stored in a Pandas' dataframe.
         import string
-        letters = string.uppercase[0:10]
+        # letters = string.uppercase[0:10] # python2
+        letters = string.ascii_uppercase[0:10]
         import pandas as pd
         df = pd.DataFrame(dict(( (k, np.random.random(10)+ord(k)-65) for k in letters)))
 

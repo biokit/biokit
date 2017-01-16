@@ -372,7 +372,7 @@ class EM(Fitting):
         :width: 50%
         :include-source:
 
-        from biokit.stats.mixture import Mixture, EM
+        from biokit.stats.mixture import GaussianMixture, EM
         m = GaussianMixture(mu=[-1,1], sigma=[0.5,0.5], mixture=[0.2,0.8])
         em = EM(m.data)
         em.estimate(k=2)

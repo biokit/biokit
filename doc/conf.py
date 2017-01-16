@@ -283,8 +283,6 @@ htmlhelp_basename = 'doc'
 # NOT in original quickstart
 pngmath_use_preview = True
 
-# The paper size ('letter' or 'a4').
-latex_paper_size = 'a4'
 
 # The font size ('10pt', '11pt' or '12pt').
 latex_font_size = '10pt'
@@ -297,6 +295,7 @@ latex_documents = [
 ]
 
 latex_elements = { 'inputenc': '\\usepackage[utf8]{inputenc}' }
+latex_elements["latex_paper_size"] = "a4"
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
@@ -313,7 +312,7 @@ latex_use_parts = False
 #latex_show_urls = False
 
 # Additional stuff for the LaTeX preamble.
-latex_preamble =r"""
+latex_elements["latex_preamble"] = r"""
 \definecolor{VerbatimColor}{rgb}{.9,1,0.9}
 \definecolor{VerbatimBorderColor}{rgb}{0,0,0}
 
