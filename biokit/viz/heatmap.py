@@ -248,6 +248,8 @@ class Heatmap(Linkage):
             [axcb_x, axcb_y, axcb_w, axcb_h] = [0.07, 0.88, 0.18, 0.09]
         elif colorbar_position == 'right':
             [axcb_x, axcb_y, axcb_w, axcb_h] = [0.85, 0.2, 0.08, 0.6]
+        else:
+            raise ValueError("'top left' or 'right' accepted for now")
 
         # COMPUTATION DENDOGRAM 1 -------------------------------------
         if self.column_method:
