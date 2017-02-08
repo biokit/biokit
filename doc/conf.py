@@ -224,7 +224,7 @@ html_short_title = "BioKit"
 # so a file named "default.css" will overwrite the builtin "default.css".
 
 # the copybutton.js must be copied there: 
-html_static_path = ['_static']
+html_static_path = ['source/_static']
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.

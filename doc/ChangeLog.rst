@@ -1,7 +1,16 @@
 Whats' new, what has changed
 ================================
 
-:Revision: 0.3.3:
+:Revision: 0.4.0
+
+    * Stable version on bioconda (remove sphinx-gallery from dependencies since
+      it is only used for the documentation.
+
+:Revision: 0.3.4
+
+    * remove stats_dev sub_directory
+
+:Revision: 0.3.3
 
     * EM class has a new plot function so that a plot can be run without doing
       the estimation but by providing the parameter of the model. This is a
