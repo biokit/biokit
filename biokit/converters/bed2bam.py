@@ -4,7 +4,7 @@
 
 
 
-class BED2BAM(object):
+class Bam2Bed(object):
     """
 
 
@@ -17,6 +17,7 @@ class BED2BAM(object):
         pass
 
     def __call__(self):
+        print("YOUPI !!!!!! ")
         pass
 
 
