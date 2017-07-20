@@ -1,6 +1,10 @@
 Whats' new, what has changed
 ================================
 
+:Revision: 0.4.1
+
+    * starting converter tool
+
 :Revision: 0.4.0
 
     * Stable version on bioconda (remove sphinx-gallery from dependencies since
