@@ -9,6 +9,13 @@ except:
 from easydev import CustomConfig
 biokitPATH = CustomConfig("biokit").user_config_dir
 
+import colorlog as logger
+def biokit_debug_level(level="WARNING"):
+    """A deubg level setter at top level of the library"""
+    assert level in ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+    logging_level = getattr(logger.logging.logging, level)
+    logger.getLogger().setLevel(logging_level)
+    
 
 from biokit import viz
 from biokit import io
@@ -29,6 +36,7 @@ from biokit.goid import *
 from biokit import taxonomy
 from biokit.taxonomy import Taxonomy
 
+from biokit import converters
 
 
 def biokit_data(filename, where=None):
