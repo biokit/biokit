@@ -5,6 +5,16 @@
 Utilities
 ==========
 
+NGS converters
+-------------------
+
+.. automodule:: biokit.converters
+
+.. automodule:: biokit.converters.bam2bed
+    :members:
+    :synopsis: 
+
+
 Tools related to network (e.g., protein networks)
 -------------------------------------------------------
 .. automodule:: biokit.network
