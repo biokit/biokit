@@ -1,9 +1,6 @@
 from biokit.converters.convbase import ConvBase
 
 
-
-
-
 class Bam2Bed(ConvBase):
     """
 

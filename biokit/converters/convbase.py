@@ -1,4 +1,4 @@
-
+from biokit import logger
 
 
 
@@ -14,6 +14,15 @@ class ConvBase(object):
         self.kargs = kargs
 
     def execute(self, cmd):
+        import time
+        t1 = time.time()
+        logger.info("CMD> " + cmd)
         from easydev import shellcmd
-        shellcmd(cmd)
+        res = shellcmd(cmd, verbose=False)
+        t2 = time.time()
+        self.last_duration = t2 - t1
+        logger.info("Took {} seconds ".format(t2-t1))
+        return res
+
+    
 
