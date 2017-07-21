@@ -31,7 +31,8 @@ before_install:
 # command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
 install:
   - echo $TRAVIS_PYTHON_VERSION
-  - conda install --yes python=$TRAVIS_PYTHON_VERSION atlas numpy scipy matplotlib nose pandas coverage biopython colorlog
+  - conda install --yes python=$TRAVIS_PYTHON_VERSION atlas numpy scipy matplotlib nose pandas coverage biopython
+  - pip install colorlog
   - pip install nose easydev bioservices
   - pip install coveralls
 # # command to run tests, e.g. python setup.py test
