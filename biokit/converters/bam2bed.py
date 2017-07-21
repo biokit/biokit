@@ -1,5 +1,6 @@
 from biokit.converters.convbase import ConvBase
 
+__all__ = ["Bam2Bed"]
 
 class Bam2Bed(ConvBase):
     """Convert sorted :term:`BAM` file into :term:`BED` file
@@ -18,7 +19,7 @@ class Bam2Bed(ConvBase):
         """
         super(Bam2Bed, self).__init__(infile, outfile, *args, **kargs)
 
-    def __call__(self):
+    def convert(self):
         cmd = "samtools depth -aa {} > {}".format(self.infile, self.outfile)
         self.execute(cmd)
 
