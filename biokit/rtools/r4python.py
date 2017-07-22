@@ -109,6 +109,10 @@ r4python = r"""
                 special_locs <- SpecialLocs(xi)
                 if (is.character(xi)) {
                     ctp[i] <- sprintf('("%s", "|S%d")', cnms[i], if (length(xi) > 0) max(nchar(xi)) else 0 )
+                    # Hack TC July 2017 S%d above was sometime replaced by SNA
+                    # in Python3. Let us use object for now
+                    ctp[i] <- sprintf('("%s", "object")', cnms[i], 50 )
+
                     xi <- paste('"', xi, '"', sep='') }
                 else if (is.logical(xi)) {
                     xi <- ifelse(xi, 'True', 'False')
