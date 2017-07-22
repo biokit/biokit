@@ -1,5 +1,15 @@
 from biokit.rtools import session
 
+
+import pytest
+import os
+skiptravis = pytest.mark.skipif( "TRAVIS_PYTHON_VERSION" in os.environ,
+    reason="On travis")
+
+
+
+
+@skiptravis
 def test_session():
 
     sess = session.RSession()
@@ -12,6 +22,7 @@ def test_session():
         assert True
 
 
+@skiptravis
 def test_attribute():
     s = session.RSession()
     s.run("b=1")
