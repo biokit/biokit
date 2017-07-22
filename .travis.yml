@@ -6,8 +6,8 @@ cache:
 matrix:
   include:
     - python: 2.7
-    - python: 3.4
     - python: 3.5
+    - python: 3.6
 
 
 # solution based on https://gist.github.com/dan-blanchard/7045057
@@ -19,6 +19,10 @@ before_install:
     - export PATH=$HOME/miniconda3/bin:$PATH
     - hash -r
     - conda update --yes conda
+    - conda config --add channels r
+    - conda config --add channels defaults
+    - conda config --add channels conda-forge
+    - conda config --add channels bioconda
     # are not specific to using mini
     - sudo rm -rf /dev/shm
     - sudo ln -s /run/shm /dev/shm
@@ -31,7 +35,7 @@ before_install:
 # command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
 install:
   - echo $TRAVIS_PYTHON_VERSION
-  - conda install --yes python=$TRAVIS_PYTHON_VERSION atlas numpy scipy matplotlib nose pandas coverage biopython
+  - conda install --yes python=$TRAVIS_PYTHON_VERSION atlas numpy scipy matplotlib pandas coverage biopython
   - conda install --yes easydev bioservices
   - pip install colorlog
   - pip install pytest pytest-cov pytest-qt pytest-xdist pytest-mock pytest-timeout
