@@ -562,7 +562,7 @@ class R(object):
                 #print(code)
                 rlt = eval(code)  # replace \\" with "
             except Exception as e:
-                print(e.message)
+                print(e)
 
                 raise RError(rlt)
         return(rlt)
