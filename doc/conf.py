@@ -146,7 +146,7 @@ modindex_common_prefix = ["biokit."]
 # -- sphinx gallery ------------------------------------------------------------
 plot_gallery = True
 sphinx_gallery_conf = {
-    "doc_module": "sequana",
+    "doc_module": "biokit",
 #    "examples_dirs": "examples",
 #    "gallery_dirs": "auto_examples",
 }

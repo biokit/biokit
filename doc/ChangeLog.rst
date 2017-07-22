@@ -4,6 +4,8 @@ Whats' new, what has changed
 :Revision: 0.4.1
 
     * starting converter tool
+    * BUG: fix rtools sub-packages for Python3 portage
+    * UPDATE: replace axibg with facecolor (matplotlib deprecated name)
 
 :Revision: 0.4.0
 

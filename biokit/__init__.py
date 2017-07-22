@@ -43,8 +43,8 @@ def biokit_data(filename, where=None):
     """Simple utilities to retrieve data sets from biokit/data directory"""
     import os
     import easydev
-    sequana_path = easydev.get_package_location('biokit')
-    share = os.sep.join([sequana_path , "biokit", 'data'])
+    biokit_path = easydev.get_package_location('biokit')
+    share = os.sep.join([biokit_path , "biokit", 'data'])
     # in the code one may use / or \ 
     if where:
         filename = os.sep.join([share, where, filename])
