@@ -82,7 +82,7 @@ setup(
     package_data = {
         '': ['*.csv'],
         'biokit.data' : ['*csv'],
-        'biokit.data.converters' : ['test*']
+        'biokit.data.converters' : ['*']
         },
 
     entry_points = {
