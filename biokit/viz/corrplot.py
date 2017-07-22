@@ -117,7 +117,7 @@ class Corrplot(Linkage):
         ind1 = hierarchy.fcluster(Y, 0.7*max(Y[:,2]), 'distance')
         Z = hierarchy.dendrogram(Y, no_plot=True)
         idx1 = Z['leaves']
-        cor2 = self.df.ix[idx1][idx1]
+        cor2 = self.df.iloc[idx1,idx1]
         if inplace is True:
             self.df = cor2
         else:
@@ -349,8 +349,9 @@ class Corrplot(Linkage):
                     continue
                 if diagonal is False and x==y:
                     continue
-                datum = (df.ix[x, y] +1.)/2.
-                d = df.ix[x, y]
+
+                datum = (df.iloc[x, y] +1.)/2.
+                d = df.iloc[x, y]
                 d_abs = np.abs(d)
                 #c = self.pvalues[x, y]
                 rotate = -45 if d > 0 else +45
