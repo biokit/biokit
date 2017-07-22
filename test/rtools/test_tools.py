@@ -1,5 +1,4 @@
 from biokit.rtools import tools
-from nose.plugins.attrib import attr
 
 
 
@@ -13,7 +12,6 @@ def test_codecs():
     except:
         assert True
 
-@attr('Ronly')
 def test_rcode():
     r = tools.rcode('a=1')
     assert r.a == 1 

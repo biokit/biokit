@@ -1,7 +1,5 @@
 from biokit.rtools import session
-from nose.plugins.attrib import attr
 
-@attr('Ronly')
 def test_session():
 
     sess = session.RSession()
@@ -14,7 +12,6 @@ def test_session():
         assert True
 
 
-@attr('Ronly')
 def test_attribute():
     s = session.RSession()
     s.run("b=1")

@@ -1,15 +1,21 @@
 from biokit.rtools import package
-from nose.plugins.attrib import attr
+import pytest
 try:
     import create_dummy_package as dun
 except:
     from . import create_dummy_package as dun
 
 
+import os
+skiptravis = pytest.mark.skipif( "TRAVIS_PYTHON_VERSION" in os.environ,
+    reason="On travis")
+
+
+
 # This will not work on travis since you will need R
 
 
-@attr('Ronly')
+#@skiptravis
 def test_install_packages():
     d = dun.CreateDummy()
     d()
@@ -17,23 +23,23 @@ def test_install_packages():
     d._clean()
 
 
-@attr('Ronly')
+@skiptravis
 def test_install_packages():
     package.install_package("truncnorm")
 
 
-@attr('Ronly')
+@skiptravis
 def test_get_r_version():
     package.get_R_version()
 
 
-@attr('Ronly')
+@skiptravis
 def test_bioclite():
     package.biocLite()
     package.biocLite('truncnorm')
 
 
-@attr('Ronly')
+@skiptravis
 def test_rpackage():
     # need to play with a pacakge. Again a dummy one would be handy
     p = package.RPackage('CellNOptR')
@@ -46,7 +52,7 @@ def test_rpackage():
     print(p)
 
 
-@attr('Ronly')
+@skiptravis
 def test_pm():
 
     pm = package.RPackageManager()
