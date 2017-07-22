@@ -42,7 +42,7 @@ install:
   - pip install coveralls
 # # command to run tests, e.g. python setup.py test
 script:
-  - pytest -v --durations=10  test/ --cov=biokit --cov-report term --timeout 300 -n 4
+  - pytest -v --durations=10  test/ --cov=biokit --cov-report term --timeout 300 
 
 
 after_success:
