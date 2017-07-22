@@ -7,25 +7,8 @@ import pylab
 import pandas as pd
 from biokit.viz.core import VizInput2D
 
-__all__ = ["scatter_hist", "ScatterHist"]
+__all__ = ["ScatterHist"]
 
-
-def scatter_hist(x,y=None, kargs_scatter={'s':20, 'c':'b'}, 
-        kargs_grids={},
-        kargs_histx={},
-        kargs_histy={},
-        scatter_position='bottom left',
-        width=.5,
-        height=.5,
-        offset_x=.10,
-        offset_y=.10,
-        gap=0.06,
-        axisbg='lightgrey',
-        grid=True, **kargs):
-    """See :class:`~biokit.viz.scatter.ScatterHist` for the documentation"""
-    print('Deprecated. Use ScatterHist instead')
-    s = ScatterHist(x,y)
-    s.plot()
 
 
 class ScatterHist(VizInput2D):
@@ -57,7 +40,7 @@ class ScatterHist(VizInput2D):
         offset_x=.10,
         offset_y=.10,
         gap=0.06,
-        axisbg='lightgrey',
+        facecolor='lightgrey',
         grid=True,
         show_labels=True,
         **kargs):
@@ -80,7 +63,7 @@ class ScatterHist(VizInput2D):
             matplotlib.histogram
         :param kargs_histy: a dictionary with pairs of key/value accepted by the
             matplotlib.histogram
-        :param kargs: other optional parameters are **hold**, **axisbg**.
+        :param kargs: other optional parameters are **hold**, **facecolor**.
         :param scatter_position: can be 'bottom right/bottom left/top left/top right'
         :param width: width of the scatter plot (value between 0 and 1)
         :param height: height of the scatter plot (value between 0 and 1)
@@ -168,19 +151,19 @@ class ScatterHist(VizInput2D):
         else:
             raise ValueError("scatter_position must be 'top left', 'top right', 'bottom left', 'bottom right'")
         
-        axisbg = kargs.get('axisbg', 'lightgrey')
+        facecolor = kargs.get('facecolor', 'lightgrey')
 
 
 
-        ax_scatter = axes((X0, Y0, W, H), axisbg=axisbg, xscale='linear', 
+        ax_scatter = axes((X0, Y0, W, H), facecolor=facecolor, xscale='linear', 
             yscale='linear')#, xticks='auto', yticks='auto')
 
         if show_labels:
             ax_scatter.set_xlabel(self.xy_names[0])
             ax_scatter.set_ylabel(self.xy_names[1])
-        ax_hist_x = axes((X0, Yoff, W, Hh), axisbg=axisbg, xscale='linear', 
+        ax_hist_x = axes((X0, Yoff, W, Hh), facecolor=facecolor, xscale='linear', 
             yscale='linear')#, xticks='auto', yticks='auto')
-        ax_hist_y = axes((Xoff, Y0, Wh, H), axisbg=axisbg, xscale='linear', 
+        ax_hist_y = axes((Xoff, Y0, Wh, H), facecolor=facecolor, xscale='linear', 
             yscale='linear')#, xticks='auto', yticks='auto')
 
         # move ticks on axis  if needed
