@@ -2,6 +2,14 @@ from biokit.converters.yaml2json import YAML2JSON
 from biokit import biokit_data
 from easydev import TempFile, md5
 
+
+import pytest
+import os
+skiptravis = pytest.mark.skipif( "TRAVIS_PYTHON_VERSION" in os.environ and 
+    os.environ['TRAVIS_PYTHON_VERSION'].startswith("2"), reason="On travis")
+
+
+@skiptravis
 def test_conv():
     infile = biokit_data("converters/test1.yaml")
     expected_outile = biokit_data("converters/test1.json")
