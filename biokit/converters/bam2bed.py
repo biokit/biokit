@@ -1,6 +1,8 @@
+"""Convert :term:`BAM` format to :term:`BED` formats"""
 from biokit.converters.convbase import ConvBase
 
 __all__ = ["Bam2Bed"]
+
 
 class Bam2Bed(ConvBase):
     """Convert sorted :term:`BAM` file into :term:`BED` file
