@@ -74,7 +74,7 @@ setup(
     # setup.
     install_requires = ['easydev>=0.9.11', "suds-jurko", 'pandas', 
         'bioservices>=1.4.5', 'colormap', 'scipy', "biopython", "matplotlib",
-	"numpydoc", "colorlog"],
+	"numpydoc", "colorlog", "pyyaml"],
 
      # This is recursive include of data files
     exclude_package_data = {"": ["__pycache__"]},
