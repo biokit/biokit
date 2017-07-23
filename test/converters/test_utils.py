@@ -4,6 +4,6 @@ from biokit.converters import utils
 def test_utils():
 
 
-    res = utils.get_format_mapper()
+    res = utils.MapperRegistry()
     assert len(res)
-    assert "bed" in res['bam']
+    assert "bam2bed" in res
