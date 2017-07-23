@@ -44,8 +44,10 @@ In order to install biokit, you can use **pip**::
 
     pip install biokit
 
-Releases are also available on BioConda but we would recommend pip for now,
-which is more up-to-date.
+
+Or using bioconda channel from the Anaconda project::
+
+    conda install biokit
 
 
 
@@ -54,6 +56,7 @@ Overview
 
 .. autosummary::
 
+    biokit.converters
     biokit.network
     biokit.viz
     biokit.rtools
@@ -67,6 +70,7 @@ Overview
 
     auto_examples/index
     references
+    glossary
 
 .. _installation:
 
