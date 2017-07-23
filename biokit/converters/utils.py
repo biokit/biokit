@@ -1,37 +1,43 @@
 import inspect
-import biokit
 from biokit import converters
 import pkgutil
 import importlib
-import collections
-
-def get_format_mapper():
-    """This functions returns a dictionary with authorised mapper
-
-    The dictionary is built dynamically assuming that there is only
-    one class to be found in the modules provides in biokit.converters
 
 
-    """
-    mapper = collections.defaultdict(list)
 
-    # First, let us figure out the modules of interest.
-    modules = pkgutil.iter_modules(biokit.converters.__path__)
-    for module in modules:
-        modulename = module[1]
+class MapperRegistry(dict):
 
-        importlib.import_module("biokit.converters." + modulename)
+    def __init__(self):
+        self.init()
 
-        classes = inspect.getmembers(getattr(biokit.converters, modulename),
+    def init(self):
+        """This functions returns a dictionary with authorised mapper
+
+        The dictionary is built dynamically assuming that there is only
+        one class to be found in the modules provides in biokit.converters
+
+        """
+        mapper = {}
+
+        # First, let us figure out the modules of interest.
+        modules = pkgutil.iter_modules(converters.__path__)
+        for module in modules:
+            modulename = module[1]
+
+            importlib.import_module("biokit.converters." + modulename)
+
+            classes = inspect.getmembers(getattr(converters, modulename),
                                      inspect.isclass)
 
-        # Here, we must have only 2 classes: the Bam2Bed if the module is called
-        # bam2bed and the ConvBase 
-        classname = [this for this in classes if this[0] != "ConvBase"]
+            # Here, we must have only 2 classes: the Bam2Bed if the module is called
+            # bam2bed and the ConvBase 
+            classname = [this for this in classes if this[0] != "ConvBase"]
 
+            if len(classname) >0:   
+                name = classname[0][0]
+                if "2" in name:
+                    k, v = name.lower().split("2")
+                    mapper[k + "2" + v] = name
+        for k,v in mapper.items():
+            self[k] = v
 
-        if len(classname) >0:
-            name = classname[0][0]
-            k, v = name.lower().split("2")
-            mapper[k].append(v)
-    return mapper
