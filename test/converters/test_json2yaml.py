@@ -1,4 +1,4 @@
-from biokit.converters.yaml2json import YAML2JSON
+from biokit.converters.json2yaml import JSON2YAML
 from biokit import biokit_data
 from easydev import TempFile, md5
 
@@ -11,10 +11,10 @@ skiptravis = pytest.mark.skipif( "TRAVIS_PYTHON_VERSION" in os.environ and
 
 @skiptravis
 def test_conv():
-    infile = biokit_data("converters/test1.yaml")
-    expected_outile = biokit_data("converters/test1.json")
-    with TempFile(suffix=".json") as tempfile:
-        convert = YAML2JSON(infile, tempfile.name)
+    infile = biokit_data("converters/test1.json")
+    expected_outile = biokit_data("converters/test1_nocomments.yaml")
+    with TempFile(suffix=".yaml") as tempfile:
+        convert = JSON2YAML(infile, tempfile.name)
         convert()
 
         # Check that the output is correct with a checksum
