@@ -6,5 +6,9 @@
     "names": [
         "marie",
         "peter"
-    ]
+    ],
+    "other": {
+        "do": true,
+        "misc": 1
+    }
 }
