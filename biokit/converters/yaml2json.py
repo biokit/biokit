@@ -1,5 +1,5 @@
 """Convert :term:`YAML` to :term`JSON` format"""
-import yaml, json, sys
+import yaml, json
 from biokit.converters.convbase import ConvBase
 
 __all__ = ["YAML2JSON"]
@@ -10,6 +10,9 @@ class YAML2JSON(ConvBase):
 
     Conversion is based on yaml and json standard Python modules
 
+    .. note:: YAML comments will be lost in JSON output
+
+
     """
     def __init__(self, infile, outfile, *args, **kargs):
         """.. rubric:: constructor
@@ -19,8 +22,12 @@ class YAML2JSON(ConvBase):
         """
         super(YAML2JSON, self).__init__(infile, outfile, *args, **kargs)
 
-    def convert(self):
+    def get_json(self):
+        """Return the JSON dictionary corresponding to the YAML input"""
         data = yaml.load(open(self.infile, "r"))
+        return json.dumps(data, sort_keys=True, indent=4)
+
+    def convert(self):
         with open(self.outfile, "w") as outfile:
-            outfile.write(json.dumps(data, sort_keys=True, indent=4))
+            outfile.write(self.get_json())
 
