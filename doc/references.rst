@@ -129,13 +129,6 @@ Genomics
     :synopsis: 
 
 
-BioServices
----------------
-.. automodule:: biokit.services
-
-BioServices is used in BioKit to access to web services (e.g., KEGG, UniProt, Ensembl...) but documentation for bioservices itself is not provided. See `<BioServices instead <http://bioservices.readthedocs.io>`_
-
-
 Stats
 ---------
 .. automodule:: biokit.stats
