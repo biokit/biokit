@@ -2,7 +2,7 @@
 
 
 
-Utilities
+References
 ==========
 
 NGS converters
@@ -12,7 +12,15 @@ NGS converters
 
 .. automodule:: biokit.converters.bam2bed
     :members:
-    :synopsis: 
+    :synopsis:
+
+.. automodule:: biokit.converters.yaml2json
+    :members:
+    :synopsis:
+
+.. automodule:: biokit.converters.json2yaml
+    :members:
+    :synopsis:
 
 
 Tools related to network (e.g., protein networks)
@@ -22,7 +30,7 @@ Tools related to network (e.g., protein networks)
 .. automodule:: biokit.network.complexes
     :members:
     :undoc-members:
-    :synopsis: 
+    :synopsis:
 
 
 Common visualisation tools
@@ -32,42 +40,42 @@ Common visualisation tools
 .. automodule:: biokit.viz.corrplot
     :members:
     :undoc-members:
-    :synopsis: 
+    :synopsis:
 
 .. automodule:: biokit.viz.scatter
     :members:
     :undoc-members:
-    :synopsis: 
+    :synopsis:
 
 .. automodule:: biokit.viz.imshow
     :members:
     :undoc-members:
-    :synopsis: 
+    :synopsis:
 
 .. automodule:: biokit.viz.heatmap
     :members:
     :undoc-members:
-    :synopsis: 
+    :synopsis:
 
 .. automodule:: biokit.viz.hinton
     :members:
     :undoc-members:
-    :synopsis: 
+    :synopsis:
 
 .. automodule:: biokit.viz.volcano
     :members:
     :undoc-members:
-    :synopsis: 
+    :synopsis:
 
 .. automodule:: biokit.viz.hist2d
     :members:
     :undoc-members:
-    :synopsis: 
+    :synopsis:
 
 .. automodule:: biokit.viz.core
     :members:
     :undoc-members:
-    :synopsis: 
+    :synopsis:
 
 
 Tools to handle R packages
@@ -81,22 +89,22 @@ Tools to handle R packages
 .. automodule:: biokit.rtools.tools
     :members:
     :undoc-members:
-    :synopsis: 
+    :synopsis:
 
 .. automodule:: biokit.rtools.package
     :members:
     :undoc-members:
-    :synopsis: 
+    :synopsis:
 
 .. automodule:: biokit.rtools.py2r
     :members:
     :undoc-members:
-    :synopsis: 
+    :synopsis:
 
 .. automodule:: biokit.rtools.r4python
     :members:
     :undoc-members:
-    :synopsis: 
+    :synopsis:
 
 
 Genomics
@@ -106,27 +114,27 @@ Genomics
 .. automodule:: biokit.sequence.seq
     :members:
     :undoc-members:
-    :synopsis: 
+    :synopsis:
 
 .. automodule:: biokit.sequence.dna
     :members:
     :undoc-members:
-    :synopsis: 
+    :synopsis:
 
 .. automodule:: biokit.sequence.rna
     :members:
     :undoc-members:
-    :synopsis: 
+    :synopsis:
 
 .. automodule:: biokit.sequence.peptide
     :members:
     :undoc-members:
-    :synopsis: 
+    :synopsis:
 
 .. automodule:: biokit.taxonomy.taxonomy
     :members:
     :undoc-members:
-    :synopsis: 
+    :synopsis:
 
 
 Stats
@@ -136,10 +144,10 @@ Stats
 .. automodule:: biokit.stats.mixture
     :members:
     :undoc-members:
-    :synopsis: 
+    :synopsis:
 
 .. automodule:: biokit.stats.criteria
     :members:
     :undoc-members:
-    :synopsis: 
+    :synopsis:
 

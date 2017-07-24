@@ -30,15 +30,15 @@ BioKit
 
 
 
-Overview and Installation
-##############################
+Overview
+###############
 
 BioKit is a set of tools gathered from several other Python packages. 
 So far, it contains a few plotting tools (viz module), some statistical
 analysis, some tools to access to Taxon and GO identifier, some basic tools to
 manipulate sequences and so on. Many biological software are developed in R so we
 also added a module to ease the installation and usage of R tools within BioKit.
- 
+
 
 In order to install biokit, you can use **pip**::
 
@@ -60,19 +60,18 @@ Overview
     biokit.network
     biokit.viz
     biokit.rtools
-    biokit.services
     biokit.sequence
     biokit.stats
 
 
 .. toctree::
     :maxdepth: 2 
+    :numbered:
 
     auto_examples/index
     references
     glossary
-
-.. _installation:
+    ChangeLog.rst
 
 
 Examples in notebooks
@@ -81,12 +80,4 @@ Examples in notebooks
 Set of `Notebooks <http://nbviewer.ipython.org/github/biokit/biokit/tree/master/notebooks/>`_
 
 
-ChangeLog
-############
-
-.. toctree::
-    :maxdepth: 2
-    :numbered:
-
-    ChangeLog.rst
 
