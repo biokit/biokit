@@ -18,11 +18,10 @@ def biokit_debug_level(level="WARNING"):
     
 
 from biokit import viz
-from biokit import io
-from biokit import services
-
 from biokit.viz import *
-from biokit.services import EUtils, KEGG, UniProt
+
+from biokit import io
+
 
 from biokit import stats
 from biokit.network import *
