@@ -1,8 +1,14 @@
 from biokit.rtools import tools
-from nose.plugins.attrib import attr
+import pytest
+import os
+skiptravis = pytest.mark.skipif( "TRAVIS_PYTHON_VERSION" in os.environ,
+    reason="On travis")
 
 
 
+
+
+@skiptravis
 def test_codecs():
 
     assert 'T' == tools.bool2R(True)
@@ -13,7 +19,7 @@ def test_codecs():
     except:
         assert True
 
-@attr('Ronly')
+@skiptravis
 def test_rcode():
     r = tools.rcode('a=1')
     assert r.a == 1 

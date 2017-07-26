@@ -1,58 +1,36 @@
 from biokit.io.fasta import FASTA, MultiFASTA
 import tempfile
-from nose.plugins.attrib import attr
 
 
-class test_FASTA(object):
-    @classmethod
-    def setup_class(klass):
-        klass.s = FASTA(verbose=False)
+def test_fasta():
+    s = FASTA()
+    s.load_fasta(None)
+    s.load_fasta("P43403")
+    s.load_fasta("P43403") # already there 
+    s.header
+    s.gene_name
+    s.sequence
+    s.fasta
+    s.identifier
+    fh = tempfile.NamedTemporaryFile(delete=False)
+    s.save_fasta(fh.name)
+    s.read_fasta(fh.name)
+    fh.delete = True
+    fh.close()
 
-    def test_fasta(self):
-        self.s.load_fasta(None)
-        self.s.load_fasta("P43403")
-        self.s.load_fasta("P43403") # already there 
-        self.s.header
-        self.s.gene_name
-        self.s.sequence
-        self.s.fasta
-        self.s.identifier
-        fh = tempfile.NamedTemporaryFile(delete=False)
-        self.s.save_fasta(fh.name)
-        self.s.read_fasta(fh.name)
-        fh.delete = True
-        fh.close()
 
-class test_FASTA(object):
-    @classmethod
-    def setup_class(klass):
-        klass.s = MultiFASTA()
+def test_attributes():
+    s = MultiFASTA()
+    s.load_fasta("P43403")
+    s.load_fasta("P43408")
+    assert len(s) == 2
 
-        try:
-            klass.s.fasta
-            assert False
-        except:
-            assert True
-        try:
-            f.header
-            assert False
-        except:
-            assert True
+    s.ids
+    s.fasta
+    fh = tempfile.NamedTemporaryFile(delete=False)
+    s.save_fasta(fh.name)
+    s.read_fasta(fh.name)
 
-        klass.s.load_fasta("P43403")
-        klass.s.load_fasta("P43408")
-
-    def test_attributes(self):
-        assert len(self.s) == 2
-    
-        self.s.ids
-        self.s.fasta
-        fh = tempfile.NamedTemporaryFile(delete=False)
-        self.s.save_fasta(fh.name)
-        self.s.read_fasta(fh.name)
-
-        self.s.fasta["P43403"]
-
-    def test_extra(self):
-        self.s.hist_size()
-        self.s.df
+    s.fasta["P43403"]
+    s.hist_size()
+    s.df

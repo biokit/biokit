@@ -1,9 +1,11 @@
 from biokit import Taxonomy
-from nose.plugins.attrib import attr
+import pytest
+import os
+skiptravis = pytest.mark.skipif( "TRAVIS_PYTHON_VERSION" in os.environ,
+    reason="On travis")
 
 
-
-@attr("skiptravis")
+@skiptravis
 def test_taxonomy():
     t = Taxonomy()
     t.load_records()

@@ -42,35 +42,35 @@ class Corrplot(Linkage):
         c = corrplot.Corrplot(df)
         c.plot()
 
-    .. seealso::    All functionalities are covered in this 
+    .. seealso::    All functionalities are covered in this
         `notebook <http://nbviewer.ipython.org/github/biokit/biokit/blob/master/notebooks/viz/corrplot.ipynb>`_
 
     """
     def __init__(self, data, na=0):
         """.. rubric:: Constructor
 
-        Plots the content of square matrix that contains correlation values. 
-        
+        Plots the content of square matrix that contains correlation values.
+
         :param data: input can be a dataframe (Pandas), or list of lists (python) or
-            a numpy matrix. Note, however, that values must be between -1 and 1. If not, 
+            a numpy matrix. Note, however, that values must be between -1 and 1. If not,
             or if the matrix (or list of lists) is not squared, then correlation is
             computed. The data or computed correlation is stored in :attr:`df` attribute.
         :param bool compute_correlation: if the matrix is non-squared or values are not
-            bounded in -1,+1, correlation is computed. If you do not want that behaviour, 
+            bounded in -1,+1, correlation is computed. If you do not want that behaviour,
             set this parameter to False. (True by default).
         :param na: replace NA values with this value (default 0)
 
         The :attr:`params` contains some tunable parameters for the colorbar in the
         :meth:`plot` method.
 
-        :: 
+        ::
 
             # can be a list of lists, the correlation matrix is then a 2x2 matrix
             c = corrplot.Corrplot([[1,1], [2,4], [3,3], [4,4]])
 
         """
         super(Corrplot, self).__init__()
-        #: The input data is stored in a dataframe and must therefore be 
+        #: The input data is stored in a dataframe and must therefore be
         #: compatible (list of lists, dictionary, matrices...)
         self.df = pd.DataFrame(data, copy=True)
 
@@ -94,8 +94,8 @@ class Corrplot(Linkage):
 
         #: tunable parameters for the :meth:`plot` method.
         self.params = {
-                'colorbar.N': 100, 
-                'colorbar.shrink': .8, 
+                'colorbar.N': 100,
+                'colorbar.shrink': .8,
                 'colorbar.orientation':'vertical'}
 
     def _set_default_cmap(self):
@@ -104,7 +104,7 @@ class Corrplot(Linkage):
     def order(self, method='complete', metric='euclidean',inplace=False):
         """Rearrange the order of rows and columns after clustering
 
-        :param method: any scipy method (e.g., single, average, centroid, 
+        :param method: any scipy method (e.g., single, average, centroid,
             median, ward). See scipy.cluster.hierarchy.linkage
         :param metric: any scipy distance (euclidean, hamming, jaccard)
             See scipy.spatial.distance or scipy.cluster.hieararchy
@@ -117,7 +117,7 @@ class Corrplot(Linkage):
         ind1 = hierarchy.fcluster(Y, 0.7*max(Y[:,2]), 'distance')
         Z = hierarchy.dendrogram(Y, no_plot=True)
         idx1 = Z['leaves']
-        cor2 = self.df.ix[idx1][idx1]
+        cor2 = self.df.iloc[idx1,idx1]
         if inplace is True:
             self.df = cor2
         else:
@@ -138,9 +138,9 @@ class Corrplot(Linkage):
 
     def plot(self, fig=None, grid=True,
             rotation=30, lower=None, upper=None,
-            shrink=0.9, axisbg='white', colorbar=True, label_color='black',
-            fontsize='small', edgecolor='black', method='ellipse', 
-            order_method='complete', order_metric='euclidean', cmap=None, 
+            shrink=0.9, facecolor='white', colorbar=True, label_color='black',
+            fontsize='small', edgecolor='black', method='ellipse',
+            order_method='complete', order_metric='euclidean', cmap=None,
             ax=None, binarise_color=False):
         """plot the correlation matrix from the content of :attr:`df`
         (dataframe)
@@ -148,32 +148,32 @@ class Corrplot(Linkage):
         By default, the correlation is shown on the upper and lower triangle and is
         symmetric wrt to the diagonal. The symbols are ellipses. The symbols can
         be changed to e.g. rectangle. The symbols are shown on upper and lower sides but
-        you could choose a symbol for the upper side and another for the lower side using 
-        the **lower** and **upper** parameters. 
+        you could choose a symbol for the upper side and another for the lower side using
+        the **lower** and **upper** parameters.
 
         :param fig: Create a new figure by default. If an instance of an existing
-            figure is provided, the corrplot is overlayed on the figure provided. 
+            figure is provided, the corrplot is overlayed on the figure provided.
             Can also be the number of the figure.
-        :param grid: add grid (Defaults to grey color). You can set it to False or a color. 
+        :param grid: add grid (Defaults to grey color). You can set it to False or a color.
         :param rotation: rotate labels on y-axis
         :param lower: if set to a valid method, plots the data on the lower
             left triangle
         :param upper: if set to a valid method, plots the data on the upper
             left triangle
         :param float shrink: maximum space used (in percent) by a symbol.
-            If negative values are provided, the absolute value is taken. 
+            If negative values are provided, the absolute value is taken.
             If greater than 1, the symbols wiill overlap.
-        :param axisbg: color of the background (defaults to white).
+        :param facecolor: color of the background (defaults to white).
         :param colorbar: add the colorbar (defaults to True).
         :param str label_color: (defaults to black).
         :param fontsize: size of the fonts defaults to 'small'.
-        :param method: shape to be used in 'ellipse', 'square', 'rectangle', 
+        :param method: shape to be used in 'ellipse', 'square', 'rectangle',
             'color', 'text', 'circle',  'number', 'pie'.
 
         :param order_method: see :meth:`order`.
         :param order_metric: see : meth:`order`.
         :param cmap: a valid cmap from matplotlib or colormap package (e.g.,
-            'jet', or 'copper'). Default is red/white/blue colors. 
+            'jet', or 'copper'). Default is red/white/blue colors.
         :param ax: a matplotlib axes.
 
         The colorbar can be tuned with the parameters stored in :attr:`params`.
@@ -207,22 +207,22 @@ class Corrplot(Linkage):
 
         # figure can be a number or an instance; otherwise creates it
         if isinstance(fig, int):
-            fig = plt.figure(num=fig, facecolor=axisbg)
+            fig = plt.figure(num=fig, facecolor=facecolor)
         elif fig is not None:
-            fig = plt.figure(num=fig.number, facecolor=axisbg)
+            fig = plt.figure(num=fig.number, facecolor=facecolor)
         else:
-            fig = plt.figure(num=None, facecolor=axisbg)
+            fig = plt.figure(num=None, facecolor=facecolor)
 
         # do we have an axes to plot the data in ?
         if ax is None:
-            ax = plt.subplot(1, 1, 1, aspect='equal', axisbg=axisbg)
+            ax = plt.subplot(1, 1, 1, aspect='equal', facecolor=facecolor)
         else:
             # if so, clear the axes. Colorbar cannot be removed easily.
             plt.sca(ax)
             ax.clear()
 
         # subplot resets the bg color, let us set it again
-        fig.set_facecolor(axisbg)
+        fig.set_facecolor(facecolor)
 
         width, height = df.shape
         labels = (df.columns)
@@ -270,7 +270,6 @@ class Corrplot(Linkage):
         ax.set_yticks(ytickslocs)
         ax.set_yticklabels(labels, fontsize=fontsize, color=label_color)
         plt.tight_layout()
-
 
         if grid is not False:
             if grid is True:
@@ -329,7 +328,7 @@ class Corrplot(Linkage):
             N = self.params['colorbar.N'] + 1
             assert N >=2
             cb = plt.gcf().colorbar(self.collection,
-                    orientation=self.params['colorbar.orientation'], 
+                    orientation=self.params['colorbar.orientation'],
                     shrink=self.params['colorbar.shrink'],
                 boundaries= np.linspace(0,1,N), ticks=[0,.25, 0.5, 0.75,1])
             cb.ax.set_yticklabels([-1,-.5,0,.5,1])
@@ -349,8 +348,9 @@ class Corrplot(Linkage):
                     continue
                 if diagonal is False and x==y:
                     continue
-                datum = (df.ix[x, y] +1.)/2.
-                d = df.ix[x, y]
+
+                datum = (df.iloc[x, y] +1.)/2.
+                d = df.iloc[x, y]
                 d_abs = np.abs(d)
                 #c = self.pvalues[x, y]
                 rotate = -45 if d > 0 else +45
@@ -398,7 +398,7 @@ class Corrplot(Linkage):
                     d_str = "{:.2f}".format(d).replace("0.", ".").replace(".00", "")
                     ax.text(x,y, d_str, color=edgecolor,
                             fontsize=self.fontsize, horizontalalignment='center',
-                            weight='bold', alpha=max(0.5, d_abs), 
+                            weight='bold', alpha=max(0.5, d_abs),
                             withdash=False)
                 elif method == 'pie':
                     S = 360 * d_abs
@@ -416,7 +416,7 @@ class Corrplot(Linkage):
 
                     #ax.add_artist(patch[0])
                     #ax.add_artist(patch[1])
-                    patches.append(patch[0])                    
+                    patches.append(patch[0])
                     patches.append(patch[1])
                 else:
                     raise ValueError('Method for the symbols is not known. Use e.g, square, circle')
@@ -424,10 +424,14 @@ class Corrplot(Linkage):
         if self.binarise_color:
             colors = [1 if color >0.5 else -1 for color in colors]
 
-        if len(patches):                    
+        if len(patches):
             col1 = PatchCollection(patches, array=np.array(colors), cmap=self.cm)
             ax.add_collection(col1)
 
             self.collection = col1
-
+            # Somehow a release of matplotlib prevent the edge color
+            # from working but the set_edgecolor on the collection itself does
+            # work... 
+            if self.edgecolor:
+                self.collection.set_edgecolor(self.edgecolor)
 

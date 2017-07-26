@@ -1,7 +1,15 @@
 from biokit.rtools import session
-from nose.plugins.attrib import attr
 
-@attr('Ronly')
+
+import pytest
+import os
+skiptravis = pytest.mark.skipif( "TRAVIS_PYTHON_VERSION" in os.environ,
+    reason="On travis")
+
+
+
+
+@skiptravis
 def test_session():
 
     sess = session.RSession()
@@ -14,7 +22,7 @@ def test_session():
         assert True
 
 
-@attr('Ronly')
+@skiptravis
 def test_attribute():
     s = session.RSession()
     s.run("b=1")

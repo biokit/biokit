@@ -1,11 +1,10 @@
-"""
+"""GO terms
 
 
 Resources: geneontology.org and godb Python package from endrebak user (Bakken).
 https://github.com/endrebak/godb/
 
 """
-
 import urllib
 import os
 from collections import defaultdict
@@ -29,7 +28,7 @@ class GOId(object):
     so this is the string "GO:" followed by 7 digits.
 
     This class ease the construction and validation of GO identifiers.
-    As an input, one can provide a valid GO identifiers or a number, which 
+    As an input, one can provide a valid GO identifiers or a number, which
     is then transformed into the proper formatted identifier
 
     ::
@@ -156,8 +155,8 @@ class GOTerm(object):
     **id** and **name** are compulsary and unique.
     optional tags are **is_
 
-    .. seealso:: :class:`GODB` and QuickGO from bioservices. For instance, 
-        from QuickGO, you may get more information about cross references as 
+    .. seealso:: :class:`GODB` and QuickGO from bioservices. For instance,
+        from QuickGO, you may get more information about cross references as
         compared to :class:`GODB` that relies on geneontologies.org snapshot.
     """
     def __init__(self, text, remove_comments=True):
@@ -195,22 +194,22 @@ class GOTerm(object):
                 d[key.strip()].append(value.strip())
 
         # Based on http://oboformat.googlecode.com/svn/trunk/doc/GO.format.obo-1_2.html
-        # we can clean up the lists converting some of them to 
+        # we can clean up the lists converting some of them to
         # single item. We also issue a warning with deprecated ones.
         lists = ['alt_id', 'synonym', 'is_a', 'xref', 'intersection_of',
-            'relationship', 'union_of', 'disjoint_from', 'consider', 
+            'relationship', 'union_of', 'disjoint_from', 'consider',
             'replaced_by', 'subset', 'property_value']
         nonlist = ['id', 'name', 'is_anonymous', 'is_obsolete', 'def',
                 'comment', 'created_by', 'creation_date', 'namespace']
         deprecated = {
-                'exact_synonym': 'synonym', 
+                'exact_synonym': 'synonym',
                 'narrow_synonym':'synonym',
                 'broad_synonym': 'synonym',
                 'xref_analog': 'xref',
                 'xref_unk': 'xref',
                 'use_term': 'consider'
                 }
-        # missing: namespace, subset, 
+        # missing: namespace, subset,
         dd = {}
         for k, v in d.items():
             if k in lists: # nothing to do
@@ -222,11 +221,11 @@ class GOTerm(object):
                     raise ValueError("%s must be found only once. Check %s" %
                             (k, d['id']))
             elif k in deprecated.keys():
-                print("%s deprecated. Kept and assuming non unique tag" % 
+                print("%s deprecated. Kept and assuming non unique tag" %
                         (k, d['id']))
                 dd[k] = v
             else:
-                print("%s not handled in %s. Assuming non unique tag" % 
+                print("%s not handled in %s. Assuming non unique tag" %
                     (k, d['id']))
                 dd[k] = v
         if self.remove_comments is True:
@@ -260,7 +259,7 @@ class GODB(object):
         """
 
         Searches for a file on geneontology.org exce
-        
+
         :param name: name of the go OBO file to be downloaded
         :param drop_obsolet: drop obsolet GO terms from the entire DB
         :param local: read the OBO file locally (False) or downloads
@@ -322,13 +321,13 @@ class GODB(object):
         return len(self.df)
 
     def get_annotations(self):
-        # replace some columns 
+        # replace some columns
         df = self.df.copy()
         df = df[['namespace', 'name', 'synonym', 'def', 'relationship']]
         df.columns = ["Ontology", "Term", "Synonym", "Definition",
                 "relationship"]
         return df
-  
+
     def search(self, search, where='name', method='in'):
         if method == 'in':
             selection = self.df[where].apply(lambda x: search in x)
@@ -339,20 +338,20 @@ class GODB(object):
         return self.df[selection].copy()
 
     #  The is a relation is transitive, which means that if A is a B, and B is a
-    #  C, we can infer that A is a C. 
+    #  C, we can infer that A is a C.
     #  B part of A does not mean that A have B systematically (think of
     # replication fork part of chromosome but chromosome do not have a
     # replication fork systemtically.
-    #  Like is a, part of is transitive: if A part of B part of C 
-    #  then A part of C 
+    #  Like is a, part of is transitive: if A part of B part of C
+    #  then A part of C
     #
     # The logical complement to the part of relation is has part, which
     # represents a part-whole relationship from the perspective of the parent.
     # As with part of, the GO relation has part is only used in cases where A
     # always has B as a part, i.e. where A necessarily has part B. If A exists,
     # B will always exist; however, if B exists, we cannot say for certain that
-    # A exists. i.e. all A have part B; some B part of A. 
-    def get_children(self, ontology='CC', 
+    # A exists. i.e. all A have part B; some B part of A.
+    def get_children(self, ontology='CC',
             relations=['is_a', 'part_of', 'has_part']):
         """http://geneontology.org/page/ontology-relations"""
 
@@ -426,6 +425,3 @@ class GODB(object):
         df2.columns = ["Parent", "Offspring"]
         concat_df = pd.concat([df, df2]).drop_duplicates()
         return concat_df
-
-
-

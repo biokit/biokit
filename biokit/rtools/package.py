@@ -251,7 +251,7 @@ class RPackageManager(object):
             self._update()
         except:
             self.logging.warning("Could not update the packages. Call update() again")
-
+        
     def _compat_version(self, version):
         return version.replace("-", "a")
 

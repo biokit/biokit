@@ -42,7 +42,7 @@ def hinton(df, fig=1, shrink=2, method='square', bgcolor='grey',
     from biokit.viz import corrplot
     c = corrplot.Corrplot(df)
     c.plot(colorbar=False, cmap=cmap, fig=fig,
-            method=method, axisbg=bgcolor,
+            method=method, facecolor=bgcolor,
             shrink=shrink, label_color=bgcolor, binarise_color=binarise_color)
 
 
