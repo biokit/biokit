@@ -20,8 +20,8 @@ BioKit
 
 
 
-:note: BioKit is tested with Travis for the following Python version: 2.7.9
-       3.4.2 and 3.5.0
+:note: BioKit is tested with Travis for the following Python version: 2.7, 3.5,
+3.6
 
 :contributions: Please join https://github.com/biokit/biokit 
 :issues: Please use https://github.com/biokit/biokit/issues
