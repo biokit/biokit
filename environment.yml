@@ -12,3 +12,4 @@ dependencies:
   - matplotlib
   - easydev>=0.9.21
   - bioservices
+  - sphinx-gallery
