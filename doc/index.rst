@@ -15,8 +15,8 @@ BioKit
 .. image:: https://secure.travis-ci.org/biokit/biokit.png
        :target: http://travis-ci.org/biokit/biokit
 
-.. image:: https://coveralls.io/repos/cokelaer/biokit/badge.png?branch=master 
-      :target: https://coveralls.io/r/cokelaer/biokit?branch=master 
+.. image:: https://coveralls.io/repos/biokit/biokit/badge.png?branch=master 
+      :target: https://coveralls.io/r/biokit/biokit?branch=master 
 
 
 
@@ -25,9 +25,6 @@ BioKit
 
 :contributions: Please join https://github.com/biokit/biokit 
 :issues: Please use https://github.com/biokit/biokit/issues
-
-
-
 
 
 Overview

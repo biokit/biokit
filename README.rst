@@ -1,9 +1,7 @@
 BioKit
 ==========
 
-Bioinformatics tools in Python
-
-
+General Bioinformatics tools in Python
 
 
 .. image:: https://badge.fury.io/py/biokit.svg
@@ -12,15 +10,14 @@ Bioinformatics tools in Python
 .. image:: https://secure.travis-ci.org/biokit/biokit.png
     :target: http://travis-ci.org/biokit/biokit
 
-.. image:: https://coveralls.io/repos/cokelaer/biokit/badge.png?branch=master 
-   :target: https://coveralls.io/r/cokelaer/biokit?branch=master 
+.. image:: https://coveralls.io/repos/biokit/biokit/badge.png?branch=master 
+   :target: https://coveralls.io/r/biokit/biokit?branch=master 
 
 
 
-:note: BioKit is tested with Travis for the following Python version: 2.7.9
-       3.4.2 and 3.5.0
+:note: BioKit is tested with Travis for the following Python version: 2.7, 3.5, 3.6
 
-:contributions: Please join https://github.com/biokit/biokit and share your notebooks https://github.com/biokit/biobooks/
+:contributions: Please join https://github.com/biokit/biokit 
 :issues: Please use https://github.com/biokit/biokit/issues
 
 
@@ -43,13 +40,6 @@ Installation
     pip install biokit
 
 
-Note about testing
-====================
+or from bioconda::
 
-From travis, coverage is about 50% at the moment, which is low because some tests are ignored. Tests ignored are
-those that are slow or required R dependencies. To be ignored, we filled the setup.cfg with an option called **attr**. 
-IF you comment that attribute in the **setup.cfg** and run ::
-
-    python setup.py nosetests
-    
-You should reach a higher coverage (about 70%)    
+    conda install bioconda
