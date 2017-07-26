@@ -1,11 +1,16 @@
 Whats' new, what has changed
 ================================
 
+
+:Revision 0.4.2:
+    * UPDATE: starting converter tool in converter sub-package
+    * UPDATE: replace axibg with facecolor (matplotlib deprecated name)
+    * REFACTORING: rtools sub-package.should not affect user interface
+    * BUG: fixed corrplot layout due to new matplotlib API and new Pandas API
+
 :Revision: 0.4.1
 
-    * starting converter tool
     * BUG: fix rtools sub-packages for Python3 portage
-    * UPDATE: replace axibg with facecolor (matplotlib deprecated name)
 
 :Revision: 0.4.0
 
