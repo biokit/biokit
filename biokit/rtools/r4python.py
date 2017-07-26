@@ -22,11 +22,11 @@ r4python = r"""
 .getRvalue4Python__ <- function(x, use_dict=NULL) {
 
     headstr <- 'numpy.array('
-    tailstr <- ')' 
+    tailstr <- ')'
 
     SpecialLocs <- function(x) { # find locations of special values: NULL, NA, NaN, Inf
         rlt <- list()
-        
+
             idx <- which(is.null(x) | is.na(x))
             if (length(idx) > 0) rlt$None <- idx
             idx <- which(is.nan(x))
@@ -39,7 +39,7 @@ r4python = r"""
                 iidx <- which(v < 0)
                 if (length(iidx) > 0) rlt['-numpy.Inf'] <- idx[iidx]
                 }
-            
+
         return(rlt)
         }
 
@@ -128,7 +128,7 @@ r4python = r"""
                     ctp[i] <- paste('("', cnms[i], '", "<G")') }
                 if (length(special_locs) > 0) xi <- SpecialVals(xi, special_locs)
                 if (nrow(x) > 0) x[[i]] <- xi }
-            tailstr <- paste(', dtype=[', paste(ctp, collapse=','), ']', tailstr, sep='') 
+            tailstr <- paste(', dtype=[', paste(ctp, collapse=','), ']', tailstr, sep='')
 
         x <- as.matrix(x)
         x <- apply(x, 1, function(r) paste('(', paste(r, collapse=','), if(length(r)<2) ',)' else ')', sep=''))
@@ -194,5 +194,5 @@ r4python = r"""
 
     if(identical(.Platform$OS.type, 'windows')) .addLibs()
     rm(.addLibs)
-    
+
 """
