@@ -1,4 +1,4 @@
-"""Convert :term:`JSON` to :term`YAML` format"""
+"""Convert :term:`JSON` to :term:`YAML` format"""
 import yaml, json
 from biokit.converters.convbase import ConvBase
 

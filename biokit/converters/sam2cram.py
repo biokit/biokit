@@ -1,3 +1,4 @@
+"""Convert :term:`SAM` file to :term:`CRAM` file"""
 from biokit.converters.convbase import ConvBase
 
 
@@ -8,7 +9,9 @@ class SAM2CRAM(ConvBase):
     def __init__(self, infile, outfile, reference, *args, **kargs):
         """.. rubric:: constructor
 
-        :param str filename
+        :param str infile: input SAM file
+        :param str outfile: output filename
+        :param str referece: reference file in :trm:`FASTA` format
 
         command used::
 

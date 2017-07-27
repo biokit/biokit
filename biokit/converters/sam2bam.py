@@ -1,3 +1,4 @@
+"""Convert :term:`SAM` file to :term:`BAM` file"""
 from biokit.converters.convbase import ConvBase
 
 
@@ -8,7 +9,8 @@ class SAM2BAM(ConvBase):
     def __init__(self, infile, outfile, *args, **kargs):
         """.. rubric:: constructor
 
-        :param str filename
+        :param str infile:
+        :param str outfile:
 
         command used::
 
