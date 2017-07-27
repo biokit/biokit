@@ -1,6 +1,7 @@
 from biokit.rtools import session
 import numpy as np
 import os
+import pytest
 skiptravis = pytest.mark.skipif( "TRAVIS_PYTHON_VERSION" in os.environ,
     reason="On travis")
 
