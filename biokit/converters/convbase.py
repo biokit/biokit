@@ -12,6 +12,9 @@ class ConvBase(object):
     def __init__(self, infile, outfile, *args, **kargs):
         self.infile = infile
         self.outfile = outfile
+        if infile == outfile:
+            msg = "Output file name must be different from the input filename"
+            raise ValueError(msg)
         self.args = args
         self.kargs = kargs
 
