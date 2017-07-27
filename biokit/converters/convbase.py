@@ -10,7 +10,7 @@ class ConvBase(object):
     """
     def __init__(self, infile, outfile, *args, **kargs):
         self.infile = infile
-        if os.path.exists(self.infile) if False:
+        if os.path.exists(self.infile) is False:
             raise IOError("{} does not exist !".format(self.infile))
         self.outfile = outfile
         if infile == outfile:
