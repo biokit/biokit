@@ -2,6 +2,8 @@ Whats' new, what has changed
 ================================
 
 
+.. converter: add sam2bam, sam2cram
+
 :Revision 0.4.2:
     * UPDATE: starting converter tool in converter sub-package
     * UPDATE: replace axibg with facecolor (matplotlib deprecated name)
