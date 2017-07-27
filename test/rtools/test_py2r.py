@@ -1,7 +1,11 @@
 from biokit.rtools import session
 import numpy as np
+import os
+skiptravis = pytest.mark.skipif( "TRAVIS_PYTHON_VERSION" in os.environ,
+    reason="On travis")
 
 
+@skiptravis
 def test_types():
     rs = session.RSession()
     rs.run("mylist = c(1,2)")
