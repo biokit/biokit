@@ -9,13 +9,7 @@ def test_conv():
     reference = biokit_data("converters/measles.fa")
     with TempFile(suffix=".cram") as tempfile:
         convert = SAM2CRAM(infile, tempfile.name, reference)
-        try:
-            convert()
-            # Right now, if the fai is missing, it is creating and a message is
-            # written on the stderr, which is caught by execute(). So, we pass
-            # and will fix the code later on
-        except:
-            pass
+        convert()
 
         # Check that the output is correct with a checksum
         # Note that we cannot test the md5 on a gzip file but only 
@@ -26,7 +20,13 @@ def test_conv():
         # compressed file size may change. I have seen 6115, 6608, 6141
         assert size > 5800 and size < 7000
 
+    with TempFile(suffix=".cram") as tempfile:
+        convert = SAM2CRAM(infile, tempfile.name, reference=None)
+        convert()
 
+    with TempFile(suffix=".cram") as tempfile:
+        convert = SAM2CRAM(infile, tempfile.name, reference="dummy.fa")
+        convert()
 
 
 
