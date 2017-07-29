@@ -37,7 +37,7 @@ install:
   - echo $TRAVIS_PYTHON_VERSION
   - conda install --yes python=$TRAVIS_PYTHON_VERSION atlas numpy scipy matplotlib pandas coverage biopython
   - conda install --yes easydev bioservices 
-  - conda install --yes samtools
+  - conda install --yes samtools pysam
   - pip install colorlog colormap
   - pip install pytest pytest-cov pytest-qt pytest-xdist pytest-mock pytest-timeout
   - pip install coveralls
