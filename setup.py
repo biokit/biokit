@@ -58,7 +58,7 @@ setup(
     description = metainfo['description'],
     license          = metainfo['license'],
     platforms        = metainfo['platforms'],
-    url              = metainfo['url'],      
+    url              = metainfo['url'],
     download_url     = metainfo['download_url'],
     classifiers      = metainfo['classifiers'],
 
@@ -72,9 +72,9 @@ setup(
     # distutils in rtools.package
     # suds-jurko is used by bioservices so we probab ly do not need it in the
     # setup.
-    install_requires = ['easydev>=0.9.11', "suds-jurko", 'pandas', 
+    install_requires = ['easydev>=0.9.11', 'pandas',
         'bioservices>=1.4.5', 'colormap', 'scipy', "biopython", "matplotlib",
-	"numpydoc", "colorlog", "pyyaml"],
+	"numpydoc", "colorlog", "pyyaml", "pysam"],
 
      # This is recursive include of data files
     exclude_package_data = {"": ["__pycache__"]},
