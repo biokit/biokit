@@ -1,0 +1,34 @@
+#! /usr/bin/env python3
+
+# this script is just to illustratre how to registry work
+# this script should be outside the module
+# to avoid to be called twice
+# one by tester
+# one by the registry dicovering 
+# I remove the .py extension
+
+import os, sys
+sys.path.insert(1, os.path.abspath(os.path.join('..')))
+sys.path.insert(1, os.path.abspath(os.path.join('..', '..')))
+
+from registry import Registry
+
+print(">>> create registry")
+r = Registry()
+
+print(">>> check all conversion available")
+for conv in r:
+	print(conv, r[conv])
+
+print("('.bam', '.wig') in r) =", ('.bam', '.wig') in r)
+
+print(">>> get class of a converter") 
+class_converter = r[ ('.bam', '.wig') ]
+
+print(">>> instanciate a converter")
+converter = class_converter('infile', 'outfile')
+
+print(">>> call the converter")
+converter()
+
+
