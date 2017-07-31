@@ -4,7 +4,6 @@ import glob
 import inspect
 import itertools
 
-from converters import ConverterError, InvalidConverterError
 from base import ConvBase
 
 
@@ -27,6 +26,7 @@ class Registry:
             obj_name, obj = item
             if not inspect.isclass(obj):
                 return False
+            
             return issubclass(obj, ConvBase) and not inspect.isabstract(obj)
 
         sys.path.insert(0, path)
@@ -35,13 +35,12 @@ class Registry:
             if module_name not in ('__init__', 'base', 'registry'):
                 try:
                     module = __import__(module_name, globals(), locals(), [module_name])
-                except (ImportError, InvalidConverterError) as err:
+                except (ImportError, TypeError) as err:
                     print(">>> WARNING skip module '{}': {} <<<".format(module_name, err, file=sys.stderr))
                     continue
                 converters = inspect.getmembers(module)
                 converters = [c for c in converters if is_converter(c)]
                 for converter_name, converter in converters:
-                    print("### converter_name", converter_name, "converter", converter)
                     if converter is not None:
                         all_conv_path = itertools.product(converter.input_ext, converter.output_ext)
                         for conv_path in all_conv_path:
@@ -59,7 +58,7 @@ class Registry:
         :type value: :class:`ConvBase` object
         """
         if conv_path in self._registry:
-            raise ConverterError('an other converter already exist for {} -> {}'.format(*conv_path))
+            raise KeyError('an other converter already exist for {} -> {}'.format(*conv_path))
         self._registry[conv_path] = value
 
 
@@ -90,3 +89,4 @@ class Registry:
         """
         for path in self._registry:
             yield path
+

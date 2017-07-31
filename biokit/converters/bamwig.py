@@ -20,7 +20,7 @@ class wig2bam(ConvBase):
     def __call__(self):
         print("I'm not abstract anymore")
 
-class truc2muche(ConvBase):
-
-    def __call__(self, *args, **kwargs):
-        print("I'm not abstract anymore")
+#class truc2muche(ConvBase):
+#
+#    def __call__(self, *args, **kwargs):
+#        print("I'm not abstract anymore")
