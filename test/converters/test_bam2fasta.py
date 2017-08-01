@@ -6,7 +6,7 @@ def test_conv():
     infile = biokit_data("converters/measles.sorted.bam")
     outfile = biokit_data("converters/R1R2_from_bam.fasta")
     with TempFile(suffix=".fasta") as tempfile:
-        convert = BAM2Fastq(infile, tempfile.name)
+        convert = BAM2Fasta(infile, tempfile.name)
         convert()
 
         # Check that the output is correct with a checksum
