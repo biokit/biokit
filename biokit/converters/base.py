@@ -39,7 +39,7 @@ class ConvMeta(abc.ABCMeta):
                 setattr(cls, '{}_ext'.format(io_name),  (ext, ))
             elif isinstance(ext, (list, tuple, set)):
                 if not all([isinstance(ext, str) for ext in input_ext]):
-                    raise TyepError("each element of the class attribute '{}.{}_ext' "
+                    raise TypeError("each element of the class attribute '{}.{}_ext' "
                                     "must be a string".format(cls, io_name))
                 else:
                     if not all([ext.startswith('.') for ext in input_ext]):
