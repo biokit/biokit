@@ -1,6 +1,10 @@
 BioKit
 ==========
 
+.. image:: https://badges.gitter.im/biokit/biokit.svg
+   :alt: Join the chat at https://gitter.im/biokit/biokit
+   :target: https://gitter.im/biokit/biokit?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+
 General Bioinformatics tools in Python
 
 
