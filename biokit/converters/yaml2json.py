@@ -13,6 +13,7 @@ class YAML2JSON(ConvBase):
     .. note:: YAML comments will be lost in JSON output
 
 
+    :reference: http://yaml.org/spec/1.2/spec.html#id2759572
     """
     def __init__(self, infile, outfile, *args, **kargs):
         """.. rubric:: constructor
