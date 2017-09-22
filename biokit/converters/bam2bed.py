@@ -1,5 +1,5 @@
 """Convert :term:`BAM` format to :term:`BED` formats"""
-from biokit.converters.convbase import ConvBase
+from .base import ConvBase
 
 __all__ = ["Bam2Bed"]
 
