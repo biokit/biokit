@@ -22,7 +22,7 @@ from argparse import RawTextHelpFormatter
 import importlib
 
 from biokit import logger, biokit_debug_level
-from biokit.converters.utils import MapperRegistry
+from biokit.converters.registry import Registry
 
 
 class Options(argparse.ArgumentParser):
@@ -63,7 +63,7 @@ properly formatted.
 def main(args=None):
     from easydev.console import purple, underline
     print(purple("Welcome to biokit converter (biokit.readthedocs.io)"))
-    mapper = MapperRegistry()
+    mapper = Registry()
 
     if args is None:
         args = sys.argv[:]
@@ -78,7 +78,7 @@ def main(args=None):
             print("Available mapping:")
             print("==================")
             for k in sorted(mapper):
-                print("{}: {}".format(k, mapper[k]))
+                print("{}: {}".format(k[0], k[1]))
             sys.exit(0)
 
     if len(args) < 3:
@@ -103,22 +103,22 @@ def main(args=None):
         inext = options.input_format
 
     # From the input parameters 1 and 2, we get the module name
-    module_name = "2".join([inext, outext]) 
-
-    # Is the module name available in biokit ? If not, let us tell the user 
-    if module_name not in mapper.keys():
+    try:
+        class_converter = mapper[(inext, outext)]
+    except KeyError:
+        # Is the module name available in biokit ? If not, let us tell the user
         msg = "Request input format ({}) to output format (({}) is not available in converters"
         logger.critical(msg.format(inext, outext))
         logger.critical("Use --formats to know the available formats")
         sys.exit(1)
+        sys.exit(1)
+
 
     # If the module exists, it is part of the MapperRegitry dictionary and
     # we should be able to import it dynamically, create the class and call
     # the instance
     logger.info("Converting from {} to {}".format(inext, outext))
-    module = importlib.import_module("biokit.converters.{}".format(module_name))
-    class_reference = getattr(module, mapper[module_name])
-    convert = class_reference(infile, outfile)
+    convert = class_converter(infile, outfile)
     convert()
     logger.info("Done")
 
