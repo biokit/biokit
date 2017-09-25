@@ -77,8 +77,8 @@ def main(args=None):
         if options.format:
             print("Available mapping:")
             print("==================")
-            for k in sorted(mapper):
-                print("{}: {}".format(k[0], k[1]))
+            for k in sorted(mapper.get_conversions()):
+                print("{} -> {}".format(k[0], k[1]))
             sys.exit(0)
 
     if len(args) < 3:
