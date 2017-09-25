@@ -2,12 +2,12 @@ import biokit.converters.base
 from .base import ConvBase
 
 
-#class bam2wig(ConvBase):
-#    """bam2wig does not implement __call__ so it's still an abstract class
-#       so it not registered
-#    """
-#    input_ext = ['bam']
-#    output_ext = '.wig'
+class bam2wig(ConvBase):
+    """bam2wig does not implement __call__ so it's still an abstract class
+       so it not registered
+    """
+    input_ext = ['bam']
+    output_ext = '.wig'
 
 class wig2bam(ConvBase):
     """
