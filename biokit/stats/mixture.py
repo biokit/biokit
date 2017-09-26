@@ -236,7 +236,7 @@ class Fitting(object):
         return params
 
     def plot(self, normed=True, N=1000, Xmin=None, Xmax=None, bins=50, color='red', lw=2,
-            hist_kw={'color':'#5F9EA0'}, ax=None):
+            hist_kw={'color':'#5F9EA0', "edgecolor":"k"}, ax=None):
 
         if ax:
             ax.hist(self.data, normed=normed, bins=bins, **hist_kw)
