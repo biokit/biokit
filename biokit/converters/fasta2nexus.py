@@ -1,14 +1,20 @@
 from Bio import AlignIO
+from biokit.converters.convbase import ConvBase
 
+class Fasta2Nexus(ConvBase):
+    """
+    Converts an alignment from Fasta format to Nexus format.
 
-class Fasta2Nexus(object):
+    :param str infile:
+    :param str outfile:
+
+    library used::
+
+        biopython
+
     """
-    """
-    def __init__(self, infile, outfile, *args, **kwargs):
-        """
-        """
-        self.infile = infile
-        self.outfile = outfile
+    input_ext = ['.fasta', '.fa']
+    output_ext = ['.nexus','.nex', '.nxs']
 
     def __call__(self):
 
@@ -20,4 +26,5 @@ class Fasta2Nexus(object):
 
         output_handle.close()
         input_handle.close()
+
 
