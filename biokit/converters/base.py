@@ -30,6 +30,7 @@ class ConvMeta(abc.ABCMeta):
             it should start by a dot otherwise fix extension and inject it in the class
 
             :param ext: the value of the class attribute (input|output)_ext
+            :type ext: a string or a list, tuple or set of strings
             :param str io_name: the type of extension, 'input' or output'
             :raise TypeError:  if ext is neither a string nor a sequence of strings
             """
@@ -38,18 +39,18 @@ class ConvMeta(abc.ABCMeta):
                     ext = '.' + ext
                 setattr(cls, '{}_ext'.format(io_name),  (ext, ))
             elif isinstance(ext, (list, tuple, set)):
-                if not all([isinstance(ext, str) for ext in input_ext]):
+                if not all([isinstance(one_ext, str) for one_ext in ext]):
                     raise TypeError("each element of the class attribute '{}.{}_ext' "
                                     "must be a string".format(cls, io_name))
                 else:
-                    if not all([ext.startswith('.') for ext in input_ext]):
-                        all_ext = []
+                    if not all([one_ext.startswith('.') for one_ext in ext]):
+                        fixed_ext = []
                         for one_ext in ext:
                             if one_ext.startswith('.'):
-                                all_ext.append(one_ext)
+                                fixed_ext.append(one_ext)
                             else:
-                                all_ext.append('.' + one_ext)
-                    setattr(cls, '{}_ext'.format(io_name), all_ext)
+                                fixed_ext.append('.' + one_ext)
+                        setattr(cls, '{}_ext'.format(io_name), fixed_ext)
             else:
                 import sys
                 err = "the class attribute '{}.{}_ext' must be specified in the class or subclasses".format(cls.__name__, io_name)
@@ -57,6 +58,7 @@ class ConvMeta(abc.ABCMeta):
                 raise TypeError("the class attribute '{}.{}_ext' must be specified "
                                 "in the class or subclasses".format(cls.__name__, io_name))
             return True
+
         if not name == 'ConvBase':
             if '2' not in name:
                 raise TypeError("converter name must follow convention inputformat2outputformat")
@@ -67,7 +69,6 @@ class ConvMeta(abc.ABCMeta):
                 check_ext(output_ext, 'output')
             setattr(cls, 'input_fmt', input_fmt)
             setattr(cls, 'output_fmt', output_fmt)
-
 
 
 class ConvBase(metaclass=ConvMeta):
