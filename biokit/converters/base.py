@@ -1,4 +1,8 @@
 import abc
+import select
+import sys
+from io import StringIO
+from subprocess import Popen, PIPE
 
 
 class ConvMeta(abc.ABCMeta):
@@ -110,3 +114,64 @@ class ConvBase(metaclass=ConvMeta):
         must be override in subclasses
         """
         print('args=', args, 'kwargs=', kwargs)
+
+
+    def execute(self, cmd, ignore_errors=False, verbose=False):
+        """
+        Execute a command in a sub-shell
+
+        :param str cmd: the command to execute
+        :param ignore_errors: If True the result is returned whatever the
+                              return value of the sub-shell.
+                              Otherwise a Runtime error is raised when the sub-shell
+                              return a non zero value
+        :param verbose: If true displays errors on standard error
+        :return: the result of the command
+        :rtype: a :class:`StringIO` instance
+        """
+        try:
+            process_ = Popen(cmd,
+                             shell=True,
+                             stdout=PIPE,
+                             stderr=PIPE,
+                             stdin=None)
+        except Exception as err:
+            msg = "Failed to execute Command: '{}'. error: '{}'".format(cmd, err)
+            raise RuntimeError(msg)
+
+        inputs = [process_.stdout, process_.stderr]
+        while process_.poll() is None:
+            # select has 3 parameters, 3 lists, the sockets, the fileobject to watch
+            # in reading, writing, the errors
+            # in addition a timeout option (the call is blocking while a fileObject
+            # is not ready to be processed)
+            # by return we get 3 lists with the fileObject to be processed
+            # in reading, writing, errors.
+            readable, writable, exceptional = select.select(inputs, [], [], 1)
+
+            output = StringIO()
+            errors = StringIO()
+            while readable and inputs:
+                for flow in readable:
+                    data = flow.read()
+                    if not data:
+                        # the flow ready in reading which has no data
+                        # is a closed flow
+                        # thus we must stop to watch it
+                        inputs.remove(flow)
+                    if flow is process_.stdout:
+                        output.write(data.decode("utf-8"))
+                    elif flow is process_.stderr:
+                        errors.write(data.decode("utf-8"))
+                readable, writable, exceptional = select.select(inputs, [], [], 1)
+
+        if verbose:
+            errors = errors.getvalue().strip()
+            if errors:
+                print(errors, file=sys.stderr)
+
+        if process_.returncode != 0:
+            if not ignore_errors:
+                raise RuntimeError(errors.getvalue())
+        else:
+            return output
