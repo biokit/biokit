@@ -5,24 +5,32 @@ __all__ = ["Bam2Bed"]
 
 
 class Bam2Bed(ConvBase):
-    """Convert sorted :term:`BAM` file into :term:`BED` file
-
-    ::
+    """
+    Convert sorted :term:`BAM` file into :term:`BED` file ::
 
         samtools depth -aa INPUT > OUTPUT
 
-
     """
-    def __init__(self, infile, outfile, *args, **kargs):
-        """.. rubric:: constructor
 
-        :param str infile: input BAM file. **It must be sorted**.
-        :param str outfile: input BED file
+    input_ext = '.bam'
+    output_ext = '.bed'
+
+    def __init__(self, infile, outfile):
         """
-        super(Bam2Bed, self).__init__(infile, outfile, *args, **kargs)
+        :param str infile: The path to the input BAM file. **It must be sorted**.
+        :param str outfile: The path to the output file
+        """
+        super().__init__(infile, outfile)
 
-    def convert(self):
-        cmd = "samtools depth -aa {} > {}".format(self.infile, self.outfile)
+
+    def __call__(self, *args, **kwargs):
+        """
+        do the conversion  sorted :term`BAM` -> :term:'BED`
+
+        :return: the standard output
+        :rtype: :class:`io.StringIO` object.
+        """
+        cmd = "samtools depth {} > {}".format(self.infile, self.outfile)
         self.execute(cmd)
 
 
