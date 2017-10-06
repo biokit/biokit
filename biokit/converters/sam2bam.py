@@ -1,24 +1,25 @@
 """Convert :term:`SAM` file to :term:`BAM` file"""
-from biokit.converters.convbase import ConvBase
+from .base import ConvBase
 
 
 class SAM2BAM(ConvBase):
     """
-
+    command used::
+    
+        samtools view -Sbh
     """
-    def __init__(self, infile, outfile, *args, **kargs):
-        """.. rubric:: constructor
+    
+    input_ext = '.sam'
+    output_ext ='.bam'
 
-        :param str infile:
-        :param str outfile:
-
-        command used::
-
-            samtools view -Sbh
+    def __call__(self):
         """
-        super(SAM2BAM, self).__init__(infile, outfile, *args, **kargs)
+        Do the conversion  sorted :term`SAM` -> :term:'BAM`
+        The result of the conversion is stored in the outputfile 
 
-    def convert(self):
+        :return: the standard output
+        :rtype: :class:`io.StringIO` object.
+        """
         # -S means ignored (input format is auto-detected)
         # -b means output to BAM format
         # -h means include header in SAM output

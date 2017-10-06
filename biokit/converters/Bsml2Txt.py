@@ -3,21 +3,14 @@ from biokit.converters.convbase import ConvBase
 from libsbml import *
 
 class Bsml2Txt(ConvBase):
+    
     """
     """
-    def __init__(self, infile, outfile, *args, **kargs):
-        """.. rubric:: constructor
-        :param str filename
-        """
-        self.infile = infile
-        self.outfile = outfile
-        
-        super(Bsml2Txt, self).__init__(infile, outfile, *args, **kargs)
-
+    input_ext = ['bsml']
+    output_ext = '.txt'
+    
     def __call__(self):
         
-        output_handle = open(self.outfile, "w")
+        with open(self.outfile, "w") as output_handle:
         
-        AlignIO.write(writeSBMLToString(SBMLReader(self.infile)), output_handle, "txt")
-        
-        output_handle.close()
+            output_handle.write(writeSBMLToString(SBMLReader(self.infile)))
