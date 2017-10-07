@@ -60,6 +60,13 @@ def test_input_output():
         except:
             assert False
 
+    with TempFile(suffix=".bed") as outfile:
+        try:
+            converter.main([prog, infile, outfile.name, '--input-format', ".bam",
+                "--logging-level", "ERROR"])
+        except:
+            assert False
+
     # Test wrong output format
     with TempFile(suffix=".bedd") as outfile:
         try:
