@@ -1,11 +1,13 @@
 """Convert :term:`SAM` file to :term:`BAM` file"""
-from biokit.converters.convbase import ConvBase
+from biokit.converters.base import ConvBase
 
 
 class BAM2SAM(ConvBase):
     """
 
     """
+    input_ext = [".bam"]
+    output_ext = [".sam"]
     def __init__(self, infile, outfile, *args, **kargs):
         """.. rubric:: constructor
 
@@ -18,7 +20,7 @@ class BAM2SAM(ConvBase):
         """
         super(BAM2SAM, self).__init__(infile, outfile, *args, **kargs)
 
-    def convert(self):
+    def __call__(self):
         # -S means ignored (input format is auto-detected)
         # -h means include header in SAM output
         #import pysam

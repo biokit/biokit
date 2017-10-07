@@ -4,7 +4,8 @@ from easydev import shellcmd
 import os
 
 
-class ConvBase(object):
+# Let us keep this for book-keeping
+class __ConvBase(object):
     """Base class for all converters
 
 

@@ -1,6 +1,6 @@
 """Convert :term:`JSON` to :term:`YAML` format"""
 import yaml, json
-from biokit.converters.convbase import ConvBase
+from biokit.converters.base import ConvBase
 
 __all__ = ["JSON2YAML"]
 
@@ -20,6 +20,8 @@ class JSON2YAML(ConvBase):
             misc: 1
 
     """
+    input_ext = [".json"]
+    output_ext = [".yaml"]
     def __init__(self, infile, outfile, *args, **kargs):
         """.. rubric:: constructor
 
@@ -35,7 +37,7 @@ class JSON2YAML(ConvBase):
                 default_flow_style="", indent=4)
         return yamldata
 
-    def convert(self):
+    def __call__(self):
         with open(self.outfile, "w") as outfile:
             outfile.write(self.get_yaml())
 

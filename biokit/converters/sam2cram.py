@@ -1,7 +1,7 @@
 """Convert :term:`SAM` file to :term:`CRAM` file"""
 import os
 
-from biokit.converters.convbase import ConvBase
+from biokit.converters.base import ConvBase
 from biokit import logger
 from easydev.multicore import cpu_count
 
@@ -16,6 +16,9 @@ class SAM2CRAM(ConvBase):
     useful for the standalone application.
 
     """
+    input_ext = [".sam"]
+    output_ext = [".cram"]
+
     def __init__(self, infile, outfile, reference=None, *args, **kargs):
         """.. rubric:: constructor
 
@@ -50,7 +53,7 @@ class SAM2CRAM(ConvBase):
             self.reference = reference
         self.threads = cpu_count()
 
-    def convert(self):
+    def __call__(self):
         # -S means ignored (input format is auto-detected)
         # -b means output to BAM format
         # -h means include header in SAM output

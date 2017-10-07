@@ -1,37 +1,59 @@
+# -*- coding: utf-8 -*-
+#
+#  This file is part of BioKit software
+#
+#  Copyright (c) 2016 - BioKit Development Team
+#
+#
+#  Distributed under the terms of the 3-clause BSD license.
+#  The full license is in the LICENSE file, distributed with this software.
+#
+#  website: https://github.com/sequana/sequana
+#  documentation: http://sequana.readthedocs.io
+#
+##############################################################################
+import time
 import abc
 import select
 import sys
 from io import StringIO
 from subprocess import Popen, PIPE
 
+from biokit import logger
+
 
 class ConvMeta(abc.ABCMeta):
     """
-    This the metaclass control that the converter classes have the right characteristics
+    This metaclass checks that the converter classes have 
 
-       * have an attribute input_ext
-       * have an attribute output_ext
+       * an attribute input_ext
+       * an attribute output_ext
 
-    It should not be used directly, it should be used through the :class:`ConvBase` class.
+    This is an abstract class used by :class:`ConvBase` class.
     The standard way to build a new converter is to inherits from :class:`ConvBase`
-    or a subclasses of it, for instance: ::
+    or a subclasses of it, for instance::
 
         class Fasta_2_Fasta(ConvBase):
 
             input_ext = ['.fa', '.fst', '.fasta']
             output_ext = '.fa'
 
-        __call__(self, *args, **kwargs):
-            do conversion
-    """
+            def __call__(self, *args, **kwargs):
+                # do conversion here
+                pass
 
+    The declaration of input_ext and output_ext is quite permissive. You can add
+    prefix the extension with a dot or not; if the input consists of a single
+    extension, it can be a single string, or a list/set/tuple of strings.
+
+    """
     def __init__(cls, name, bases, classdict):
 
         def check_ext(ext, io_name):
             """
-            Check if extension is specified correctly.
+            Check if the extension is specified correctly.
             I must be a string or a sequence of string, otherwise raise an error
-            it should start by a dot otherwise fix extension and inject it in the class
+            it should start with a dot. Otherwise fix extension and inject it in the class
 
             :param ext: the value of the class attribute (input|output)_ext
             :type ext: a string or a list, tuple or set of strings
@@ -58,14 +80,14 @@ class ConvMeta(abc.ABCMeta):
             else:
                 import sys
                 err = "the class attribute '{}.{}_ext' must be specified in the class or subclasses".format(cls.__name__, io_name)
-                print(">>> WARNING skip class '{}': {} <<<".format(cls.__name__, err, file=sys.stderr))
+                logger.warning("skip class '{}': {} <<<".format(cls.__name__, err, file=sys.stderr))
                 raise TypeError("the class attribute '{}.{}_ext' must be specified "
                                 "in the class or subclasses".format(cls.__name__, io_name))
             return True
 
         if not name == 'ConvBase':
             if '2' not in name:
-                raise TypeError("converter name must follow convention inputformat2outputformat")
+                raise TypeError("converter name must follow convention input2output")
             input_fmt, output_fmt, *_ = name.upper().split('2')
             input_ext = getattr(cls, 'input_ext')
             if check_ext(input_ext, 'input'):
@@ -97,7 +119,6 @@ class ConvBase(metaclass=ConvMeta):
     """specify the extensions of the output file, can be a sequence (must be overridden in subclasses)"""
     output_ext = None
 
-
     def __init__(self, infile, outfile):
         """
 
@@ -106,7 +127,10 @@ class ConvBase(metaclass=ConvMeta):
         """
         self.infile = infile
         self.outfile = outfile
+        self._check_extension()
 
+    def _check_extension(self):
+        print("FIXME _check_extension")
 
     @abc.abstractmethod
     def __call__(self, *args, **kwargs):
@@ -115,8 +139,20 @@ class ConvBase(metaclass=ConvMeta):
         """
         print('args=', args, 'kwargs=', kwargs)
 
+    def _get_name(self):
+        return type(self).__name__
+    name = property(_get_name, doc="return the name of the class")
 
     def execute(self, cmd, ignore_errors=False, verbose=False):
+        t1 = time.time()
+        logger.info("{}> ".format(self.name))
+        self._execute(cmd, ignore_errors, verbose)
+        t2 = time.time()
+        self.last_duration = t2 - t1
+        logger.info("Took {} seconds ".format(t2-t1))
+        self._last_time = t2 - t1
+
+    def _execute(self, cmd, ignore_errors=False, verbose=False):
         """
         Execute a command in a sub-shell
 

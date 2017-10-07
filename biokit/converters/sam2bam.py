@@ -5,10 +5,9 @@ from .base import ConvBase
 class SAM2BAM(ConvBase):
     """
     command used::
-    
+
         samtools view -Sbh
     """
-    
     input_ext = '.sam'
     output_ext ='.bam'
 

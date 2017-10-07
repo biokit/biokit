@@ -1,4 +1,3 @@
-import biokit.converters.base
 from .base import ConvBase
 
 

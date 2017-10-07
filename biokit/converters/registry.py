@@ -9,12 +9,18 @@ import biokit.converters
 
 
 class Registry(object):
+    """
 
+
+
+        r = Registry()
+        r.conversion_exists("BAM", "BED")
+
+    """
     def __init__(self):
         self._ext_registry = {}
         self._fmt_registry = {}
         self._fill_registry(biokit.converters.__path__)
-
 
     def _fill_registry(self, path):
         """
@@ -48,7 +54,6 @@ class Registry(object):
                             self[conv_path] = converter
                         self.set_fmt_conv(converter.input_fmt, converter.output_fmt, converter)
 
-
     def __setitem__(self, conv_path, value):
         """
         Set new
@@ -61,7 +66,6 @@ class Registry(object):
             raise KeyError('an other converter already exist for {} -> {}'.format(*conv_path))
         self._ext_registry[conv_path] = value
 
-
     def __getitem__(self, conv_path):
         """
         :param conv_path: the input extension, the output extension
@@ -69,7 +73,6 @@ class Registry(object):
         :return: an object of subclass o :class:`ConvBase`
         """
         return self._ext_registry[conv_path]
-
 
     def __contains__(self, conv_path):
         """
@@ -82,14 +85,12 @@ class Registry(object):
         """
         return conv_path in self._ext_registry
 
-
     def __iter__(self):
         """
         make registry iterable through conv_path (str input extension, str output extension)
         """
         for path in self._ext_registry:
             yield path
-
 
     def set_fmt_conv(self, in_fmt, out_fmt, converter):
         """
@@ -103,7 +104,6 @@ class Registry(object):
         """
         self._fmt_registry[(in_fmt, out_fmt)] = converter
 
-
     def get_conversions(self):
         """
         :return: a generator which allow to iterate on all available conversions
@@ -112,7 +112,6 @@ class Registry(object):
         """
         for conv in self._fmt_registry:
             yield conv
-
 
     def conversion_exists(self, in_fmt, out_fmt):
         """
