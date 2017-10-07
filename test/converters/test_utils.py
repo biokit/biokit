@@ -1,7 +1,7 @@
 from biokit.converters import utils
 
 
-def test_utils():
+def _test_utils():
 
 
     res = utils.MapperRegistry()
