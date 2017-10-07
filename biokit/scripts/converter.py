@@ -96,8 +96,8 @@ def main(args=None):
     # that is not standard. For instance fq instead of fastq
     # If so, we can use the --input-format fastq to overwrite the
     # provided filename extension
-    inext = os.path.splitext(infile)[-1][1:]
-    outext = os.path.splitext(outfile)[-1][1:]
+    inext = "." + os.path.splitext(infile)[-1][1:]
+    outext = "." + os.path.splitext(outfile)[-1][1:]
 
     if options.input_format:
         inext = options.input_format
@@ -106,11 +106,14 @@ def main(args=None):
     try:
         class_converter = mapper[(inext, outext)]
     except KeyError:
+        print(mapper)
+        print(inext)
+        print(outext)
+
         # Is the module name available in biokit ? If not, let us tell the user
         msg = "Request input format ({}) to output format (({}) is not available in converters"
         logger.critical(msg.format(inext, outext))
         logger.critical("Use --formats to know the available formats")
-        sys.exit(1)
         sys.exit(1)
 
 
