@@ -70,7 +70,6 @@ def main(args=None):
 
     user_options = Options(prog="converter")
 
-
     # If --help or no options provided, show the help
     if "-f" in args or "--formats" in args:
         options = user_options.parse_args(args[1:])
@@ -101,9 +100,13 @@ def main(args=None):
 
     if options.input_format:
         inext = options.input_format
+        if inext[0] != ".":
+            inext = "." + inext
 
     # From the input parameters 1 and 2, we get the module name
     try:
+        logger.info("Input: {}".format(inext))
+        logger.info("Output: {}".format(outext))
         class_converter = mapper[(inext, outext)]
     except KeyError:
         print(mapper)
