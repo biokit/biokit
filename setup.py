@@ -37,8 +37,6 @@ metainfo = {
           'Topic :: Scientific/Engineering :: Physics']
     }
 
-
-
 with open('README.rst') as f:
     readme = f.read()
 
@@ -55,7 +53,7 @@ setup(
     author_email     = metainfo['authors']['Cokelaer'][1],
     long_description = readme,
     keywords         = metainfo['keywords'],
-    description = metainfo['description'],
+    description      = metainfo['description'],
     license          = metainfo['license'],
     platforms        = metainfo['platforms'],
     url              = metainfo['url'],
@@ -72,9 +70,7 @@ setup(
     # distutils in rtools.package
     # suds-jurko is used by bioservices so we probab ly do not need it in the
     # setup.
-    install_requires = ['easydev>=0.9.11', 'pandas',
-        'bioservices>=1.4.5', 'colormap', 'scipy', "biopython", "matplotlib",
-	"numpydoc", "colorlog", "pyyaml", "pysam"],
+    install_requires = open('requirements.txt').read().split(),
 
      # This is recursive include of data files
     exclude_package_data = {"": ["__pycache__"]},
