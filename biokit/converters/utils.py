@@ -5,7 +5,9 @@ import importlib
 
 
 
-class MapperRegistry(dict):
+# WILL BE REMOVED
+
+class __MapperRegistry(dict):
 
     def __init__(self):
         self.init()
