@@ -10,6 +10,10 @@ NGS converters
 
 .. automodule:: biokit.converters
 
+.. automodule:: biokit.converters.bam2bed
+    :members:
+    :synopsis:
+
 .. automodule:: biokit.converters.sam2bam
     :members:
     :synopsis:

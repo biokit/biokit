@@ -31,5 +31,3 @@ class Bam2Bed(ConvBase):
         cmd = "samtools depth -aa {} > {}".format(self.infile, self.outfile)
         self.execute(cmd)
 
-
-
