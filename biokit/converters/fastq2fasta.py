@@ -9,8 +9,8 @@ class Fastq2Fasta(ConvBase):
     Convert :term:`FASTQ` to :term:`FASTA`
     """
 
-    input_ext = ['.fasta', '.fa', '.fst']
-    output_ext = '.fastq'
+    input_ext = ['.fastq', '.fq']
+    output_ext = '.fasta'
 
 
     def __init__(self, inputfile, outputfile):
