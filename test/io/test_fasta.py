@@ -34,3 +34,11 @@ def test_attributes():
     s.fasta["P43403"]
     s.hist_size()
     s.df
+
+def test_idempotency():
+    f1=FASTA()
+    f1.load_fasta('P43403')
+    f1.save_fasta('/tmp/P43403.fasta')
+    f2=FASTA()
+    f2.read_fasta('/tmp/P43403.fasta')
+    assert str(f1)==str(f2)
