@@ -2,7 +2,12 @@ Whats' new, what has changed
 ================================
 
 
-.. converter: add sam2bam, sam2cram
+:Revision 0.4.3:
+    * move all converters related code (now in biokit/bioconvert project)
+    * Fixed deprecated issues in stats/mixture (pylab.normpdf changed to
+scipy.stats.norm.pdf
+    * 
+
 
 :Revision 0.4.2:
     * UPDATE: starting converter tool in converter sub-package
