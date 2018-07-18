@@ -417,17 +417,13 @@ class FASTA(object):
         fh.close()
 
         # Is there more than one sequence ?
-        data = data.split(">")[1:]
-        if len(data)>1 or len(data)==0:
-            raise ValueError("""Only one sequence expected to be found. Found %s. Please use MultiFASTA class instead""" % len(data))
+        tmpdata = data.split(">")[1:]
+        if len(tmpdata)>1 or len(tmpdata)==0:
+            raise ValueError("""Only one sequence expected to be found. Found %s. Please use MultiFASTA class instead""" % len(tmpdata))
 
-        self._data = data
-        if data.count(">sp|")>1:
-            raise ValueError("""It looks like your FASTA file contains more than
-            one FASTA. You must use MultiFASTA class instead""")
+        self._data = data[:]
 
         self._fasta = data[:]
-        self._fasta = self._fasta[0]
         if self.dbtype not in self.known_dbtypes:
             print("Only sp and gi header are recognised so far but sequence and header are loaded")
 

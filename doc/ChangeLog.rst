@@ -8,7 +8,7 @@ Whats' new, what has changed
     * Fixed deprecated issues in stats/mixture (pylab.normpdf changed to
       scipy.stats.norm.pdf
     * Fix doc gallery  
-
+    * BUG: fix fasta module test and cleanup FASTA class
 
 :Revision 0.4.2:
     * UPDATE: starting converter tool in converter sub-package
