@@ -13,6 +13,9 @@ General Bioinformatics tools in Python
 .. image:: https://coveralls.io/repos/biokit/biokit/badge.png?branch=master 
    :target: https://coveralls.io/r/biokit/biokit?branch=master 
 
+.. image:: https://badges.gitter.im/biokit/biokit.svg
+   :alt: Join the chat at https://gitter.im/biokit/biokit
+   :target: https://gitter.im/biokit/biokit?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
 
 
 :note: BioKit is tested with Travis for the following Python version: 2.7, 3.5, 3.6
