@@ -7,6 +7,9 @@ General Bioinformatics tools in Python
 .. image:: https://badge.fury.io/py/biokit.svg
     :target: https://pypi.python.org/pypi/biokit
 
+.. image:: https://img.shields.io/pypi/pyversions/biokit.svg
+    :target: https://www.python.org
+
 .. image:: https://secure.travis-ci.org/biokit/biokit.png
     :target: http://travis-ci.org/biokit/biokit
 
@@ -16,6 +19,11 @@ General Bioinformatics tools in Python
 .. image:: https://badges.gitter.im/biokit/biokit.svg
    :alt: Join the chat at https://gitter.im/biokit/biokit
    :target: https://gitter.im/biokit/biokit?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+
+.. image:: http://readthedocs.org/projects/biokit/badge/?version=master
+    :target: http://biokit.readthedocs.org/en/master/?badge=master
+    :alt: Documentation Status
+
 
 
 :note: BioKit is tested with Travis for the following Python version: 2.7, 3.5, 3.6
