@@ -3,10 +3,11 @@ Whats' new, what has changed
 
 
 :Revision 0.4.3:
+
     * move all converters related code (now in biokit/bioconvert project)
     * Fixed deprecated issues in stats/mixture (pylab.normpdf changed to
-scipy.stats.norm.pdf
-    * 
+      scipy.stats.norm.pdf
+    * Fix doc gallery  
 
 
 :Revision 0.4.2:

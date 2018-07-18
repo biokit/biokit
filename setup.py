@@ -8,7 +8,7 @@ import glob
 
 _MAJOR               = 0
 _MINOR               = 4
-_MICRO               = 2
+_MICRO               = 3
 version              = '%d.%d.%d' % (_MAJOR, _MINOR, _MICRO)
 release              = '%d.%d' % (_MAJOR, _MINOR)
 
@@ -30,6 +30,8 @@ metainfo = {
           'License :: OSI Approved :: BSD License',
           'Operating System :: OS Independent',
           'Programming Language :: Python :: 2.7',
+          'Programming Language :: Python :: 3.5',
+          'Programming Language :: Python :: 3.6',
           'Topic :: Software Development :: Libraries :: Python Modules',
           'Topic :: Scientific/Engineering :: Bio-Informatics',
           'Topic :: Scientific/Engineering :: Information Analysis',

@@ -5,12 +5,11 @@ BioKit
 ####################
 
 
-.. image:: biokit.gif
-    :width: 30%
-
-
 .. image:: https://badge.fury.io/py/biokit.svg
        :target: https://pypi.python.org/pypi/biokit
+
+.. image:: https://img.shields.io/pypi/pyversions/biokit.svg
+       :target: https://www.python.org
 
 .. image:: https://secure.travis-ci.org/biokit/biokit.png
        :target: http://travis-ci.org/biokit/biokit
@@ -18,9 +17,14 @@ BioKit
 .. image:: https://coveralls.io/repos/cokelaer/biokit/badge.png?branch=master 
       :target: https://coveralls.io/r/cokelaer/biokit?branch=master 
 
+.. image:: http://readthedocs.org/projects/biokit/badge/?version=master
+    :target: http://biokit.readthedocs.org/en/master/?badge=master
+    :alt: Documentation Status
 
 
-:note: BioKit is tested with Travis for the following Python version: 2.7, 3.5, 3.6
+
+:note: BioKit is tested with Travis for the following Python 
+    version: 2.7, 3.5, 3.6
 :contributions: Please join https://github.com/biokit/biokit 
 :issues: Please use https://github.com/biokit/biokit/issues
 
@@ -47,7 +51,6 @@ Overview
 
 .. autosummary::
 
-    biokit.converters
     biokit.network
     biokit.viz
     biokit.rtools
