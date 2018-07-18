@@ -8,7 +8,7 @@ import glob
 
 _MAJOR               = 0
 _MINOR               = 4
-_MICRO               = 2
+_MICRO               = 3
 version              = '%d.%d.%d' % (_MAJOR, _MINOR, _MICRO)
 release              = '%d.%d' % (_MAJOR, _MINOR)
 
@@ -30,6 +30,8 @@ metainfo = {
           'License :: OSI Approved :: BSD License',
           'Operating System :: OS Independent',
           'Programming Language :: Python :: 2.7',
+          'Programming Language :: Python :: 3.5',
+          'Programming Language :: Python :: 3.6',
           'Topic :: Software Development :: Libraries :: Python Modules',
           'Topic :: Scientific/Engineering :: Bio-Informatics',
           'Topic :: Scientific/Engineering :: Information Analysis',
@@ -53,7 +55,7 @@ setup(
     author_email     = metainfo['authors']['Cokelaer'][1],
     long_description = readme,
     keywords         = metainfo['keywords'],
-    description = metainfo['description'],
+    description      = metainfo['description'],
     license          = metainfo['license'],
     platforms        = metainfo['platforms'],
     url              = metainfo['url'],
@@ -70,9 +72,7 @@ setup(
     # distutils in rtools.package
     # suds-jurko is used by bioservices so we probab ly do not need it in the
     # setup.
-    install_requires = ['easydev>=0.9.11', "suds-jurko", 'pandas', 
-        'bioservices>=1.4.5', 'colormap', 'scipy', "biopython", "matplotlib",
-	"numpydoc", "colorlog", "pyyaml"],
+    install_requires = open('requirements.txt').read().split(),
 
      # This is recursive include of data files
     exclude_package_data = {"": ["__pycache__"]},
@@ -85,7 +85,6 @@ setup(
 
     entry_points = {
         'console_scripts':[
-           'converter=biokit.scripts.converter:main'
         ]
     }
 

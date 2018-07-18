@@ -14,8 +14,8 @@ __all__ = ["Hist2D"]
 
 class Hist2D(VizInput2D):
     """2D histogram
-    
-    
+
+
     .. plot::
         :include-source:
         :width: 80%
@@ -27,10 +27,7 @@ class Hist2D(VizInput2D):
         h = hist2d.Hist2D(X,Y)
         h.plot(bins=100, contour=True)
 
-    
-    
     """
-
     def __init__(self, x, y=None, verbose=False):
         """.. rubric:: constructor
 
@@ -45,7 +42,7 @@ class Hist2D(VizInput2D):
         colorbar=True, contour=True, grid=True, **kargs):
         """plots histogram of mean across replicates versus coefficient variation
 
-        :param int bins: binning for the 2D histogram (either a float or list 
+        :param int bins: binning for the 2D histogram (either a float or list
             of 2 binning values).
         :param cmap: a valid colormap (defaults to hot_r)
         :param fontsize: fontsize for the labels
@@ -73,7 +70,7 @@ class Hist2D(VizInput2D):
             res = pylab.hist2d(X, Y, bins=bins, normed=normed,
                cmap=cmap, norm=colors.LogNorm())
         else:
-            res = pylab.hist2d(X, Y, bins=bins, cmap=cmap, 
+            res = pylab.hist2d(X, Y, bins=bins, cmap=cmap,
                     normed=normed, range=range)
 
         if colorbar is True:
@@ -90,11 +87,11 @@ class Hist2D(VizInput2D):
             X, Y = pylab.meshgrid(res[1][0:bins1], res[2][0:bins2])
             if contour:
                 if res[0].max().max() < 10 and norm == 'log':
-                    pylab.contour(X, Y, res[0].transpose(),  color="g")
+                    pylab.contour(X, Y, res[0].transpose())
                 else:
-                    levels = [round(x) for x in 
+                    levels = [round(x) for x in
                             pylab.logspace(0, pylab.log10(res[0].max().max()), Nlevels)]
-                    pylab.contour(X, Y, res[0].transpose(), levels[2:], color="g")
+                    pylab.contour(X, Y, res[0].transpose(), levels[2:])
                 #pylab.clabel(C, fontsize=fontsize, inline=1)
 
         if ylabel is None:

@@ -27,6 +27,7 @@ pkg_name = "biokit"
 import matplotlib
 matplotlib.use('Agg')
 
+on_rtd = os.environ.get("READTHEDOCS", None) == "True"
 
 
 
@@ -39,7 +40,7 @@ import matplotlib.sphinxext
 release = version
 author = "BioKit developers"
 title = "BioKit"
-copyright = author + ", 2014-2016"
+copyright = author + ", 2014-2018"
 project = 'biokit'
 
 
@@ -121,6 +122,7 @@ release = release
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
+exclude_trees = ['build']
 exclude_patterns = []
 
 # The reST default role (used for this markup: `text`) to use for all documents.
@@ -144,11 +146,18 @@ pygments_style = 'sphinx'
 modindex_common_prefix = ["biokit."]
 
 # -- sphinx gallery ------------------------------------------------------------
+
+# By default, examples are not built locally. You can set plot_gallery to True
+# to force their creation. Note that it requires singularity or dot to be
+# installed. Fixes https://github.com/biokit/bioconvert/issues/153
+
 plot_gallery = True
+
 sphinx_gallery_conf = {
     "doc_module": "biokit",
-#    "examples_dirs": "examples",
-#    "gallery_dirs": "auto_examples",
+    'backreferences_dir': os.path.join("modules", "generated"),
+    #"backreferences_dir": False,
+    #"filename_pattern": 'plot_benchmark'
 }
 
 # Get rid of spurious warnings due to some interaction between
@@ -166,8 +175,8 @@ def touch_example_backreferences(app, what, name, obj, options, lines):
                                  "%s.examples" % name)
     if not os.path.exists(examples_path):
         # touch file
+        os.makedirs(os.path.dirname(examples_path), exist_ok=True)
         open(examples_path, 'w').close()
-
 
 
 # Add the 'copybutton' javascript, to hide/show the prompt in code
@@ -176,15 +185,10 @@ def setup(app):
     app.add_javascript('copybutton.js')
     app.connect('autodoc-process-docstring', touch_example_backreferences)
 
-
-
-
-
 # -- Options for HTML output ---------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  Major themes that come with
 # Sphinx are currently 'default' and 'sphinxdoc'.
-on_rtd = os.environ.get("READTHEDOCS", None) == "True"
 if not on_rtd:
     import sphinx_rtd_theme
     html_theme = 'sphinx_rtd_theme'
@@ -212,7 +216,7 @@ html_short_title = "BioKit"
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-#html_logo = None
+html_logo = "biokit.gif"
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32

@@ -1,7 +1,7 @@
 __version__ = "0.1.2"
 import pkg_resources
 try:
-    version = pkg_resources.require(biokit)[0].version
+    version = pkg_resources.require("biokit")[0].version
 except:
     version = __version__
 
@@ -15,7 +15,7 @@ def biokit_debug_level(level="WARNING"):
     assert level in ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
     logging_level = getattr(logger.logging.logging, level)
     logger.getLogger().setLevel(logging_level)
-    
+
 
 from biokit import viz
 from biokit.viz import *
@@ -34,8 +34,6 @@ from biokit.goid import *
 
 from biokit import taxonomy
 from biokit.taxonomy import Taxonomy
-
-from biokit import converters
 
 
 def biokit_data(filename, where=None):

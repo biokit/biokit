@@ -6,7 +6,6 @@ skiptravis = pytest.mark.skipif( "TRAVIS_PYTHON_VERSION" in os.environ,
     reason="On travis")
 
 
-
 @skiptravis
 def test_types():
     rs = session.RSession()

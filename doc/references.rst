@@ -5,22 +5,6 @@
 References
 ==========
 
-NGS converters
--------------------
-
-.. automodule:: biokit.converters
-
-.. automodule:: biokit.converters.bam2bed
-    :members:
-    :synopsis:
-
-.. automodule:: biokit.converters.yaml2json
-    :members:
-    :synopsis:
-
-.. automodule:: biokit.converters.json2yaml
-    :members:
-    :synopsis:
 
 
 Tools related to network (e.g., protein networks)

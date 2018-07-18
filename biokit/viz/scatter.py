@@ -20,7 +20,7 @@ class ScatterHist(VizInput2D):
         """.. rubric:: constructor
 
         :param x: if x is provided, it should be a dataframe with 2 columns. The
-            first one will be used as your X data, and the second one as 
+            first one will be used as your X data, and the second one as
             the Y data
         :param y:
         :param verbose:
@@ -29,8 +29,8 @@ class ScatterHist(VizInput2D):
         """
         super(ScatterHist, self).__init__(x,y,verbose)
 
-    def plot(self, 
-        kargs_scatter={'s':20, 'c':'b'}, 
+    def plot(self,
+        kargs_scatter={'s':20, 'c':'b'},
         kargs_grids={},
         kargs_histx={},
         kargs_histy={},
@@ -45,18 +45,18 @@ class ScatterHist(VizInput2D):
         show_labels=True,
         **kargs):
         """Scatter plot of set of 2 vectors and their histograms.
-    
-        :param x: a dataframe or a numpy matrix (2 vectors) or a list of 2 items, 
+
+        :param x: a dataframe or a numpy matrix (2 vectors) or a list of 2 items,
             which can be a mix of list or numpy array.
-            if **size** and/or **color** are found in the columns dataframe, 
+            if **size** and/or **color** are found in the columns dataframe,
             those columns will be used in the scatter plot. kargs_scatter keys **c**
             and **s** will then be ignored. If a list of lists, **x** will be the first row
             and **y** the second row.
-        :param y: if x is a list or an array, then y must also be provided as 
+        :param y: if x is a list or an array, then y must also be provided as
             a list or an array
-        :param kargs_scatter: a dictionary with pairs of key/value accepted by 
+        :param kargs_scatter: a dictionary with pairs of key/value accepted by
             matplotlib.scatter function. Examples is a list of colors or a list
-            of sizes as shown in the examples below. 
+            of sizes as shown in the examples below.
         :param kargs_grid: a dictionary with pairs of key/value accepted by
             the maplotlib.grid (applied on histogram and axis at the same time)
         :param kargs_histx: a dictionary with pairs of key/value accepted by the
@@ -93,10 +93,10 @@ class ScatterHist(VizInput2D):
             :width: 50%
 
             from biokit.viz import ScatterHist
-            ScatterHist(x=[1,2,3,4], y=[3,5,6,4]).plot( 
+            ScatterHist(x=[1,2,3,4], y=[3,5,6,4]).plot(
                 kargs_scatter={
-                    's':[200,400,600,800], 
-                    'c': ['red', 'green', 'blue', 'yellow'], 
+                    's':[200,400,600,800],
+                    'c': ['red', 'green', 'blue', 'yellow'],
                     'alpha':0.5},
                 kargs_histx={'color': 'red'},
                 kargs_histy={'color': 'green'})
@@ -138,32 +138,32 @@ class ScatterHist(VizInput2D):
             Wh = 1 - offset_x*2 - W - gap
             Hh = 1 - offset_y*2 - H - gap
             X0 = offset_x + Wh +gap
-            Y0 = offset_y + Hh + gap 
+            Y0 = offset_y + Hh + gap
             Xoff = offset_x
             Yoff = offset_y
         elif scatter_position == 'top left':
             Wh = 1 - offset_x*2 - W - gap
             Hh = 1 - offset_y*2 - H - gap
-            X0 = offset_x 
+            X0 = offset_x
             Y0 = offset_y + Hh + gap
             Xoff = offset_x + W + gap
             Yoff = offset_y #Y0 #+ H + gap
         else:
             raise ValueError("scatter_position must be 'top left', 'top right', 'bottom left', 'bottom right'")
-        
+
         facecolor = kargs.get('facecolor', 'lightgrey')
 
 
 
-        ax_scatter = axes((X0, Y0, W, H), facecolor=facecolor, xscale='linear', 
+        ax_scatter = axes((X0, Y0, W, H), facecolor=facecolor, xscale='linear',
             yscale='linear')#, xticks='auto', yticks='auto')
 
         if show_labels:
             ax_scatter.set_xlabel(self.xy_names[0])
             ax_scatter.set_ylabel(self.xy_names[1])
-        ax_hist_x = axes((X0, Yoff, W, Hh), facecolor=facecolor, xscale='linear', 
+        ax_hist_x = axes((X0, Yoff, W, Hh), facecolor=facecolor, xscale='linear',
             yscale='linear')#, xticks='auto', yticks='auto')
-        ax_hist_y = axes((Xoff, Y0, Wh, H), facecolor=facecolor, xscale='linear', 
+        ax_hist_y = axes((Xoff, Y0, Wh, H), facecolor=facecolor, xscale='linear',
             yscale='linear')#, xticks='auto', yticks='auto')
 
         # move ticks on axis  if needed

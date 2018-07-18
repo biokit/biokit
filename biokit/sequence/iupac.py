@@ -29,7 +29,7 @@ dna_bases_names = {
 
 # DNA bases represented
 dna_ambiguities = {
-    "A": "A", 
+    "A": "A",
     "C": "C",
     "G": "G",
     "T": "T",
@@ -45,6 +45,8 @@ dna_ambiguities = {
     "H": "[ACT]",
     "V": "[ACG]"
 }
+# not also . or - means "gap"
+
 
 # IUPAC degeneracies. Complementary bases
 dna_complement = {
@@ -65,8 +67,6 @@ dna_complement = {
     'X': 'X',
     'Y': 'R'}
 
-
-
 codons = {
     "UUU":"F", "UUC":"F","UUA":"L", "UUG":"L",
     "CUU":"L", "CUC":"L","CUA":"L", "CUG":"L",
@@ -84,5 +84,42 @@ codons = {
     "CGU":"R", "CGC":"R","CGA":"R", "CGG":"R",
     "AGU":"S", "AGC":"S","AGA":"R", "AGG":"R",
     "GGU":"G", "GGC":"G","GGA":"G", "GGG":"G",
-    }   
+}
+
+
+
+#IUPAC amino acide code, three letter code and amino acid name
+amino_acid_code = {
+    "A": ("Ala", "Alanine")
+    "C": ("Cys", "Cysteine")
+    "D": ("Asp", "Aspartic Acid")
+    "E": ("Glu", "Glutamic Acid")
+    "F": ("Phe", "Phenylalanine")
+    "G": ("Gly", "Glycine")
+    "H": ("His", "Histidine")
+    "I": ("Ile", "Isoleucine")
+    "K": ("Lys", "Lysine")
+    "L": ("Leu", "Leucine")
+    "M": ("Met", "Methionine")
+    "N": ("Asn", "Asparagine")
+    "P": ("Pro", "Proline")
+    "Q": ("Gln", "Glutamine")
+    "R": ("Arg", "Arginine")
+    "S": ("Ser", "Serine")
+    "T": ("Thr", "Threonine")
+    "V": ("Val", "Valine")
+    "W": ("Trp", "Tryptophan")
+    "Y": ("Tyr", "Tyrosine")
+}
+
+
+
+
+
+
+
+
+
+
+
 

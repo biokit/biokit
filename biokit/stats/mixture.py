@@ -4,6 +4,7 @@
 from easydev import DevTools
 devtools = DevTools()
 from scipy.optimize import minimize, show_options
+import scipy.stats as ss
 import numpy as np
 import pylab
 from easydev import AttrDict
@@ -175,7 +176,7 @@ class GaussianMixtureModel(object):
             mu, sigma, pi_ = params[i*3: (i+1)*3]
             pi_ = pis[i]
             if sigma != 0:
-                data += pi_ * pylab.normpdf(x, mu, sigma)
+                data += pi_ * ss.norm.pdf(x, mu, sigma)
         return data
 
     def log_likelihood(self, params, sample):
@@ -236,12 +237,12 @@ class Fitting(object):
         return params
 
     def plot(self, normed=True, N=1000, Xmin=None, Xmax=None, bins=50, color='red', lw=2,
-            hist_kw={'color':'#5F9EA0'}, ax=None):
+            hist_kw={'color':'#5F9EA0', "edgecolor":"k"}, ax=None):
 
         if ax:
             ax.hist(self.data, normed=normed, bins=bins, **hist_kw)
         else:
-            pylab.hist(self.data, normed=normed, bins=bins, **hist_kw)
+            pylab.hist(self.data, density=normed, bins=bins, **hist_kw)
         if Xmin is None:
             Xmin = self.data.min()
         if Xmax is None:
@@ -261,10 +262,10 @@ class Fitting(object):
 
             mu, sigma, pi_ = self.results.mus[i], self.results.sigmas[i], self.results.pis[i]
             if ax:
-                ax.plot(X, [pi_ * pylab.normpdf(x, mu, sigma) for x in X], 
+                ax.plot(X, [pi_ * ss.norm.pdf(x, mu, sigma) for x in X], 
                         'k--', alpha=0.7, lw=2)
             else:
-                pylab.plot(X, [pi_ * pylab.normpdf(x, mu, sigma) for x in X], 
+                pylab.plot(X, [pi_ * ss.norm.pdf(x, mu, sigma) for x in X], 
                         'k--', alpha=0.7, lw=2)
 
 
@@ -427,7 +428,7 @@ class EM(Fitting):
                 # unstable if eslf.model.pdf is made of zeros
 
                 #self.model.pdf(self.data, p_new,normalise=False).sum()!=0:
-                gamma[k, :] = pi_[k] * pylab.normpdf(self.data, mu[k], sig[k])
+                gamma[k, :] = pi_[k] * ss.norm.pdf(self.data, mu[k], sig[k])
                 gamma[k, :] /= (self.model.pdf(self.data, p_new, normalise=False))
                 """else:
                     gamma[k, :] = pi_[k]*pylab.normpdf(self.data, mu[k],
@@ -483,24 +484,24 @@ class EM(Fitting):
         self.results.AICc = criteria.AICc(log_likelihood, self.k, self.data.size, logL=True)
         self.results.BIC = criteria.BIC(log_likelihood, self.k, self.data.size, logL=True)
 
-    def plot(self, modele_parameters=None, **kwargs):
+    def plot(self, model_parameters=None, **kwargs):
         """ Take a list of dictionnaries with models parameters to plot
-        predicted modeles. If user doesn't provide parameters, the standard
+        predicted models. If user doesn't provide parameters, the standard
         plot function from fitting is used.
 
         Example:
-            modele_parameters=[{"mu": 5, "sigma": 0.5, "pi": 1}]
+            model_parameters=[{"mu": 5, "sigma": 0.5, "pi": 1}]
         """
-        if not modele_parameters:
+        if not model_parameters:
             return super(EM, self).plot(**kwargs)
         # Set parameters with the dictionnary
-        self.k = len(modele_parameters)
+        self.k = len(model_parameters)
         self.results = AttrDict()
-        self.results.mus = [model["mu"] for model in modele_parameters]
-        self.results.sigmas = [model["sigma"] for model in modele_parameters]
-        self.results.pis = [model["pi"] for model in modele_parameters]
+        self.results.mus = [model["mu"] for model in model_parameters]
+        self.results.sigmas = [model["sigma"] for model in model_parameters]
+        self.results.pis = [model["pi"] for model in model_parameters]
         parms_keys = ("mu", "sigma", "pi")
-        self.results.x = [model[key] for model in modele_parameters for key in
+        self.results.x = [model[key] for model in model_parameters for key in
                           parms_keys]
         return super(EM, self).plot(**kwargs)
 

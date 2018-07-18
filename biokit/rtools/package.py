@@ -204,7 +204,7 @@ class RPackageManager(object):
 
     def __init__(self, verbose=True):
         self.session = RSession()
-        self.logging = Logging(verbose)
+        self.logging = Logging("INFO")
         self.logging.info('Fetching package information')
         self.update()
 

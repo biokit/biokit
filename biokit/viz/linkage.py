@@ -1,4 +1,5 @@
 """Heatmap and dendograms"""
+import warnings
 import scipy.cluster.hierarchy as hierarchy
 import scipy.spatial.distance as distance
 import easydev
@@ -38,5 +39,9 @@ class Linkage(object):
         self.check_method(method)
         d = distance.pdist(df)
         D = distance.squareform(d)
-        Y = hierarchy.linkage(D, method=method, metric=metric)
-        return Y
+
+        # hierarchy.ClusterWarning
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore')
+            Y = hierarchy.linkage(D, method=method, metric=metric)
+            return Y

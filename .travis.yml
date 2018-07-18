@@ -35,13 +35,14 @@ before_install:
 # command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
 install:
   - echo $TRAVIS_PYTHON_VERSION
-  - conda install --yes python=$TRAVIS_PYTHON_VERSION atlas numpy scipy matplotlib pandas coverage biopython
-  - conda install --yes easydev bioservices 
-  - conda install --yes samtools
-  - pip install colorlog colormap
+  - conda install --yes python=$TRAVIS_PYTHON_VERSION --file requirements.txt
+
+  - conda install --yes python=$TRAVIS_PYTHON_VERSION  coverage 
+  - conda install --yes samtools bamtools bcftools
   - pip install pytest pytest-cov pytest-qt pytest-xdist pytest-mock pytest-timeout
   - pip install coveralls
   - pip install .
+
 
 # # command to run tests, e.g. python setup.py test
 script:
