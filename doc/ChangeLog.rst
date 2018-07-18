@@ -2,6 +2,10 @@ Whats' new, what has changed
 ================================
 
 
+:Revision 0.4.4:
+
+    * add missing MANIFEST to include requirements used in bioconda
+
 :Revision 0.4.3:
 
     * move all converters related code (now in biokit/bioconvert project)
