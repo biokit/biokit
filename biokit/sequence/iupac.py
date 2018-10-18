@@ -90,25 +90,25 @@ codons = {
 
 #IUPAC amino acide code, three letter code and amino acid name
 amino_acid_code = {
-    "A": ("Ala", "Alanine")
-    "C": ("Cys", "Cysteine")
-    "D": ("Asp", "Aspartic Acid")
-    "E": ("Glu", "Glutamic Acid")
-    "F": ("Phe", "Phenylalanine")
-    "G": ("Gly", "Glycine")
-    "H": ("His", "Histidine")
-    "I": ("Ile", "Isoleucine")
-    "K": ("Lys", "Lysine")
-    "L": ("Leu", "Leucine")
-    "M": ("Met", "Methionine")
-    "N": ("Asn", "Asparagine")
-    "P": ("Pro", "Proline")
-    "Q": ("Gln", "Glutamine")
-    "R": ("Arg", "Arginine")
-    "S": ("Ser", "Serine")
-    "T": ("Thr", "Threonine")
-    "V": ("Val", "Valine")
-    "W": ("Trp", "Tryptophan")
+    "A": ("Ala", "Alanine"),
+    "C": ("Cys", "Cysteine"),
+    "D": ("Asp", "Aspartic Acid"),
+    "E": ("Glu", "Glutamic Acid"),
+    "F": ("Phe", "Phenylalanine"),
+    "G": ("Gly", "Glycine"),
+    "H": ("His", "Histidine"),
+    "I": ("Ile", "Isoleucine"),
+    "K": ("Lys", "Lysine"),
+    "L": ("Leu", "Leucine"),
+    "M": ("Met", "Methionine"),
+    "N": ("Asn", "Asparagine"),
+    "P": ("Pro", "Proline"),
+    "Q": ("Gln", "Glutamine"),
+    "R": ("Arg", "Arginine"),
+    "S": ("Ser", "Serine"),
+    "T": ("Thr", "Threonine"),
+    "V": ("Val", "Valine"),
+    "W": ("Trp", "Tryptophan"),
     "Y": ("Tyr", "Tyrosine")
 }
 
