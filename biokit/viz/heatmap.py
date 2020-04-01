@@ -132,7 +132,9 @@ class Heatmap(Linkage):
     row_metric = property(_get_row_metric, _set_row_metric)
 
     def plot(self, num=1, cmap=None, colorbar=True, vmin=None,
-             vmax=None, colorbar_position='right', gradient_span='None'
+             vmax=None, colorbar_position='right', gradient_span='None',
+            figsize=(12, 8),
+            fontsize=None
              ):
         """
 
@@ -186,8 +188,12 @@ class Heatmap(Linkage):
             matplotlib.rcParams['font.size'] = 6
         if len(row_header) > 50 or len(column_header) > 50:
             matplotlib.rcParams['font.size'] = 7
+        if len(row_header) > 30 or len(column_header) > 30:
+            matplotlib.rcParams['font.size'] = 8
         else:
             matplotlib.rcParams['font.size'] = 12
+        if fontsize:
+            matplotlib.rcParams['font.size'] = fontsize
 
         # scaling min/max range
         self.gradient_span  = gradient_span #'only_max'
@@ -205,7 +211,7 @@ class Heatmap(Linkage):
         norm = matplotlib.colors.Normalize(vmin, vmax)
 
         # Scale the figure window size #
-        fig = pylab.figure(num=num, figsize=(12, 8))
+        fig = pylab.figure(num=num, figsize=figsize)
         fig.clf()
 
         # LAYOUT --------------------------------------------------

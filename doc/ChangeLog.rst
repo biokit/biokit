@@ -1,6 +1,10 @@
 Whats' new, what has changed
 ================================
 
+:Revision 0.4.5:
+
+    * BUG: fix iuapc module syntax
+
 
 :Revision 0.4.4:
 
