@@ -332,7 +332,8 @@ class Corrplot(Linkage):
                     shrink=self.params['colorbar.shrink'],
                 boundaries= np.linspace(0,1,N), ticks=[0,.25, 0.5, 0.75,1])
             cb.ax.set_yticklabels([-1,-.5,0,.5,1])
-            cb.set_clim(0,1) # make sure it goes from -1 to 1 even though actual values may not reach that range
+            sm = cm.ScalarMappable(cmap=cb.cmap)
+            sm.set_clim(0, 1) # make sure it goes from -1 to 1 even though actual values may not reach that range
 
     def _add_patches(self, df, method, fill, ax, diagonal=True):
         width, height = df.shape
