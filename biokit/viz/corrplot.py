@@ -399,12 +399,12 @@ class Corrplot(Linkage):
                     #ax.add_artist(patch)
                     patches.append(patch)
                 elif method in ['number', 'text']:
+                    from easydev import precision
                     if d<0:
-                        edgecolor = self.cm(-1.0)
+                        edgecolor = 'red'
                     elif d>=0:
-                        edgecolor = self.cm(1.0)
-                    d_str = "{:.2f}".format(d).replace("0.", ".").replace(".00", "")
-                    ax.text(x,y, d_str, color=edgecolor,
+                        edgecolor = 'blue'
+                    ax.text(x,y, precision(d, 2), color=edgecolor,
                             fontsize=self.fontsize, horizontalalignment='center',
                             weight='bold', alpha=max(0.5, d_abs))
                             # withdash=False)
