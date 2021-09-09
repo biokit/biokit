@@ -10,8 +10,8 @@ General Bioinformatics tools in Python
 .. image:: https://img.shields.io/pypi/pyversions/biokit.svg
     :target: https://www.python.org
 
-.. image:: https://github.com/biokit/biokit/actions/workflows/ci.yml/badge.svg
-    :target: https://github.com/biokit/biokit/actions/workflows/ci.yml
+.. image:: https://github.com/biokit/biokit/actions/workflows/main.yml/badge.svg
+    :target: https://github.com/biokit/biokit/actions/workflows/main.yml
 
 .. image:: https://coveralls.io/repos/biokit/biokit/badge.png?branch=master 
    :target: https://coveralls.io/r/biokit/biokit?branch=master 
