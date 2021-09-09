@@ -1,4 +1,5 @@
 import tempfile
+
 try:
     from urllib.request import urlopen
     from urllib.error import HTTPError, URLError
@@ -13,12 +14,18 @@ from distutils.version import StrictVersion
 from easydev import Logging, TempFile
 
 
-__all__ = ["get_R_version", "biocLite", "RPackage", 
-    'install_package', 'RPackageManager']
+__all__ = [
+    "get_R_version",
+    "biocLite",
+    "RPackage",
+    "install_package",
+    "RPackageManager",
+]
 
 
-def install_package(query, dependencies=False, verbose=True,
-    repos = "http://cran.univ-paris1.fr/"):
+def install_package(
+    query, dependencies=False, verbose=True, repos="http://cran.univ-paris1.fr/"
+):
     """Install a R package
 
     :param str query: It can be a valid URL to a R package (tar ball), a CRAN
@@ -41,21 +48,23 @@ def install_package(query, dependencies=False, verbose=True,
 
     # Is it a local file?
     if os.path.exists(query):
-        repos = 'NULL'
+        repos = "NULL"
     else:
-        repos = '"{0}"'.format(repos) # we want the " to be part of the string later on
-    
+        repos = '"{0}"'.format(repos)  # we want the " to be part of the string later on
+
     try:
         # PART for fetching a file on the web, download and install locally
         if verbose:
             print("Trying from the web ?")
         data = urlopen(query)
         fh = TempFile(suffix=".tar.gz")
-        with open(fh.name, 'w') as fh:
+        with open(fh.name, "w") as fh:
             for x in data.readlines():
                 fh.write(x)
-        code = """install.packages("%s", dependencies=%s """ % \
-            (fh.name, bool2R(dependencies))
+        code = """install.packages("%s", dependencies=%s """ % (
+            fh.name,
+            bool2R(dependencies),
+        )
         code += """ , repos=NULL) """
         session.run(code)
 
@@ -63,13 +72,19 @@ def install_package(query, dependencies=False, verbose=True,
         if verbose:
             print(err)
             print("trying local or from repos")
-            print("RTOOLS warning: URL provided does not seem to exist %s. Trying from CRAN" % query)
-        code = """install.packages("%s", dependencies=%s """ % \
-            (query, bool2R(dependencies))
+            print(
+                "RTOOLS warning: URL provided does not seem to exist %s. Trying from CRAN"
+                % query
+            )
+        code = """install.packages("%s", dependencies=%s """ % (
+            query,
+            bool2R(dependencies),
+        )
 
         code += """ , repos=%s) """ % repos
         session.run(code)
         return
+
 
 def get_R_version():
     """Return R version"""
@@ -85,7 +100,7 @@ def biocLite(package=None, suppressUpdates=True, verbose=True):
     implemented so far. However, you can use rcode function directly if needed.
 
     :param str package: name of the bioconductor package to install. If None, no
-        package is installed but installed packages are updated. If not provided, 
+        package is installed but installed packages are updated. If not provided,
         biocLite itself may be updated if needed.
     :param bool suppressUpdates: updates the dependencies if needed (default is
         False)
@@ -103,16 +118,16 @@ def biocLite(package=None, suppressUpdates=True, verbose=True):
 
     # without a package, biocLite performs an update of the installed packages
     if package is None:
-        code += """biocLite(suppressUpdates=%s) """ % (
-            bool2R(suppressUpdates))
+        code += """biocLite(suppressUpdates=%s) """ % (bool2R(suppressUpdates))
     else:
         # if not found, no error is returned...
         code += """biocLite("%s", suppressUpdates=%s) """ % (
             package,
-            bool2R(suppressUpdates))
+            bool2R(suppressUpdates),
+        )
     r = RSession(verbose=verbose)
     r.run(code)
-    
+
 
 class RPackage(object):
     """
@@ -129,21 +144,24 @@ class RPackage(object):
     .. todo:: do we need the version_required attribute/parameter anywhere ?
 
     .. note:: R version includes dashes, which are not recognised
-       by distutils so they should be replaced. 
+       by distutils so they should be replaced.
     """
+
     def __init__(self, name, version_required=None, install=False, verbose=False):
         self.name = name
         self.version_required = version_required  # the required version
         if self.version_required and isinstance(self.version_required, str) is False:
-            raise TypeError("version_required argument must be a string e.g., 2.0, 2.0.1")
+            raise TypeError(
+                "version_required argument must be a string e.g., 2.0, 2.0.1"
+            )
         if version_required and "." not in self.version_required:
             # trying to infer correct version
-            self.version_required += '.0'
+            self.version_required += ".0"
 
         self.session = RSession()
 
         code = """rvar_version = as.character(packageVersion("%s"))"""
-        self.session.run(code  % (self.name))
+        self.session.run(code % (self.name))
         try:
             self._version = self.session.rvar_version
         except:
@@ -152,11 +170,15 @@ class RPackage(object):
         if self.version is None and install is True:
             self.install(name)
         if self.version and self.version_required:
-            if self._get_val_version(self.version) >= self._get_val_version(self.version_required):
+            if self._get_val_version(self.version) >= self._get_val_version(
+                self.version_required
+            ):
                 pass
             else:
-                print("Found %s (version %s) but version %s required." % (
-                    self.name, self.version, self.version_required))
+                print(
+                    "Found %s (version %s) but version %s required."
+                    % (self.name, self.version, self.version_required)
+                )
 
     def _get_val_version(self, version):
         return StrictVersion(version.replace("-", "a"))
@@ -169,10 +191,12 @@ class RPackage(object):
             return True
         else:
             return False
+
     isinstalled = property(_get_isinstalled)
 
     def _get_version(self):
         return self._version
+
     version = property(_get_version)
 
     def __str__(self):
@@ -195,23 +219,25 @@ class RPackageManager(object):
 
 
     You can access to all information within a dataframe called **packages** where
-    indices are the name packages. Some aliases are provided as attributes (e.g., available, 
+    indices are the name packages. Some aliases are provided as attributes (e.g., available,
     installed)
 
 
     """
+
     cran_repos = "http://cran.univ-lyon1.fr/"
 
     def __init__(self, verbose=True):
         self.session = RSession()
         self.logging = Logging("INFO")
-        self.logging.info('Fetching package information')
+        self.logging.info("Fetching package information")
         self.update()
 
     def _update(self):
         # local import ?
         import numpy
         import pandas
+
         # figure out the installed packages first
         code = """rvar_packages = as.data.frame(installed.packages())"""
         self.session.run(code)
@@ -223,7 +249,7 @@ class RPackageManager(object):
         except:
             df = s
 
-        df.set_index('Package', inplace=True)
+        df.set_index("Package", inplace=True)
         self._packages = df.copy()
 
         # Now, fetch was is possible to install from the default cran repo
@@ -239,56 +265,63 @@ class RPackageManager(object):
             res = eval(s)
         except:
             res = s
-        res['inst'].set_index('Package', inplace=True)
-        res['avail'].set_index('Package', inplace=True)
+        res["inst"].set_index("Package", inplace=True)
+        res["avail"].set_index("Package", inplace=True)
         self._status = res
 
     def update(self):
-        """If you install/remove packages yourself elsewhere, you may need to 
+        """If you install/remove packages yourself elsewhere, you may need to
         call this function to update the package manager"""
         try:
-            #self.session.reconnect()          
+            # self.session.reconnect()
             self._update()
         except:
             self.logging.warning("Could not update the packages. Call update() again")
-        
+
     def _compat_version(self, version):
         return version.replace("-", "a")
 
     def _get_installed(self):
         # we do not buffer because packages may be removed manually or from R of
         # using remove_packages method, ....
-        #self._package_status()
-        return self._status['inst']
-    installed = property(_get_installed, "returns list of packages installed as a dataframe")
+        # self._package_status()
+        return self._status["inst"]
+
+    installed = property(
+        _get_installed, "returns list of packages installed as a dataframe"
+    )
 
     def _get_available(self):
         # we do not buffer because packages may be removed manually or from R of
         # using remove_packages method, ....
-        #self._package_status()
-        return self._status['avail']
-    available = property(_get_available, "returns list of packages available as a dataframe")
+        # self._package_status()
+        return self._status["avail"]
 
-    def  _get_packages(self):
+    available = property(
+        _get_available, "returns list of packages available as a dataframe"
+    )
+
+    def _get_packages(self):
         # do not buffer since it may change in many places
         return self._packages
+
     packages = property(_get_packages)
 
     def get_package_latest_version(self, package):
         """Get latest version available of a package"""
-        return self.available['Version'].ix[package]
+        return self.available["Version"].ix[package]
 
     def get_package_version(self, package):
         """Get version of an install package"""
         if package not in self.installed.index:
             self.logging.error("package {0} not installed".format(package))
-        return self.installed['Version'].ix[package]
+        return self.installed["Version"].loc[package]
 
     def biocLite(self, package=None, suppressUpdates=True, verbose=False):
         """Installs one or more biocLite packages
 
-        :param package: a package name (string) or list of package names (list of 
-            strings) that will be installed from BioConductor. If package is set 
+        :param package: a package name (string) or list of package names (list of
+            strings) that will be installed from BioConductor. If package is set
             to None, all packages already installed will be updated.
 
         """
@@ -300,7 +333,7 @@ class RPackageManager(object):
                 self.logging.info("Installing %s" % pkg)
                 if self.is_installed(pkg) is False:
                     biocLite(pkg, suppressUpdates, verbose=verbose)
-        else: # trying other cases (e.g., None updates biocLite itself). 
+        else:  # trying other cases (e.g., None updates biocLite itself).
             biocLite(package, suppressUpdates, verbose=verbose)
         self.update()
 
@@ -312,7 +345,7 @@ class RPackageManager(object):
 
     def remove(self, package):
         """Remove a package (or list) from local repository"""
-        rcode ="""remove.packages("%s")"""
+        rcode = """remove.packages("%s")"""
         if isinstance(package, str):
             package = [package]
         for pkg in package:
@@ -336,7 +369,7 @@ class RPackageManager(object):
 
     def _install_package(self, packageName, dependencies=True):
         """Installs one or more CRAN packages
-        
+
         .. todo:: check if it is already available to prevent renstallation ?
         """
 
@@ -347,12 +380,10 @@ class RPackageManager(object):
         for pkg in packageName:
             if self.is_installed(pkg) is False:
                 self.logging.info("Package not found. Installing %s..." % pkg)
-                install_package(pkg, dependencies=dependencies, 
-                        repos=repos)
+                install_package(pkg, dependencies=dependencies, repos=repos)
             else:
                 self.logging.info("Package %s found. " % pkg)
-                install_package(pkg, dependencies=dependencies, 
-                        repos=repos)
+                install_package(pkg, dependencies=dependencies, repos=repos)
         self.update()
 
     def install(self, pkg, require=None, update=True, reinstall=False):
@@ -363,6 +394,7 @@ class RPackageManager(object):
 
         """
         from easydev import to_list
+
         pkgs = to_list(pkg)
         for pkg in pkgs:
             self._install(pkg, require=require, update=update, reinstall=reinstall)
@@ -389,14 +421,20 @@ class RPackageManager(object):
                     pass
 
             if require is None:
-                self.logging.info("%s already installed with version %s" % \
-                    (pkg, currentVersion))
+                self.logging.info(
+                    "%s already installed with version %s" % (pkg, currentVersion)
+                )
                 return
-            
+
             # if require is not none, is it the required version ?
-            if self._get_version(currentVersion) >= self._get_version(require) and reinstall is False:
-                self.logging.info("%s already installed with required version %s" \
-                    % (pkg, currentVersion))
+            if (
+                self._get_version(currentVersion) >= self._get_version(require)
+                and reinstall is False
+            ):
+                self.logging.info(
+                    "%s already installed with required version %s"
+                    % (pkg, currentVersion)
+                )
                 # if so, nothing to do
             else:
                 # Try updating
@@ -406,8 +444,10 @@ class RPackageManager(object):
                     return
                 currentVersion = self.get_package_version(pkg)
                 if self._get_version(currentVersion) < self._get_version(require):
-                    self.logging.warning("%s installed but current version (%s) does not fulfill your requirement" % \
-                        (pkg, currentVersion))
+                    self.logging.warning(
+                        "%s installed but current version (%s) does not fulfill your requirement"
+                        % (pkg, currentVersion)
+                    )
 
         elif pkg in self.available.index:
             self._install_package(pkg)
@@ -420,8 +460,10 @@ class RPackageManager(object):
                 return
             currentVersion = self.get_package_version(pkg)
             if self._get_version(currentVersion) >= self._get_version(require):
-                self.logging.warning("%s installed but version is %s too small (even after update)" % \
-                    (pkg, currentVersion, require))
+                self.logging.warning(
+                    "%s installed but version is %s too small (even after update)"
+                    % (pkg, currentVersion, require)
+                )
 
     def _get_version(self, version):
         # some pacakge do not use the correct version convention
@@ -435,7 +477,7 @@ class RPackageManager(object):
                 # This becomes 1.86a61  which is not great but not workaround
                 # for now
                 left, right = version.split("-")
-                version = left + "a" + right.replace('.', '')
+                version = left + "a" + right.replace(".", "")
                 return StrictVersion(version)
 
     def is_installed(self, pkg_name):
@@ -443,5 +485,3 @@ class RPackageManager(object):
             return True
         else:
             return False
-
-

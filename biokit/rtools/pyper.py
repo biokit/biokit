@@ -97,7 +97,7 @@ import sys
 import time
 import re
 import tempfile
-from types import *   # need to clean that
+from types import *  # need to clean that
 import subprocess
 
 from biokit.rtools.r4python import r4python
@@ -109,55 +109,63 @@ from biokit.rtools.py2r import *
 import numpy
 import pandas
 
-if sys.version < '3.0':
+if sys.version < "3.0":
     _mystr = _mybytes = lambda s: s
     _in_py3 = False
 else:
     from functools import reduce
+
     long, basestring, unicode = int, str, str
-    _mybytes = lambda s: bytes(s, 'utf8')  # 'ascii')
-    _mystr = lambda s: str(s, 'utf8')
+    _mybytes = lambda s: bytes(s, "utf8")  # 'ascii')
+    _mystr = lambda s: str(s, "utf8")
     _in_py3 = True
 
 
 _has_subp = False
 
 
-
 PIPE, _STDOUT = None, None
+
+
 def Popen(CMD, *a, **b):
-    #original pyper code:
-    #class A:
+    # original pyper code:
+    # class A:
     #    None
-    #p = A()
-    #p.stdin, p.stdout = os.popen4(' '.join(CMD))
+    # p = A()
+    # p.stdin, p.stdout = os.popen4(' '.join(CMD))
     # popen4 does not work in Python 3, so we use a Popen
-    p = subprocess.Popen(CMD,shell=False,
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            close_fds=True)
-    return(p)
+    p = subprocess.Popen(
+        CMD,
+        shell=False,
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        close_fds=True,
+    )
+    return p
+
 
 def sendAll(p, s):
     p.stdin.write(_mybytes(s))
-    #os.write(p.stdin.fileno(), s)
+    # os.write(p.stdin.fileno(), s)
     p.stdin.flush()
 
+
 def readLine(p, dump_stdout=False, *a, **b):
-    #rv = _mystr(nbsr.readline())
+    # rv = _mystr(nbsr.readline())
     rv = _mystr(p.stdout.readline())
     if dump_stdout:
         sys.stdout.write(rv)
         sys.stdout.flush()
-    return(rv)
+    return rv
 
 
 class RError(Exception):
     def __init__(self, value):
         self.value = value
+
     def __str__(self):
-        return(repr(self.value))
+        return repr(self.value)
 
 
 class R(object):
@@ -167,10 +175,20 @@ class R(object):
     __Rfun = r4python
     _DEBUG_MODE = True
 
-    def __init__(self, RCMD='R', max_len=10000, use_dict=None,
-                 host='localhost', user=None, ssh='ssh', return_err=True, dump_stdout=False,
-                 verbose=False, options=('--quiet', '--no-save', '--no-restore')):
-        '''
+    def __init__(
+        self,
+        RCMD="R",
+        max_len=10000,
+        use_dict=None,
+        host="localhost",
+        user=None,
+        ssh="ssh",
+        return_err=True,
+        dump_stdout=False,
+        verbose=False,
+        options=("--quiet", "--no-save", "--no-restore"),
+    ):
+        """
         RCMD: The name of a R interpreter, path information should be included
             if it is not in the system search path.
         use_dict: A R named list will be returned as a Python dictionary if
@@ -194,7 +212,7 @@ class R(object):
         dump_stdout:
             prints output from R directly to sys.stdout, useful for long running
             routines which print progress during execution.
-        '''
+        """
         # use self.__dict__.update to register variables since __setattr__ is
         # used to set variables for R.  tried to define __setattr in the class,
         # and change it to __setattr__ for instances at the end of __init__,
@@ -204,34 +222,36 @@ class R(object):
         # "Warning: In 2.5, magic names (typically those with a double
         # underscore (DunderAlias) at both ends of the name) may look at the
         # class rather than the instance even for old-style classes."
-        self.__dict__.update({
-            'prog': None,
-            'Rfun': self.__class__.__Rfun,
-            'Rexecutable': RCMD,
-            'max_len': max_len,
-            'use_dict': use_dict,
-            'verbose': verbose,
-            'dump_stdout': dump_stdout,
-            'localhost': host == 'localhost',
-            'newline': sys.platform == 'win32' and '\r\n' or '\n',
-            'sendAll' : sendAll # keep a reference to the global function "sendAll" which will be used by __del__
-            })
+        self.__dict__.update(
+            {
+                "prog": None,
+                "Rfun": self.__class__.__Rfun,
+                "Rexecutable": RCMD,
+                "max_len": max_len,
+                "use_dict": use_dict,
+                "verbose": verbose,
+                "dump_stdout": dump_stdout,
+                "localhost": host == "localhost",
+                "newline": sys.platform == "win32" and "\r\n" or "\n",
+                "sendAll": sendAll,  # keep a reference to the global function "sendAll" which will be used by __del__
+            }
+        )
 
         RCMD = [RCMD]
         if not self.localhost:
             RCMD.insert(0, host)
             if user:
-                RCMD.insert(0, '-l%s' % user)
+                RCMD.insert(0, "-l%s" % user)
             RCMD.insert(0, ssh)
 
         for arg in options:
             if arg not in RCMD:
                 RCMD.append(arg)
 
-        if _has_subp and hasattr(subprocess, 'STARTUPINFO'):
+        if _has_subp and hasattr(subprocess, "STARTUPINFO"):
             info = subprocess.STARTUPINFO()
             try:
-                if hasattr(subprocess, '_subprocess'):
+                if hasattr(subprocess, "_subprocess"):
                     info.dwFlags |= subprocess._subprocess.STARTF_USESHOWWINDOW
                     info.wShowWindow = subprocess._subprocess.SW_HIDE
                 else:
@@ -244,22 +264,26 @@ class R(object):
 
         # create stderr to replace None for py2exe:
         # http://www.py2exe.org/index.cgi/Py2ExeSubprocessInteractions
-        if sys.platform != 'win32':
+        if sys.platform != "win32":
             childstderr = None
         else:
-            if hasattr(sys.stderr, 'fileno'):
+            if hasattr(sys.stderr, "fileno"):
                 childstderr = sys.stderr
-            elif hasattr(sys.stderr, '_file') and hasattr(sys.stderr._file, 'fileno'):
+            elif hasattr(sys.stderr, "_file") and hasattr(sys.stderr._file, "fileno"):
                 childstderr = sys.stderr._file
             else:  # Give up and point child stderr at nul
-                childstderr = file('nul', 'a')
+                childstderr = file("nul", "a")
 
         from easydev import AttrDict
-        self.__dict__['subprocess_args'] = AttrDict(**{
-                'RCMD': RCMD,
-                'PIPE': PIPE,
-                'stderr': return_err and _STDOUT or childstderr,
-                'info': info})
+
+        self.__dict__["subprocess_args"] = AttrDict(
+            **{
+                "RCMD": RCMD,
+                "PIPE": PIPE,
+                "stderr": return_err and _STDOUT or childstderr,
+                "info": info,
+            }
+        )
 
         self.reconnect()
 
@@ -271,44 +295,51 @@ class R(object):
 
         """
         args = self.subprocess_args
-        RCMD = args['RCMD']
-        PIPE = args['PIPE']
-        stderr = args['stderr']
-        info = args['info']
-        self.__dict__['prog'] = Popen(RCMD, stdin=PIPE, stdout=PIPE,
-                stderr=stderr, startupinfo=info)
+        RCMD = args["RCMD"]
+        PIPE = args["PIPE"]
+        stderr = args["stderr"]
+        info = args["info"]
+        self.__dict__["prog"] = Popen(
+            RCMD, stdin=PIPE, stdout=PIPE, stderr=stderr, startupinfo=info
+        )
         self.__call__(self.Rfun)
 
     def __runOnce(self, CMD, use_try=None):
         """CMD: a R command string"""
 
-
         use_try = use_try or self._DEBUG_MODE
         newline = self.newline
-        tail_token = 'R command at time: %s' % repr(time.time())
+        tail_token = "R command at time: %s" % repr(time.time())
         # tail_token_r = re.sub(r'[\(\)\.]', r'\\\1', tail_token)
         tail_cmd = 'print("%s")%s' % (tail_token, newline)
-        tail_token = tail_token.replace(' ', '\\s').replace('.', '\\.').replace('+', '\\+')
-        re_tail = re.compile(r'>\sprint\("%s"\)\r?\n\[1\]\s"%s"\r?\n$' % (tail_token, tail_token))
+        tail_token = (
+            tail_token.replace(" ", "\\s").replace(".", "\\.").replace("+", "\\+")
+        )
+        re_tail = re.compile(
+            r'>\sprint\("%s"\)\r?\n\[1\]\s"%s"\r?\n$' % (tail_token, tail_token)
+        )
 
         if len(CMD) <= self.max_len or not self.localhost:
             fn = None
-            CMD = (use_try and 'try({%s})%s%s' or '%s%s%s') % (CMD.replace('\\', '\\\\'),
-                    newline, tail_cmd)
+            CMD = (use_try and "try({%s})%s%s" or "%s%s%s") % (
+                CMD.replace("\\", "\\\\"),
+                newline,
+                tail_cmd,
+            )
         else:
             fh, fn = tempfile.mkstemp()
-            os.fdopen(fh, 'wb').write(_mybytes(CMD))
-            if sys.platform == 'cli':
+            os.fdopen(fh, "wb").write(_mybytes(CMD))
+            if sys.platform == "cli":
                 os.close(fh)  # this is necessary on IronPython
-            fn = fn.replace('\\', '/')
+            fn = fn.replace("\\", "/")
 
-            params = {'fn':fn , 'newline':newline, 'tail_cmd':tail_cmd}
+            params = {"fn": fn, "newline": newline, "tail_cmd": tail_cmd}
             if use_try is True:
                 CMD = 'try({source("%(fn)s")})%(newline)s ' % params
-                CMD += 'dummy=file.remove(%(fn)r)%(newline)s%(tail_cmd)s' % params
+                CMD += "dummy=file.remove(%(fn)r)%(newline)s%(tail_cmd)s" % params
             else:
                 CMD = '({source("%(fn)s")})%(newline)s ' % params
-                CMD += 'dummy=file.remove(%(fn)r)%(newline)s%(tail_cmd)s' % params
+                CMD += "dummy=file.remove(%(fn)r)%(newline)s%(tail_cmd)s" % params
 
         try:
             self.sendAll(self.prog, CMD)
@@ -321,8 +352,7 @@ class R(object):
             print("Failed")
             raise err
 
-
-        rlt = ''
+        rlt = ""
         while not re_tail.search(rlt):
             try:
                 rltonce = readLine(self.prog, dump_stdout=self.dump_stdout)
@@ -331,10 +361,10 @@ class R(object):
             except:
                 break
         else:
-            rlt = re_tail.sub('', rlt)
-            if rlt.startswith('> '):
+            rlt = re_tail.sub("", rlt)
+            if rlt.startswith("> "):
                 rlt = rlt[2:]
-        return(rlt)
+        return rlt
 
     def __call__(self, CMDS=[], use_try=None):
         """Run a (list of) R command(s),
@@ -346,10 +376,12 @@ class R(object):
         if isinstance(CMDS, basestring):  # a single command
             rlt = self.__runOnce(CMDS, use_try=use_try)
         else:
-            rlt = self.__runOnce('; '.join(CMDS), use_try=use_try)
+            rlt = self.__runOnce("; ".join(CMDS), use_try=use_try)
         return rlt
 
-    def __getitem__(self, obj, use_try=None, use_dict=None): # to model a dict: "r['XXX']"
+    def __getitem__(
+        self, obj, use_try=None, use_dict=None
+    ):  # to model a dict: "r['XXX']"
         """Get the value of an R variable or expression.
 
 
@@ -361,57 +393,72 @@ class R(object):
         :param use_dict: named list will be returned a dict if use_dict is True,
             otherwise it will be a list of tuples (name, value)
         """
-        if obj.startswith('_'):
-            raise RError('Leading underscore ("_") is not permitted in R variable names!')
+        if obj.startswith("_"):
+            raise RError(
+                'Leading underscore ("_") is not permitted in R variable names!'
+            )
         use_try = use_try or self._DEBUG_MODE
         if use_dict is None:
             use_dict = self.use_dict
-        cmd = '.getRvalue4Python__(%s, use_dict=%s)' % (obj, use_dict is None and 'NULL' or use_dict and 'TRUE' or 'FALSE')
+        cmd = ".getRvalue4Python__(%s, use_dict=%s)" % (
+            obj,
+            use_dict is None and "NULL" or use_dict and "TRUE" or "FALSE",
+        )
         rlt = self.__call__(cmd, use_try=use_try)
-        head = (use_try and 'try({%s})%s[1] ' or '%s%s[1] ') % (cmd, self.newline)
+        head = (use_try and "try({%s})%s[1] " or "%s%s[1] ") % (cmd, self.newline)
         # sometimes (e.g. after "library(fastICA)") the R on Windows uses '\n' instead of '\r\n'
         head = rlt.startswith(head) and len(head) or len(head) - 1
-        tail = rlt.endswith(self.newline) and len(rlt) - len(self.newline) or len(rlt) - len(self.newline) + 1 # - len('"')
+        tail = (
+            rlt.endswith(self.newline)
+            and len(rlt) - len(self.newline)
+            or len(rlt) - len(self.newline) + 1
+        )  # - len('"')
+
         try:
-            rlt = eval(eval(rlt[head:tail])) # The inner eval remove quotes and recover escaped characters.
+            rlt = eval(
+                eval(rlt[head:tail])
+            )  # The inner eval remove quotes and recover escaped characters.
         except:
             try:
                 # some hack for installed.packages()
+                rlt = rlt.strip("\n")
                 code = rlt[head:tail]
-                code = code.replace('\\\\"', '"')
-                #code = code.replace("\n", "")
-                #print(code)
-                rlt = eval(code)  # replace \\" with "
+                code = code.replace('\\"', '"')
+                rlt = eval(code.strip("'").strip('"'))  # replace \\" with "
             except Exception as e:
                 print(e)
 
                 raise RError(rlt)
-        return(rlt)
+        return rlt
 
     def __setitem__(self, obj, val):  # to model a dict: "r['XXX'] = YYY"
-        """ Assign a value (val) to an R variable (obj).
+        """Assign a value (val) to an R variable (obj).
 
         :param obj: a string - the name of an R variable
         :param val: a python object - the value to be passed to an R object
         """
-        if obj.startswith('_'):
-            raise RError('Leading underscore ("_") is not permitted in R variable names!')
-        self.__call__('%s <- %s' % (obj, Str4R(val)))
+        if obj.startswith("_"):
+            raise RError(
+                'Leading underscore ("_") is not permitted in R variable names!'
+            )
+        self.__call__("%s <- %s" % (obj, Str4R(val)))
 
     def __delitem__(self, obj):  # to model a dict: "del r['XXX']"
-        if obj.startswith('_'):
-            raise RError('Leading underscore ("_") is not permitted in R variable names!')
-        self.__call__('rm(%s)' % obj)
+        if obj.startswith("_"):
+            raise RError(
+                'Leading underscore ("_") is not permitted in R variable names!'
+            )
+        self.__call__("rm(%s)" % obj)
 
     def __del__(self):  # to model "del r"
         # if we do not have those 2 lines, prog may not be in the dictionary
         # and we enter in an infite recursion loop ....
-        if 'prog' not in self.__dict__.keys():
+        if "prog" not in self.__dict__.keys():
             return
 
         if self.prog:
             try:
-                self.sendAll(self.prog, 'q("no")'+self.newline)
+                self.sendAll(self.prog, 'q("no")' + self.newline)
             except:
                 pass
             self.prog = None
@@ -426,21 +473,23 @@ class R(object):
         # only called as a last resort i.e. if there are no attributes in the
         # instance that match the name
         if obj in self.__dict__:
-            return(self.__dict__[obj])
+            return self.__dict__[obj]
         if obj in self.__class__.__dict__:
-            return(self.__class__.__dict__[obj])
+            return self.__class__.__dict__[obj]
         try:
             if use_dict is None:
                 use_dict = self.use_dict
             rlt = self.__getitem__(obj, use_dict=use_dict)
         except:
             raise
-        return(rlt)
+        return rlt
 
     def __setattr__(self, obj, val):  # to model object attribute: "r.XXX = YYY"
-        if obj in self.__dict__ or obj in self.__class__.__dict__: # or obj.startswith('_'):
-            self.__dict__[obj] = val # for old-style class
-            #object.__setattr__(self, obj, val) # for new-style class
+        if (
+            obj in self.__dict__ or obj in self.__class__.__dict__
+        ):  # or obj.startswith('_'):
+            self.__dict__[obj] = val  # for old-style class
+            # object.__setattr__(self, obj, val) # for new-style class
         else:
             self.__setitem__(obj, val)
 
@@ -450,7 +499,9 @@ class R(object):
         else:
             self.__delitem__(obj)
 
-    def get(self, obj, default=None, use_dict=None):  # to model a dict: "r.get('XXX', 'YYY')"
+    def get(
+        self, obj, default=None, use_dict=None
+    ):  # to model a dict: "r.get('XXX', 'YYY')"
         """
         :param obj: a string - the name of an R variable, or an R expression
         :param default: a python object - the value to be returned if failed to get data from R
@@ -464,9 +515,7 @@ class R(object):
             if True:  # val is not None:
                 rlt = default
             else:
-                raise RError('No this object!')
-        return(rlt)
+                raise RError("No this object!")
+        return rlt
 
     run, assign, remove = __call__, __setitem__, __delitem__
-
-

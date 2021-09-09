@@ -20,7 +20,6 @@ def biokit_debug_level(level="WARNING"):
 from biokit import viz
 from biokit.viz import *
 
-from biokit import io
 
 
 from biokit import stats

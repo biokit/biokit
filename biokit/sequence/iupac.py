@@ -25,7 +25,8 @@ dna_bases_names = {
     "D": "not C",
     "H": "not G",
     "V": "not T/U",
-    "N": "Unknown"}
+    "N": "Unknown",
+}
 
 # DNA bases represented
 dna_ambiguities = {
@@ -43,52 +44,100 @@ dna_ambiguities = {
     "B": "[CGT]",
     "D": "[AGT]",
     "H": "[ACT]",
-    "V": "[ACG]"
+    "V": "[ACG]",
 }
 # not also . or - means "gap"
 
 
 # IUPAC degeneracies. Complementary bases
 dna_complement = {
-    'A': 'T',
-    'B': 'V',
-    'C': 'G',
-    'D': 'H',
-    'G': 'C',
-    'H': 'D',
-    'K': 'M',
-    'M': 'K',
-    'N': 'N',
-    'R': 'Y',
-    'S': 'S',
-    'T': 'A',
-    'V': 'B',
-    'W': 'W',
-    'X': 'X',
-    'Y': 'R'}
+    "A": "T",
+    "B": "V",
+    "C": "G",
+    "D": "H",
+    "G": "C",
+    "H": "D",
+    "K": "M",
+    "M": "K",
+    "N": "N",
+    "R": "Y",
+    "S": "S",
+    "T": "A",
+    "V": "B",
+    "W": "W",
+    "X": "X",
+    "Y": "R",
+}
 
 codons = {
-    "UUU":"F", "UUC":"F","UUA":"L", "UUG":"L",
-    "CUU":"L", "CUC":"L","CUA":"L", "CUG":"L",
-    "AUU":"I", "AUC":"I","AUA":"I", "AUG":"M",
-    "GUU":"V", "GUC":"V","GUA":"V", "GUG":"V",
-    "UCU":"S", "UCC":"S","UCA":"S", "UCG":"S",
-    "CCU":"P", "ACC":"P","CCA":"P", "CCG":"P",
-    "ACU":"T", "ACC":"T","ACA":"T", "ACG":"T",
-    "GCU":"A", "GCC":"A","GCA":"A", "GCG":"A",
-    "UAU":"Y", "UAC":"Y","UAA":"*", "UAG":"*",
-    "CAU":"H", "CAC":"H","CAA":"Q", "CAG":"Q",
-    "AAU":"N", "AAC":"N","AAA":"K", "AAG":"K",
-    "GAU":"D", "GAC":"D","GAA":"E", "GAG":"E",
-    "UGU":"C", "UGC":"C","UGA":"*", "UGG":"W",
-    "CGU":"R", "CGC":"R","CGA":"R", "CGG":"R",
-    "AGU":"S", "AGC":"S","AGA":"R", "AGG":"R",
-    "GGU":"G", "GGC":"G","GGA":"G", "GGG":"G",
+    "UUU": "F",
+    "UUC": "F",
+    "UUA": "L",
+    "UUG": "L",
+    "CUU": "L",
+    "CUC": "L",
+    "CUA": "L",
+    "CUG": "L",
+    "AUU": "I",
+    "AUC": "I",
+    "AUA": "I",
+    "AUG": "M",
+    "GUU": "V",
+    "GUC": "V",
+    "GUA": "V",
+    "GUG": "V",
+    "UCU": "S",
+    "UCC": "S",
+    "UCA": "S",
+    "UCG": "S",
+    "CCU": "P",
+    "ACC": "P",
+    "CCA": "P",
+    "CCG": "P",
+    "ACU": "T",
+    "ACC": "T",
+    "ACA": "T",
+    "ACG": "T",
+    "GCU": "A",
+    "GCC": "A",
+    "GCA": "A",
+    "GCG": "A",
+    "UAU": "Y",
+    "UAC": "Y",
+    "UAA": "*",
+    "UAG": "*",
+    "CAU": "H",
+    "CAC": "H",
+    "CAA": "Q",
+    "CAG": "Q",
+    "AAU": "N",
+    "AAC": "N",
+    "AAA": "K",
+    "AAG": "K",
+    "GAU": "D",
+    "GAC": "D",
+    "GAA": "E",
+    "GAG": "E",
+    "UGU": "C",
+    "UGC": "C",
+    "UGA": "*",
+    "UGG": "W",
+    "CGU": "R",
+    "CGC": "R",
+    "CGA": "R",
+    "CGG": "R",
+    "AGU": "S",
+    "AGC": "S",
+    "AGA": "R",
+    "AGG": "R",
+    "GGU": "G",
+    "GGC": "G",
+    "GGA": "G",
+    "GGG": "G",
 }
 
 
-
-#IUPAC amino acide code, three letter code and amino acid name
+# IUPAC amino acide code, three letter code and amino acid name
 amino_acid_code = {
     "A": ("Ala", "Alanine"),
     "C": ("Cys", "Cysteine"),
@@ -109,17 +158,5 @@ amino_acid_code = {
     "T": ("Thr", "Threonine"),
     "V": ("Val", "Valine"),
     "W": ("Trp", "Tryptophan"),
-    "Y": ("Tyr", "Tyrosine")
+    "Y": ("Tyr", "Tyrosine"),
 }
-
-
-
-
-
-
-
-
-
-
-
-

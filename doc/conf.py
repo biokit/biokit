@@ -68,7 +68,6 @@ extensions = [
     "numpydoc.numpydoc",
     'easydev.copybutton',
     'matplotlib.sphinxext.plot_directive',
-    'matplotlib.sphinxext.only_directives',
     ('sphinx.ext.imgmath'  # only available for sphinx >= 1.4
                   if sphinx.version_info[:2] >= (1, 4)
                   else 'sphinx.ext.pngmath'),
@@ -151,7 +150,7 @@ modindex_common_prefix = ["biokit."]
 # to force their creation. Note that it requires singularity or dot to be
 # installed. Fixes https://github.com/biokit/bioconvert/issues/153
 
-plot_gallery = True
+plot_gallery = 'True'
 
 sphinx_gallery_conf = {
     "doc_module": "biokit",
@@ -182,7 +181,6 @@ def touch_example_backreferences(app, what, name, obj, options, lines):
 # Add the 'copybutton' javascript, to hide/show the prompt in code
 # examples
 def setup(app):
-    app.add_javascript('copybutton.js')
     app.connect('autodoc-process-docstring', touch_example_backreferences)
 
 # -- Options for HTML output ---------------------------------------------------
@@ -299,7 +297,7 @@ latex_documents = [
 ]
 
 latex_elements = { 'inputenc': '\\usepackage[utf8]{inputenc}' }
-latex_elements["latex_paper_size"] = "a4"
+#latex_elements["latex_paper_size"] = "a4"
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.

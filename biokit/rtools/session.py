@@ -15,13 +15,13 @@
 ##############################################################################
 from biokit.rtools import pyper
 
-__all__ = ['RSession']
+__all__ = ["RSession"]
 
 
 class RSession(pyper.R):
     """Interface to a R session
 
-    This class uses the pyper package to provide an access to R (via 
+    This class uses the pyper package to provide an access to R (via
     a subprocess). You can call R script and get back the results
     into the session as Python objects. Returned objects may be transformed
     into numpy arrays or Pandas datafranes.
@@ -48,9 +48,18 @@ class RSession(pyper.R):
     additional features. This is to create a common API.
 
     """
-    def __init__(self, RExecutable='R', max_len=1000,
-            use_dict=None, host='localhost', user=None, ssh='ssh',
-            verbose=False, return_err=True):
+
+    def __init__(
+        self,
+        RExecutable="R",
+        max_len=1000,
+        use_dict=None,
+        host="localhost",
+        user=None,
+        ssh="ssh",
+        verbose=False,
+        return_err=True,
+    ):
         """
 
         :param str RCMD: the name of the R executable
@@ -72,24 +81,32 @@ class RSession(pyper.R):
         :param kargs: must be empty. Error raised otherwise
         """
         from easydev import cmd_exists
-        if host == 'localhost' and cmd_exists(RExecutable) is False:
-            raise Exception('Could not find the R executable %s in your path' % RExecutable)
 
-        super(RSession, self).__init__(RCMD=RExecutable, max_len=max_len,
-            use_dict=use_dict, host=host, user=user, ssh=ssh, return_err=return_err,
-            dump_stdout=verbose)
+        if host == "localhost" and cmd_exists(RExecutable) is False:
+            raise Exception(
+                "Could not find the R executable %s in your path" % RExecutable
+            )
 
+        super(RSession, self).__init__(
+            RCMD=RExecutable,
+            max_len=max_len,
+            use_dict=use_dict,
+            host=host,
+            user=user,
+            ssh=ssh,
+            return_err=return_err,
+            dump_stdout=verbose,
+        )
+
+        self.run("options(warn=-1)")
 
     def get_version(self):
         """Return the R version"""
         return self.version
 
     def __repr__(self):
-        txt = "Rsession information:" 
+        txt = "Rsession information:"
         txt += "\nverbosity: " + str(self.verbose)
         txt += "\ndump_stdout: " + str(self.dump_stdout)
         txt += "\ndebug mode: " + str(self._DEBUG_MODE)
         return txt
-
-
-

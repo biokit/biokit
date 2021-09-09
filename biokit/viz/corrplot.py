@@ -338,7 +338,7 @@ class Corrplot(Linkage):
                     orientation=self.params['colorbar.orientation'],
                     shrink=self.params['colorbar.shrink'],
                     boundaries= np.linspace(0,1,N), 
-                    ticks=[0,.25, 0.5, 0.75,1])
+                    ticks=[0,.25, 0.5, 0.75,1], ax=ax)
             cb.ax.set_yticklabels([-1,-.5,0,.5,1])
             return cb
 
