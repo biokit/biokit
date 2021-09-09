@@ -23,7 +23,7 @@ from io import StringIO
 __all__ = ["Complexes"]
 
 
-class Complexes(Logging):
+class Complexes():
     """Manipulate complexes of Proteins
 
     This class uses Intact Complex database to extract information about
@@ -88,17 +88,15 @@ class Complexes(Logging):
     package BioServices provided in Pypi.
     """
 
-    def __init__(self, organism="Homo sapiens", verbose=True, cache=False):
+    def __init__(self, organism="Homo sapiens", cache=False):
         """.. rubric:: Constructor
 
         :param str orgamism: the organism to look at. Homo sapiens
             is the default. Other possible organisms can be found
             in :attr:`organisms`.
-        :param str verbose: a verbose level in ERROR/DEBUG/INFO/WARNING
-            compatible with those used in BioServices.
 
         """
-        super(Complexes, self).__init__(level=verbose)
+        self.logging = Logging()
 
         self.devtools = DevTools()
         self.webserv = IntactComplex(verbose=verbose, cache=cache)

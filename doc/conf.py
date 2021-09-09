@@ -150,7 +150,7 @@ modindex_common_prefix = ["biokit."]
 # to force their creation. Note that it requires singularity or dot to be
 # installed. Fixes https://github.com/biokit/bioconvert/issues/153
 
-plot_gallery = True
+plot_gallery = 'True'
 
 sphinx_gallery_conf = {
     "doc_module": "biokit",
@@ -297,7 +297,7 @@ latex_documents = [
 ]
 
 latex_elements = { 'inputenc': '\\usepackage[utf8]{inputenc}' }
-latex_elements["latex_paper_size"] = "a4"
+#latex_elements["latex_paper_size"] = "a4"
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.

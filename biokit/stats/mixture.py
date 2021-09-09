@@ -142,11 +142,11 @@ class GaussianMixture(object):
             data = pylab.normal(m, s, size=n)
             self.data.extend(data)
 
-    def plot(self, bins=30, normed=True):
-        self.hist(bins=bins, normed=normed)
+    def plot(self, bins=30, density=True):
+        self.hist(bins=bins, density=density)
 
-    def hist(self, bins=30, normed=True):
-        pylab.hist(self.data, bins=bins, normed=normed)
+    def hist(self, bins=30, density=True):
+        pylab.hist(self.data, bins=bins, density=density)
 
 
 class GaussianMixtureModel(object):
@@ -257,7 +257,7 @@ class Fitting(object):
 
     def plot(
         self,
-        normed=True,
+        density=True,
         N=1000,
         Xmin=None,
         Xmax=None,
@@ -269,9 +269,9 @@ class Fitting(object):
     ):
 
         if ax:
-            ax.hist(self.data, normed=normed, bins=bins, **hist_kw)
+            ax.hist(self.data, density=density, bins=bins, **hist_kw)
         else:
-            pylab.hist(self.data, density=normed, bins=bins, **hist_kw)
+            pylab.hist(self.data, density=density, bins=bins, **hist_kw)
         if Xmin is None:
             Xmin = self.data.min()
         if Xmax is None:
