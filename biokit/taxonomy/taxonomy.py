@@ -192,9 +192,11 @@ class Taxonomy(object):
         if len(self.records) == 0:
             self.load_records()
 
+        print("---")
+        print(taxon, type(taxon))
         try:
             record = self.records[taxon]
-        except:
+        except KeyError:
             return [('unknown', 'no rank')]
 
         parent = int(record['parent'])

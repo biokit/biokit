@@ -86,7 +86,7 @@ class Corrplot(Linkage):
 
         if compute_correlation:
             print("Computing correlation")
-            cor = self.df.corr()
+            cor = self.df.fillna(na).corr()
             self.df = cor
 
         # replace NA with zero
@@ -254,9 +254,6 @@ class Corrplot(Linkage):
             self._add_patches(df, upper, 'upper',  ax, diagonal=False)
             self._add_patches(df, lower, 'lower',  ax, diagonal=False)
 
-        # shift the limits to englobe the patches correctly
-        ax.set_xlim(-0.5, width-.5)
-        ax.set_ylim(-0.5, height-.5)
 
         # set xticks/xlabels on top
         ax.xaxis.tick_top()
@@ -265,11 +262,16 @@ class Corrplot(Linkage):
         ax.set_xticklabels(labels, rotation=rotation, color=label_color,
                 fontsize=fontsize, ha='left')
 
-        ax.invert_yaxis()
         ytickslocs = np.arange(len(labels))
         ax.set_yticks(ytickslocs)
         ax.set_yticklabels(labels, fontsize=fontsize, color=label_color)
         plt.tight_layout()
+
+        # shift the limits to englobe the patches correctly
+        # This should be here afer set_xticks
+        ax.set_xlim(-0.5, width-.5)
+        ax.set_ylim(-0.5, height-.5)
+        ax.invert_yaxis()
 
         if grid is not False:
             if grid is True:
@@ -327,12 +329,18 @@ class Corrplot(Linkage):
         if colorbar:
             N = self.params['colorbar.N'] + 1
             assert N >=2
+            # make sure the colorbar limits remains between the min (0) and the
+            # max (1) (remember colormap are normalised) so that if data is
+            # between -0.5 and let us say +1, the colors do not start at -0.5
+            # but -1 indeed. 
+            self.collection.set_clim(0,1)
             cb = plt.gcf().colorbar(self.collection,
                     orientation=self.params['colorbar.orientation'],
                     shrink=self.params['colorbar.shrink'],
-                boundaries= np.linspace(0,1,N), ticks=[0,.25, 0.5, 0.75,1])
+                    boundaries= np.linspace(0,1,N), 
+                    ticks=[0,.25, 0.5, 0.75,1])
             cb.ax.set_yticklabels([-1,-.5,0,.5,1])
-            cb.set_clim(0,1) # make sure it goes from -1 to 1 even though actual values may not reach that range
+            return cb
 
     def _add_patches(self, df, method, fill, ax, diagonal=True):
         width, height = df.shape
@@ -391,15 +399,15 @@ class Corrplot(Linkage):
                     #ax.add_artist(patch)
                     patches.append(patch)
                 elif method in ['number', 'text']:
+                    from easydev import precision
                     if d<0:
-                        edgecolor = self.cm(-1.0)
+                        edgecolor = 'red'
                     elif d>=0:
-                        edgecolor = self.cm(1.0)
-                    d_str = "{:.2f}".format(d).replace("0.", ".").replace(".00", "")
-                    ax.text(x,y, d_str, color=edgecolor,
+                        edgecolor = 'blue'
+                    ax.text(x,y, precision(d, 2), color=edgecolor,
                             fontsize=self.fontsize, horizontalalignment='center',
-                            weight='bold', alpha=max(0.5, d_abs),
-                            withdash=False)
+                            weight='bold', alpha=max(0.5, d_abs))
+                            # withdash=False)
                 elif method == 'pie':
                     S = 360 * d_abs
                     patch = [
