@@ -1,0 +1,52 @@
+name: Testing
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches-ignore: []
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 5
+      matrix:
+        python: [3.7, 3.8, 3.9]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python 3.X
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python }}
+
+    - name: conda
+      run: |
+        # $CONDA is an environment variable pointing to the root of the miniconda directory
+        echo $CONDA/bin >> $GITHUB_PATH
+    - name: Install dependencies conda
+      run: |
+        conda install -c conda-forge mamba --quiet
+        mamba install -c conda-forge -c bioconda --quiet -y R 
+        
+    - name: Install the package itself
+      run: |
+          pip install .
+          # for the test to work (colormap needs pyqt backend on the CI action)
+
+    - name: Install packages for testing
+      run: |
+        pip install -r requirements_dev.txt
+
+    - name: Test with pytest
+      run: |
+        pytest --cov-report term --cov=biokit
+
+    - name: coveralls
+      run: |
+        coveralls --service=github
+      env:
+          GITHUB_TOKEN: ${{ github.token }}
