@@ -282,7 +282,7 @@ class RPackageManager(object):
         """Get version of an install package"""
         if package not in self.installed.index:
             self.logging.error("package {0} not installed".format(package))
-        return self.installed['Version'].ix[package]
+        return self.installed['Version'].loc[package]
 
     def biocLite(self, package=None, suppressUpdates=True, verbose=False):
         """Installs one or more biocLite packages

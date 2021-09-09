@@ -372,17 +372,22 @@ class R(object):
         # sometimes (e.g. after "library(fastICA)") the R on Windows uses '\n' instead of '\r\n'
         head = rlt.startswith(head) and len(head) or len(head) - 1
         tail = rlt.endswith(self.newline) and len(rlt) - len(self.newline) or len(rlt) - len(self.newline) + 1 # - len('"')
+
+
+        #rlt = rlt.replace('\\"', '"')
+        #rlt = rlt.strip('\n')
+
         try:
             rlt = eval(eval(rlt[head:tail])) # The inner eval remove quotes and recover escaped characters.
         except:
             try:
                 # some hack for installed.packages()
+                rlt = rlt.strip('\n')
                 code = rlt[head:tail]
-                code = code.replace('\\\\"', '"')
-                #code = code.replace("\n", "")
-                #print(code)
-                rlt = eval(code)  # replace \\" with "
+                code = code.replace('\\"', '"')
+                rlt = eval(code.strip("'").strip('"'))  # replace \\" with "
             except Exception as e:
+                print("Exception")
                 print(e)
 
                 raise RError(rlt)

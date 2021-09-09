@@ -79,6 +79,7 @@ class RSession(pyper.R):
             use_dict=use_dict, host=host, user=user, ssh=ssh, return_err=return_err,
             dump_stdout=verbose)
 
+        self.run("options(warn=-1)")
 
     def get_version(self):
         """Return the R version"""
