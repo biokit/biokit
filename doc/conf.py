@@ -68,7 +68,6 @@ extensions = [
     "numpydoc.numpydoc",
     'easydev.copybutton',
     'matplotlib.sphinxext.plot_directive',
-    'matplotlib.sphinxext.only_directives',
     ('sphinx.ext.imgmath'  # only available for sphinx >= 1.4
                   if sphinx.version_info[:2] >= (1, 4)
                   else 'sphinx.ext.pngmath'),
@@ -182,7 +181,6 @@ def touch_example_backreferences(app, what, name, obj, options, lines):
 # Add the 'copybutton' javascript, to hide/show the prompt in code
 # examples
 def setup(app):
-    app.add_javascript('copybutton.js')
     app.connect('autodoc-process-docstring', touch_example_backreferences)
 
 # -- Options for HTML output ---------------------------------------------------

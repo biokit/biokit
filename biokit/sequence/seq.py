@@ -2,25 +2,25 @@ import string
 import collections
 import pylab
 
-__all__ = ['Sequence']
+__all__ = ["Sequence"]
 
 
 class Sequence(object):
     """Common data structure to all sequences (e.g., :meth:`~biokit.sequence.dna.DNA`)
 
-    A sequence is a string contained in the :attr:`_data`. If you manipulate this 
-    attribute, you should also changed the :attr:`_N` (length of the string) and 
+    A sequence is a string contained in the :attr:`_data`. If you manipulate this
+    attribute, you should also changed the :attr:`_N` (length of the string) and
     set :attr:`_counter` to  None.
 
-    Sequences can be concatenated easily. You can also add a string or numpy 
+    Sequences can be concatenated easily. You can also add a string or numpy
     array or pandas time series to an existing sequence::
 
         d1 = Sequence('ACGT')
         d2 = Sequence('ACGT')
 
-    Note that there is a :meth:`check` method, which is not called during the 
-    instanciation but is called when adding sequences together. Each type of 
-    sequence (e.g., Sequence, DNA, RNA) has its own symbols. So you cannot add 
+    Note that there is a :meth:`check` method, which is not called during the
+    instanciation but is called when adding sequences together. Each type of
+    sequence (e.g., Sequence, DNA, RNA) has its own symbols. So you cannot add
     a DNA sequence with a RNA sequence for instance. Those are valid operation::
 
         >>> d1 = Sequence('ACGT')
@@ -29,7 +29,8 @@ class Sequence(object):
         >>> "AAAA" + d1
 
     """
-    def __init__(self, data=''):
+
+    def __init__(self, data=""):
         # initialise before filling _data attribute
         self._checked = False
 
@@ -48,24 +49,28 @@ class Sequence(object):
         self._N = len(self._data)
         self._counter = None
         try:
-            #python2
+            # python2
             self.symbols = string.punctuation + string.letters
         except:
             # python3
             self.symbols = string.punctuation + string.ascii_letters
 
-        self._type = 'Sequence'
+        self._type = "Sequence"
 
     def _looks_like_a_sequence(self, this):
         # if it looks like a sequence, let us assume it is a sequence
-        if hasattr(this, 'symbols') and hasattr(this, '_data') and\
-            hasattr(this, '_checked'):
+        if (
+            hasattr(this, "symbols")
+            and hasattr(this, "_data")
+            and hasattr(this, "_checked")
+        ):
             return True
         else:
             return False
 
     def _get_N(self):
         return self._N
+
     N = property(_get_N)
 
     def __len__(self):
@@ -73,27 +78,31 @@ class Sequence(object):
 
     def _get_sequence(self):
         return self._data[:]
-    sequence = property(_get_sequence,
-            doc="returns a copy of the sequence")
+
+    sequence = property(_get_sequence, doc="returns a copy of the sequence")
 
     def _get_count(self):
         if self._counter is None:
             self._counter = collections.Counter(self._data)
         return self._counter
+
     counter = property(_get_count, doc="return counter of the letters")
 
     def histogram(self):
         pylab.clf()
         import pandas as pd
-        pd.Series(self.counter).plot(kind='bar')
+
+        pd.Series(self.counter).plot(kind="bar")
 
     def pie(self):
         pylab.clf()
         keys = self.counter.keys()
-        labels = dict([(k,float(self.counter[k])/len(self)) for k in keys])
+        labels = dict([(k, float(self.counter[k]) / len(self)) for k in keys])
 
-        pylab.pie([self.counter[k] for k in keys], labels=[k +
-            ':'+str(labels[k]) for k in keys])
+        pylab.pie(
+            [self.counter[k] for k in keys],
+            labels=[k + ":" + str(labels[k]) for k in keys],
+        )
 
     def hamming_distance(self, other):
         """Return hamming distance between this sequence and another sequence
@@ -110,7 +119,7 @@ class Sequence(object):
             7
         """
         # TODO:: convert to appropriate sequence.
-        return sum(1 for x,y in zip(self._data, other._data) if x!=y)
+        return sum(1 for x, y in zip(self._data, other._data) if x != y)
 
     def upper(self):
         """convertes sequence string to uppercase (inplace)"""
@@ -124,20 +133,26 @@ class Sequence(object):
         """checks that characters are valid symbols"""
         for i, x in enumerate(self._data):
             if x not in self.symbols:
-                raise ValueError("found invalid symbol %s at position %s" % (x,i))
+                raise ValueError("found invalid symbol %s at position %s" % (x, i))
         self._checked = True
 
     def __repr__(self):
         if self._N > 10:
-            return "%s: %s ... (length %s) " % (self._type, self.sequence[0:10], 
-                    self._N)
+            return "%s: %s ... (length %s) " % (
+                self._type,
+                self.sequence[0:10],
+                self._N,
+            )
         else:
             return "%s: %s (length %s) " % (self._type, self.sequence, self._N)
 
     def __str__(self):
         if self._N > 10:
-            return "%s: %s ... (length %s) " % (self._type,self.sequence[0:10], 
-                    self._N)
+            return "%s: %s ... (length %s) " % (
+                self._type,
+                self.sequence[0:10],
+                self._N,
+            )
         else:
             return "%s: %s (length %s) " % (self._type, self.sequence, self._N)
 
@@ -160,7 +175,9 @@ class Sequence(object):
         if isinstance(other, Sequence) is False:
             other = self.__convert_to_compat(other)
         elif type(other) != type(self):
-            raise TypeError('incompatible sequences %s versus %s' % (type(other), type(self)))
+            raise TypeError(
+                "incompatible sequences %s versus %s" % (type(other), type(self))
+            )
 
         # now let us add the 2 sequences
         return self.__convert_to_compat(self._data + other._data)
@@ -170,7 +187,9 @@ class Sequence(object):
         if isinstance(other, Sequence) is False:
             other = self.__convert_to_compat(other)
         elif type(other) != type(self):
-            raise TypeError('incompatible sequences %s versus %s' % (type(other), type(self)))
+            raise TypeError(
+                "incompatible sequences %s versus %s" % (type(other), type(self))
+            )
 
         # now let us add the 2 sequences
         return self.__convert_to_compat(other._data + self._data)
@@ -179,7 +198,9 @@ class Sequence(object):
         if isinstance(other, Sequence) is False:
             other = self.__convert_to_compat(other)
         elif type(other) != type(self):
-            raise TypeError('incompatible sequences %s versus %s' % (type(other), type(self)))
+            raise TypeError(
+                "incompatible sequences %s versus %s" % (type(other), type(self))
+            )
 
         # now let us add the 2 sequences
         self._data += other._data
@@ -190,5 +211,5 @@ class Sequence(object):
         if isinstance(other, str):
             return self._data == other
         else:
-            #assume this is a sequence:
+            # assume this is a sequence:
             return self._data == other._data

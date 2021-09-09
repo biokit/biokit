@@ -5,7 +5,7 @@ from biokit.sequence.seq import Sequence
 
 
 class Peptide(Sequence):
-    """a Peptide :class:`~biokit.sequence.seq.Sequence`. 
+    """a Peptide :class:`~biokit.sequence.seq.Sequence`.
 
     You can add Peptide sequences together::
 
@@ -17,11 +17,8 @@ class Peptide(Sequence):
 
     .. note:: redundant with Sequence but may evolve in the future.
     """
+
     def __init__(self, data):
         super(Peptide, self).__init__(data)
-        self.symbols = 'ACGTacgt'
-        self._translate = string.maketrans('ACGTacgt', 'TGCAtgca')
-
-
-
-
+        self.symbols = "ACGTacgt"
+        self._translate = string.maketrans("ACGTacgt", "TGCAtgca")

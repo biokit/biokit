@@ -13,7 +13,7 @@ from biokit import biokitPATH
 import pandas as pd
 
 
-__all__ = ['num2goid', 'GOId', 'GODB', 'GOTerm']
+__all__ = ["num2goid", "GOId", "GODB", "GOTerm"]
 
 
 def num2goid(value):
@@ -43,7 +43,8 @@ class GOId(object):
         'GO:0000005'
 
     """
-    def __init__(self, value):
+
+    def __init__(self, value, verbose=True):
         """converts the numbers into Gene Ontology IDs.
 
         :param list numbers: a list of integer or strings or just a
@@ -53,13 +54,19 @@ class GOId(object):
         IDs are seven-digit numbers preceded by the prefix GO: (Gene Ontology
         database standard).
         """
+        if verbose:
+            print(
+                "Will be deprecated after v0.5 please checkout sequana.readtheodocs.io for an alternative"
+            )
         self._identifier = None
         self.identifier = value
 
     def _get_identifier(self):
         return self._identifier
+
     def _set_identifier(self, identifier):
         self._identifier = self._num2goid(identifier)
+
     identifier = property(_get_identifier, _set_identifier)
 
     def _num2goid(self, value):
@@ -74,8 +81,7 @@ class GOId(object):
         elif isinstance(value, int):
             suffix = value
         else:
-            raise TypeError("value must be a string or an integer. Provided %s"
-                    % value)
+            raise TypeError("value must be a string or an integer. Provided %s" % value)
 
         if suffix < 1e7:
             goId = "GO:%07d" % suffix
@@ -159,19 +165,21 @@ class GOTerm(object):
         from QuickGO, you may get more information about cross references as
         compared to :class:`GODB` that relies on geneontologies.org snapshot.
     """
+
     def __init__(self, text, remove_comments=True):
         if text.startswith("<obo>"):
             raise NotImplementedError("obo XML format, use obo plain text instead")
         elif "id:" in text and "name:" in text:
-            #assume that the text is a OBO formatted text
+            # assume that the text is a OBO formatted text
             self.text = text[:]
         else:
             # Assume the input text is a valid GO identifier
             goid = GOId(text).identifier
             # try to retrieve Term for this GO identifier with QuickGO
             from bioservices import QuickGO
+
             q = QuickGO()
-            text = q.Term(goid, frmt='obo')
+            text = q.Term(goid, frmt="obo")
             self.text = text
         self.remove_comments = remove_comments
 
@@ -196,44 +204,63 @@ class GOTerm(object):
         # Based on http://oboformat.googlecode.com/svn/trunk/doc/GO.format.obo-1_2.html
         # we can clean up the lists converting some of them to
         # single item. We also issue a warning with deprecated ones.
-        lists = ['alt_id', 'synonym', 'is_a', 'xref', 'intersection_of',
-            'relationship', 'union_of', 'disjoint_from', 'consider',
-            'replaced_by', 'subset', 'property_value']
-        nonlist = ['id', 'name', 'is_anonymous', 'is_obsolete', 'def',
-                'comment', 'created_by', 'creation_date', 'namespace']
+        lists = [
+            "alt_id",
+            "synonym",
+            "is_a",
+            "xref",
+            "intersection_of",
+            "relationship",
+            "union_of",
+            "disjoint_from",
+            "consider",
+            "replaced_by",
+            "subset",
+            "property_value",
+        ]
+        nonlist = [
+            "id",
+            "name",
+            "is_anonymous",
+            "is_obsolete",
+            "def",
+            "comment",
+            "created_by",
+            "creation_date",
+            "namespace",
+        ]
         deprecated = {
-                'exact_synonym': 'synonym',
-                'narrow_synonym':'synonym',
-                'broad_synonym': 'synonym',
-                'xref_analog': 'xref',
-                'xref_unk': 'xref',
-                'use_term': 'consider'
-                }
+            "exact_synonym": "synonym",
+            "narrow_synonym": "synonym",
+            "broad_synonym": "synonym",
+            "xref_analog": "xref",
+            "xref_unk": "xref",
+            "use_term": "consider",
+        }
         # missing: namespace, subset,
         dd = {}
         for k, v in d.items():
-            if k in lists: # nothing to do
+            if k in lists:  # nothing to do
                 dd[k] = v
             elif k in nonlist:
                 if len(v) == 1:
                     dd[k] = v[0]
                 else:
-                    raise ValueError("%s must be found only once. Check %s" %
-                            (k, d['id']))
+                    raise ValueError(
+                        "%s must be found only once. Check %s" % (k, d["id"])
+                    )
             elif k in deprecated.keys():
-                print("%s deprecated. Kept and assuming non unique tag" %
-                        (k, d['id']))
+                print("%s deprecated. Kept and assuming non unique tag" % (k, d["id"]))
                 dd[k] = v
             else:
-                print("%s not handled in %s. Assuming non unique tag" %
-                    (k, d['id']))
+                print("%s not handled in %s. Assuming non unique tag" % (k, d["id"]))
                 dd[k] = v
         if self.remove_comments is True:
             dd = self._remove_comments(dd)
 
         # IN OBO/GO format, id and name must be provided
         # others are optional
-        if 'id' not in dd.keys() and 'name' not in dd.keys():
+        if "id" not in dd.keys() and "name" not in dd.keys():
             raise ValueError("'id' tag and 'name' must be provided")
 
         return dd
@@ -255,7 +282,8 @@ class GODB(object):
 
     .. seealso:: bioservices QuickGO class
     """
-    def __init__(self, name='go.obo', drop_obsolet=True, local=False):
+
+    def __init__(self, name="go.obo", drop_obsolet=True, local=False):
         """
 
         Searches for a file on geneontology.org exce
@@ -266,7 +294,7 @@ class GODB(object):
            from geneontology.org if not present in the biokit
            directory.
         """
-        self.name = 'go.obo'
+        self.name = "go.obo"
         if local is False:
             self.filename = biokitPATH + os.sep + self.name
         else:
@@ -274,15 +302,17 @@ class GODB(object):
         self._init()
 
         if drop_obsolet is True:
-           self.df = self.df[self.df.is_obsolete != True]
-           self.df.pop('is_obsolete')
+            self.df = self.df[self.df.is_obsolete != True]
+            self.df.pop("is_obsolete")
 
         # split relationships
 
-        self.mapping = {'id': 'GO id',
-                'namespace': 'Ontology',
-                'name': 'Term',
-                'def': 'Definition'}
+        self.mapping = {
+            "id": "GO id",
+            "namespace": "Ontology",
+            "name": "Term",
+            "def": "Definition",
+        }
         # TODO: split relationshio into has_part and part_of
 
     def _init(self):
@@ -295,8 +325,9 @@ class GODB(object):
 
     def _download_godb(self):
         print("Downloading go db once for all")
-        urllib.urlretrieve ("http://geneontology.org/ontology/%s" % self.name,
-             self.filename)
+        urllib.urlretrieve(
+            "http://geneontology.org/ontology/%s" % self.name, self.filename
+        )
 
     def read_goterms(self):
         # lines starting with ! can be ignored
@@ -312,9 +343,9 @@ class GODB(object):
     def _terms2df(self):
         terms = [self._term2dict(term) for term in self.obo_terms]
         df = pd.DataFrame(terms)
-        df.replace('true', True, inplace=True)
-        df.replace('false', False, inplace=True)
-        df.set_index('id', inplace=True)
+        df.replace("true", True, inplace=True)
+        df.replace("false", False, inplace=True)
+        df.set_index("id", inplace=True)
         return df
 
     def __len__(self):
@@ -323,17 +354,16 @@ class GODB(object):
     def get_annotations(self):
         # replace some columns
         df = self.df.copy()
-        df = df[['namespace', 'name', 'synonym', 'def', 'relationship']]
-        df.columns = ["Ontology", "Term", "Synonym", "Definition",
-                "relationship"]
+        df = df[["namespace", "name", "synonym", "def", "relationship"]]
+        df.columns = ["Ontology", "Term", "Synonym", "Definition", "relationship"]
         return df
 
-    def search(self, search, where='name', method='in'):
-        if method == 'in':
+    def search(self, search, where="name", method="in"):
+        if method == "in":
             selection = self.df[where].apply(lambda x: search in x)
-        elif method == 'is':
+        elif method == "is":
             selection = self.df[where].apply(lambda x: search == x)
-        elif method == 'startswith':
+        elif method == "startswith":
             selection = self.df[where].apply(lambda x: x.startswith(search))
         return self.df[selection].copy()
 
@@ -351,16 +381,15 @@ class GODB(object):
     # always has B as a part, i.e. where A necessarily has part B. If A exists,
     # B will always exist; however, if B exists, we cannot say for certain that
     # A exists. i.e. all A have part B; some B part of A.
-    def get_children(self, ontology='CC',
-            relations=['is_a', 'part_of', 'has_part']):
+    def get_children(self, ontology="CC", relations=["is_a", "part_of", "has_part"]):
         """http://geneontology.org/page/ontology-relations"""
 
-        if ontology in ['CC', 'cellular_component']:
-            ontology = 'cellular_component'
-        elif ontology in ['BP', 'biological_process']:
-            ontology = 'biological_process'
-        elif ontology in ['MF', 'molecular_function']:
-            ontology = 'molecular_function'
+        if ontology in ["CC", "cellular_component"]:
+            ontology = "cellular_component"
+        elif ontology in ["BP", "biological_process"]:
+            ontology = "biological_process"
+        elif ontology in ["MF", "molecular_function"]:
+            ontology = "molecular_function"
         else:
             raise ValueError("ontology must be one of %s" % set(self.df.namespace))
 
@@ -371,32 +400,33 @@ class GODB(object):
         vrelations = []
         # this part is slow and maybe improved.
         for name, row in newdf.iterrows():
-            if str(row.is_a) == 'nan':
+            if str(row.is_a) == "nan":
                 pass
-            elif 'is_a' in relations:
+            elif "is_a" in relations:
                 for this in row.is_a:
                     children.append(name)
                     parents.append(this)
-                    vrelations.append('is_a')
-            if str(row.relationship) == 'nan':
+                    vrelations.append("is_a")
+            if str(row.relationship) == "nan":
                 pass
             else:
                 for this in row.relationship:
                     relation, goid = this.split()
-                    if relation == 'part_of' and relation in relations:
+                    if relation == "part_of" and relation in relations:
                         children.append(name)
                         parents.append(goid)
                         vrelations.append(relation)
-                    elif relation == 'has_part' and relation in relations:
+                    elif relation == "has_part" and relation in relations:
                         # not that children/parent are swapped as compared
                         # to the part_of relation.
                         children.append(goid)
                         parents.append(name)
                         vrelations.append(relation)
 
-        df = pd.DataFrame({'Child':children, 'Parent':parents,
-            'Relation':vrelations})
-        df.sort('Relation', inplace=True, ascending=False)
+        df = pd.DataFrame(
+            {"Child": children, "Parent": parents, "Relation": vrelations}
+        )
+        df.sort("Relation", inplace=True, ascending=False)
         return df
 
     def get_offspring(self):
@@ -419,8 +449,12 @@ class GODB(object):
     def _compute_transitive_closure(self, df):
         """Computes the transitive closure from a two-col parent/child map."""
         df_temp = df[df["Parent"].isin(df["Offspring"])]
-        df2 = df.merge(df_temp, left_on="Offspring", right_on="Parent",
-            suffixes=["_1_gen", "_2_gen"])
+        df2 = df.merge(
+            df_temp,
+            left_on="Offspring",
+            right_on="Parent",
+            suffixes=["_1_gen", "_2_gen"],
+        )
         df2 = df2.drop(["Offspring_1_gen", "Parent_2_gen"], axis=1)
         df2.columns = ["Parent", "Offspring"]
         concat_df = pd.concat([df, df2]).drop_duplicates()

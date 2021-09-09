@@ -33,7 +33,3 @@ def rcode(code, verbose=True):
     r = RSession(verbose=verbose)
     r.run(code)
     return r
-
-
-
-

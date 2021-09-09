@@ -10,8 +10,8 @@ General Bioinformatics tools in Python
 .. image:: https://img.shields.io/pypi/pyversions/biokit.svg
     :target: https://www.python.org
 
-.. image:: https://secure.travis-ci.org/biokit/biokit.png
-    :target: http://travis-ci.org/biokit/biokit
+.. image:: https://github.com/biokit/biokit/actions/workflows/ci.yml/badge.svg
+    :target: https://github.com/biokit/biokit/actions/workflows/ci.yml
 
 .. image:: https://coveralls.io/repos/biokit/biokit/badge.png?branch=master 
    :target: https://coveralls.io/r/biokit/biokit?branch=master 
@@ -22,7 +22,7 @@ General Bioinformatics tools in Python
 
 
 
-:note: BioKit is tested with Travis for the following Python version: 2.7, 3.5, 3.6
+:note: BioKit is tested with Travis for the following Python version: 3.7, 3.8, 3.9
 
 :contributions: Please join https://github.com/biokit/biokit 
 :issues: Please use https://github.com/biokit/biokit/issues
@@ -42,7 +42,7 @@ analysis (mixture model), some tools to access to Taxon and GO identifier, some 
 **WARNING**: This package is maintained and used in production but its
 contents are moving slowly to another project called sequana
 (sequana.readthedocs.io) (.e.g mixture model from biokit.stats and biokit.viz
-will most probably be moved in the current of 2020).
+will most probably be moved in the current of 2021-2022).
 
 Installation
 ==============

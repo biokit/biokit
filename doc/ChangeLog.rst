@@ -1,6 +1,17 @@
 Whats' new, what has changed
 ================================
 
+:Revision 0.5.0:
+
+   * Remove the io/ package (FASTA/FASTQ classes) and sequence/benchmark.py
+     module. Dedicates packages such as Sequana are more complete class to
+     handle such data
+
+   * Planning to remove the genomic modules in sequence/
+   * Fix the rtools package to be compatible with newest pandas version
+   * add github CI action 
+
+
 :Revision 0.4.5:
 
     * BUG: fix iuapc module syntax

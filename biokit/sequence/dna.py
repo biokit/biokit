@@ -22,11 +22,11 @@ except:
 from biokit.sequence.seq import Sequence
 
 
-__all__ = ['DNA']
+__all__ = ["DNA"]
 
 
 class DNA(Sequence):
-    """a DNA :class:`~biokit.sequence.seq.Sequence`. 
+    """a DNA :class:`~biokit.sequence.seq.Sequence`.
 
     You can add DNA sequences together::
 
@@ -38,38 +38,41 @@ class DNA(Sequence):
 
 
     """
-    def __init__(self, data=''):
+
+    def __init__(self, data=""):
         super(DNA, self).__init__(data)
-        self.symbols = 'ACGTacgt'
+        self.symbols = "ACGTacgt"
         try:
-            self._translate = string.maketrans('ACGTacgt', 'TGCAtgca')
+            self._translate = string.maketrans("ACGTacgt", "TGCAtgca")
         except:
-            self._translate = bytes.maketrans(b'ACGTacgt', b'TGCAtgca')
-        self._type = 'DNA'
+            self._translate = bytes.maketrans(b"ACGTacgt", b"TGCAtgca")
+        self._type = "DNA"
 
     def get_complement(self):
         compl = self._data.translate(self._translate)
         return DNA(compl)
+
     complement = property(get_complement)
 
     def get_reverse_complement(self):
         complement = self.get_complement()
         return DNA(complement._data[::-1])
+
     reverse_complement = property(get_reverse_complement)
-    
-    #def _get_complement_in_c(self):
+
+    # def _get_complement_in_c(self):
     #    return cseqkit.dna_complement(self.sequence, len(self.sequence))
-    #complement2 = property(_get_complement_in_c)
+    # complement2 = property(_get_complement_in_c)
     #
-    #def get_complement_c(self):
+    # def get_complement_c(self):
     #    print("Experimetal. Not faster than Python...")
     #    return cseqkit.dna_complement(self._data, self._N)
 
-    def gc_content(self, letters='CGS'):
+    def gc_content(self, letters="CGS"):
         """Returns the G+C content in percentage.
 
         Copes mixed case sequences, and with the ambiguous nucleotide S (G or C)
-        when counting the G and C content.  
+        when counting the G and C content.
 
         ::
 
@@ -78,25 +81,21 @@ class DNA(Sequence):
             >>> d.gc_content()
             0.375
 
-        
+
         """
         if len(self) == 0:
-            denom = 1.
+            denom = 1.0
         else:
             denom = float(self._N)
         letters = [x.upper() for x in letters] + [x.lower() for x in letters]
         letters = list(set(letters))
         counter = sum(self._data.count(x) for x in letters)
-        return 100. * counter / denom
+        return 100.0 * counter / denom
 
     def get_rna(self):
         from biokit.sequence.rna import RNA
+
         # here a copy is made
-        seq = self._data.replace('T', 'U')
-        seq = seq.replace('t', 'u')
+        seq = self._data.replace("T", "U")
+        seq = seq.replace("t", "u")
         return RNA(seq)
-
-
-
-
-
